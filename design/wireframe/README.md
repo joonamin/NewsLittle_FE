@@ -1,6 +1,6 @@
 # Mid-fi wireframe mapping
 
-[`mid-fi.pen`](./mid-fi.pen)은 전체 서비스의 현재 중간 충실도 와이어프레임 원본이다. 화면 설계가 고도화되면 각 화면의 pen 파일을 이 디렉터리에 분리한다.
+[`wireframe.pen`](./wireframe.pen)은 전체 서비스의 현재 mid-fi 와이어프레임 원본이다. 화면 설계를 고도화하고, 고도화된 결과물을 디렉토리 별로 생성한다.
 
 | Wireframe frame | Pages Router file | URL |
 | --- | --- | --- |
