@@ -29,8 +29,6 @@ export const Standard: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.ownerDocument.body);
     await expect(canvas.getByRole("dialog")).toBeVisible();
-    await userEvent.click(canvas.getByRole("button", { name: "닫기" }));
-    await expect(canvas.queryByRole("dialog")).not.toBeInTheDocument();
   },
 };
 
@@ -40,5 +38,15 @@ export const Compact: Story = {
     size: "compact",
     title: "정말 삭제할까요?",
     onConfirm: fn(),
+  },
+};
+
+export const CloseInteraction: Story = {
+  render: (args) => <ModalDemo {...args} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement.ownerDocument.body);
+    await expect(canvas.getByRole("dialog")).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "닫기" }));
+    await expect(canvas.queryByRole("dialog")).not.toBeInTheDocument();
   },
 };
