@@ -1,0 +1,1300 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "CcnfU",
+      "x": 0,
+      "y": 240,
+      "name": "SCR-04 숏폼 문제 풀이 / 선택형 응답 전",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zF1vL5H",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 숏폼 문제 풀이 / 선택형 응답 전 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "rKWfr",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "sPafx",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "AGklT",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "id": "F60hK",
+              "type": "ref",
+              "ref": "newslittle:X1rDs1",
+              "name": "진행",
+              "descendants": {
+                "newslittle:dzcau": {
+                  "content": "오늘 목록 · OX·객관식"
+                },
+                "newslittle:ABXC9": {
+                  "content": "01 / 03"
+                }
+              }
+            },
+            {
+              "id": "AMs2j",
+              "type": "ref",
+              "ref": "newslittle:te9hx",
+              "name": "진행 막대"
+            },
+            {
+              "id": "lWB75",
+              "type": "ref",
+              "ref": "newslittle:wsCoz",
+              "name": "문제 및 답변",
+              "descendants": {
+                "newslittle:KkQjG": {
+                  "content": "기사 01 · 도심의 열을 낮추는 나무, 그늘 이상의 역할"
+                },
+                "newslittle:tyASv": {
+                  "content": "나무는 그늘을 만드는 것 외에도 수분을 내보내 주변 온도를 낮춘다."
+                },
+                "newslittle:qqAQg": {
+                  "content": "기사 기준 2026.09.14 · 맞으면 O, 틀리면 X를 골라주세요."
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "Y66iXS",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "uf4gn",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "RUeDA",
+      "x": 1680,
+      "y": 240,
+      "name": "SCR-04 주관식형 / 빈 답변",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zVHEhjL",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 주관식형 / 빈 답변 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "B2nBr0",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "TIffd",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "h9F0gm",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "id": "sa6LR",
+              "type": "ref",
+              "ref": "newslittle:X1rDs1",
+              "name": "진행",
+              "descendants": {
+                "newslittle:dzcau": {
+                  "content": "숏폼 퀴즈 · 주관식형 · 사실형"
+                },
+                "newslittle:ABXC9": {
+                  "content": "01 / 03"
+                }
+              }
+            },
+            {
+              "id": "k8hku",
+              "type": "ref",
+              "ref": "newslittle:te9hx",
+              "name": "진행 막대"
+            },
+            {
+              "id": "WaZVy",
+              "type": "ref",
+              "ref": "newslittle:DYM2J",
+              "name": "문제 및 답변",
+              "descendants": {
+                "newslittle:oqnO6": {
+                  "content": "기사 01 · 도심의 열을 낮추는 나무, 그늘 이상의 역할"
+                },
+                "newslittle:aDzCT": {
+                  "content": "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?"
+                },
+                "newslittle:K4j2As": {
+                  "content": "기사 기준 2026.09.14 · 핵심 개념을 짧게 입력해 주세요."
+                },
+                "newslittle:Saofy": {
+                  "theme": {
+                    "newslittle:btn-state": "disabled"
+                  }
+                },
+                "newslittle:Saofy/yZaSP": {
+                  "content": "답변 제출 · 비활성"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "jvl84",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "Ls7fa",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "m4pgt",
+      "x": 3360,
+      "y": 240,
+      "name": "SCR-04 주관식형 / 판정 중",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zJc9wnO",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 주관식형 / 판정 중 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "sgmpt",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "r9n6VL",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "UUCga",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "id": "zNDLI",
+              "type": "ref",
+              "ref": "newslittle:X1rDs1",
+              "name": "진행",
+              "descendants": {
+                "newslittle:dzcau": {
+                  "content": "숏폼 퀴즈 · 주관식형 · 사실형"
+                },
+                "newslittle:ABXC9": {
+                  "content": "01 / 03"
+                }
+              }
+            },
+            {
+              "id": "N3bBp",
+              "type": "ref",
+              "ref": "newslittle:te9hx",
+              "name": "진행 막대"
+            },
+            {
+              "id": "ChbGi",
+              "type": "ref",
+              "ref": "newslittle:DYM2J",
+              "name": "문제 및 답변",
+              "descendants": {
+                "newslittle:oqnO6": {
+                  "content": "기사 01 · 도심의 열을 낮추는 나무, 그늘 이상의 역할"
+                },
+                "newslittle:aDzCT": {
+                  "content": "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?"
+                },
+                "newslittle:K4j2As": {
+                  "content": "기사 기준 2026.09.14 · 핵심 개념을 짧게 입력해 주세요."
+                },
+                "newslittle:QCWI6": {
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1
+                },
+                "newslittle:d60Cge": {
+                  "content": "증산",
+                  "fill": "$newslittle:nl-text"
+                },
+                "newslittle:Saofy": {
+                  "theme": {
+                    "newslittle:btn-state": "disabled"
+                  }
+                },
+                "newslittle:Saofy/yZaSP": {
+                  "content": "판정 중…"
+                },
+                "newslittle:n6iMA": {
+                  "enabled": false
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "zA2P6",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "LH9f0",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "zHrcg",
+      "x": 5040,
+      "y": 240,
+      "name": "SCR-04 주관식형 / 1차 힌트",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "z9EbqBM",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 주관식형 / 오답 후 1차 힌트 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "L2mYES",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "nhyvt",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "XQVfi",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "id": "tC8cc",
+              "type": "ref",
+              "ref": "newslittle:X1rDs1",
+              "name": "진행",
+              "descendants": {
+                "newslittle:dzcau": {
+                  "content": "숏폼 퀴즈 · 주관식형 · 사실형"
+                },
+                "newslittle:ABXC9": {
+                  "content": "01 / 03"
+                }
+              }
+            },
+            {
+              "id": "w1oNN",
+              "type": "ref",
+              "ref": "newslittle:te9hx",
+              "name": "진행 막대"
+            },
+            {
+              "id": "ChLGO",
+              "type": "ref",
+              "ref": "newslittle:DYM2J",
+              "name": "문제 및 답변",
+              "descendants": {
+                "newslittle:oqnO6": {
+                  "content": "기사 01 · 도심의 열을 낮추는 나무, 그늘 이상의 역할"
+                },
+                "newslittle:aDzCT": {
+                  "content": "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?"
+                },
+                "newslittle:K4j2As": {
+                  "content": "기사 기준 2026.09.14 · 핵심 개념을 짧게 입력해 주세요."
+                },
+                "newslittle:QCWI6": {
+                  "stroke": "$newslittle:nl-accent",
+                  "strokeWidth": 2
+                },
+                "newslittle:d60Cge": {
+                  "content": "광합성",
+                  "fill": "$newslittle:nl-text"
+                },
+                "newslittle:Yze7d": {
+                  "enabled": true
+                },
+                "newslittle:Yze7d/M7HcH": {
+                  "content": "아직 정답이 아니에요 · 1차 힌트"
+                },
+                "newslittle:Yze7d/EUJmo": {
+                  "content": "양분을 만드는 과정이 아니라, 잎에서 물이 빠져나가는 과정을 떠올려보세요."
+                },
+                "newslittle:Saofy/yZaSP": {
+                  "content": "다시 제출"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "e3Vyt",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "F72qt",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "j0rauR",
+      "x": 6720,
+      "y": 240,
+      "name": "SCR-04 주관식형 / 2차 힌트",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zzZ4utR",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 주관식형 / 오답 후 2차 힌트 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "mz0vt",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "X2FH4",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "v78gdZ",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "id": "KUGBD",
+              "type": "ref",
+              "ref": "newslittle:X1rDs1",
+              "name": "진행",
+              "descendants": {
+                "newslittle:dzcau": {
+                  "content": "숏폼 퀴즈 · 주관식형 · 사실형"
+                },
+                "newslittle:ABXC9": {
+                  "content": "01 / 03"
+                }
+              }
+            },
+            {
+              "id": "UWZEb",
+              "type": "ref",
+              "ref": "newslittle:te9hx",
+              "name": "진행 막대"
+            },
+            {
+              "id": "EPhId",
+              "type": "ref",
+              "ref": "newslittle:DYM2J",
+              "name": "문제 및 답변",
+              "descendants": {
+                "newslittle:oqnO6": {
+                  "content": "기사 01 · 도심의 열을 낮추는 나무, 그늘 이상의 역할"
+                },
+                "newslittle:aDzCT": {
+                  "content": "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?"
+                },
+                "newslittle:K4j2As": {
+                  "content": "기사 기준 2026.09.14 · 핵심 개념을 짧게 입력해 주세요."
+                },
+                "newslittle:QCWI6": {
+                  "stroke": "$newslittle:nl-accent",
+                  "strokeWidth": 2
+                },
+                "newslittle:d60Cge": {
+                  "content": "수분 배출",
+                  "fill": "$newslittle:nl-text"
+                },
+                "newslittle:Yze7d": {
+                  "enabled": true
+                },
+                "newslittle:Yze7d/M7HcH": {
+                  "content": "아직 정답이 아니에요 · 2차 힌트"
+                },
+                "newslittle:Yze7d/EUJmo": {
+                  "content": "핵심 개념은 '증산'으로 시작해요. 다시 답하거나 포기할 수 있어요."
+                },
+                "newslittle:Saofy/yZaSP": {
+                  "content": "다시 제출"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "DrUVv",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "l9PJ0r",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "J40qom",
+      "x": 8400,
+      "y": 240,
+      "name": "SCR-04 주관식형 / 판정 미완료",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zBtdD5R",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 주관식형 / 판정 미완료 · 10초 초과 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "e4Wk3",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "mrh5E",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "Fg2G8",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "id": "o7Xb7x",
+              "type": "ref",
+              "ref": "newslittle:X1rDs1",
+              "name": "진행",
+              "descendants": {
+                "newslittle:dzcau": {
+                  "content": "숏폼 퀴즈 · 주관식형 · 사실형"
+                },
+                "newslittle:ABXC9": {
+                  "content": "01 / 03"
+                }
+              }
+            },
+            {
+              "id": "AkyWR",
+              "type": "ref",
+              "ref": "newslittle:te9hx",
+              "name": "진행 막대"
+            },
+            {
+              "id": "vd1WW",
+              "type": "ref",
+              "ref": "newslittle:DYM2J",
+              "name": "문제 및 답변",
+              "descendants": {
+                "newslittle:oqnO6": {
+                  "content": "기사 01 · 도심의 열을 낮추는 나무, 그늘 이상의 역할"
+                },
+                "newslittle:aDzCT": {
+                  "content": "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?"
+                },
+                "newslittle:K4j2As": {
+                  "content": "기사 기준 2026.09.14 · 핵심 개념을 짧게 입력해 주세요."
+                },
+                "newslittle:QCWI6": {
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1
+                },
+                "newslittle:d60Cge": {
+                  "content": "증산",
+                  "fill": "$newslittle:nl-text"
+                },
+                "newslittle:Q9kXnA": {
+                  "enabled": true
+                },
+                "newslittle:uoEyG": {
+                  "enabled": false
+                },
+                "newslittle:B8xuxE": {
+                  "enabled": true
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "ME2SM",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "MZXf8",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Hu9gL",
+      "x": 10080,
+      "y": 240,
+      "name": "SCR-04 주관식형 / 문항 서비스 제외",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zB1gfkB",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 주관식형 / 문항 서비스 제외 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "TdsVb",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "tEn7M",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "X7oUNh",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "id": "dhCsN",
+              "type": "ref",
+              "ref": "newslittle:X1rDs1",
+              "name": "진행",
+              "descendants": {
+                "newslittle:dzcau": {
+                  "content": "숏폼 퀴즈 · 주관식형 · 사실형"
+                },
+                "newslittle:ABXC9": {
+                  "content": "01 / 03"
+                }
+              }
+            },
+            {
+              "id": "mGKCA",
+              "type": "ref",
+              "ref": "newslittle:te9hx",
+              "name": "진행 막대"
+            },
+            {
+              "id": "mrQMG",
+              "type": "ref",
+              "ref": "newslittle:DYM2J",
+              "name": "문제 및 답변",
+              "descendants": {
+                "newslittle:oqnO6": {
+                  "content": "기사 01 · 도심의 열을 낮추는 나무, 그늘 이상의 역할"
+                },
+                "newslittle:aDzCT": {
+                  "content": "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?"
+                },
+                "newslittle:K4j2As": {
+                  "content": "기사 기준 2026.09.14 · 핵심 개념을 짧게 입력해 주세요."
+                },
+                "newslittle:QCWI6": {
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1
+                },
+                "newslittle:d60Cge": {
+                  "content": "증산",
+                  "fill": "$newslittle:nl-text"
+                },
+                "newslittle:smEct": {
+                  "enabled": true
+                },
+                "newslittle:uoEyG": {
+                  "enabled": false
+                },
+                "newslittle:h6h9C": {
+                  "enabled": true
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "QEoN2",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "q2acX",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "RpkEL",
+      "x": 11760,
+      "y": 240,
+      "name": "SCR-04 주관식형 / 서비스 사유 종료",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zGsbVlQ",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 주관식형 / 서비스 사유 종료 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "SfS7v",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "d8J07",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "ueFBf",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "f5PtFY",
+              "name": "서비스 사유 종료",
+              "width": "fill_container",
+              "fill": "$newslittle:nl-bg",
+              "cornerRadius": 12,
+              "stroke": "$newslittle:nl-border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 16,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "iCPx6",
+                  "name": "종료 헤더",
+                  "fill": "$newslittle:nl-accent",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "서비스 사유 종료",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 20,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "t8EXJJ",
+                  "name": "종료 본문",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "유효 문항이 0개여서 종료했어요. 완료·오답으로 집계하지 않아요.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "id": "zFjfkrw",
+                  "type": "ref",
+                  "ref": "newslittle:Rd5Tc",
+                  "theme": {
+                    "newslittle:btn-variant": "primary",
+                    "newslittle:btn-size": "s",
+                    "newslittle:btn-state": "enabled"
+                  },
+                  "descendants": {
+                    "yZaSP": {
+                      "content": "홈으로"
+                    }
+                  },
+                  "width": "fill_container",
+                  "name": "홈으로"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "yRXLC",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "WPxhU",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "WuTB1",
+      "x": 13440,
+      "y": 240,
+      "name": "SCR-04 주관식형 / 해설 공개",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zEis0Kt",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-04 주관식형 / 포기 후 해설 공개 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "B7RowV",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "p1iMDA",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "yw3sm",
+              "name": "숏폼 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "숏폼 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "id": "O87dB3",
+              "type": "ref",
+              "ref": "newslittle:X1rDs1",
+              "name": "진행",
+              "descendants": {
+                "newslittle:dzcau": {
+                  "content": "숏폼 퀴즈 · 주관식형 · 사실형"
+                },
+                "newslittle:ABXC9": {
+                  "content": "01 / 03"
+                }
+              }
+            },
+            {
+              "id": "t8Prvn",
+              "type": "ref",
+              "ref": "newslittle:te9hx",
+              "name": "진행 막대"
+            },
+            {
+              "id": "D5c4Qz",
+              "type": "ref",
+              "ref": "newslittle:DYM2J",
+              "name": "문제 및 답변",
+              "descendants": {
+                "newslittle:oqnO6": {
+                  "content": "기사 01 · 도심의 열을 낮추는 나무, 그늘 이상의 역할"
+                },
+                "newslittle:aDzCT": {
+                  "content": "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?"
+                },
+                "newslittle:K4j2As": {
+                  "content": "기사 기준 2026.09.14 · 핵심 개념을 짧게 입력해 주세요."
+                },
+                "newslittle:QCWI6": {
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1
+                },
+                "newslittle:d60Cge": {
+                  "content": "수분 배출",
+                  "fill": "$newslittle:nl-text"
+                },
+                "newslittle:Vs2wP": {
+                  "enabled": true
+                },
+                "newslittle:uoEyG": {
+                  "enabled": false
+                },
+                "newslittle:h6h9C": {
+                  "enabled": true
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "F3b45c",
+              "name": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "시간 제한은 없어요. 이동·새로고침 시 확인 후 회차가 중도 종료돼요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "OoUjC",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "f5a6a119-0afa-47dd-b04f-f8517008e2c1"
+}

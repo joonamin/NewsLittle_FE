@@ -1,0 +1,522 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "T9KGg",
+      "x": 0,
+      "y": 240,
+      "name": "ADM-02 이용 근거·상태",
+      "clip": true,
+      "width": 1440,
+      "height": 1140,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zo0jc",
+          "type": "ref",
+          "ref": "newslittle:Vdadc",
+          "name": "관리자 주 내비게이션"
+        },
+        {
+          "type": "frame",
+          "id": "O8oJh",
+          "name": "운영 레이아웃",
+          "width": "fill_container",
+          "height": "fill_container",
+          "children": [
+            {
+              "id": "Q0x9ri",
+              "type": "ref",
+              "ref": "newslittle:S5ny8w",
+              "name": "운영 메뉴",
+              "height": "fill_container",
+              "descendants": {
+                "newslittle:A5IIx": {
+                  "fill": "#F0F0FA",
+                  "cornerRadius": 8
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "r9BC9t",
+              "name": "운영 본문",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "aPt9X",
+                  "name": "ADM-02 이용 근거·상태",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "ADM-02 이용 근거·상태",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 28,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "s1rorM",
+                  "name": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "bQEPf",
+                  "name": "필터",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "z8DJKKH",
+                      "type": "ref",
+                      "ref": "newslittle:gBhCc",
+                      "descendants": {
+                        "C1iyX": {
+                          "content": "상태: 전체 ▾"
+                        }
+                      },
+                      "name": "상태: 검토 대기 ▾"
+                    },
+                    {
+                      "id": "zD7jfJV",
+                      "type": "ref",
+                      "ref": "newslittle:gBhCc",
+                      "descendants": {
+                        "C1iyX": {
+                          "content": "대상: 전체 ▾"
+                        }
+                      },
+                      "name": "대상: 전체 ▾"
+                    },
+                    {
+                      "id": "zYKC9ED",
+                      "type": "ref",
+                      "ref": "newslittle:Rd5Tc",
+                      "theme": {
+                        "newslittle:btn-variant": "primary",
+                        "newslittle:btn-size": "xs",
+                        "newslittle:btn-state": "enabled"
+                      },
+                      "descendants": {
+                        "yZaSP": {
+                          "content": "+ 이용 근거 등록"
+                        }
+                      },
+                      "name": "+ 이용 근거 등록"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "CrW48",
+                  "name": "데이터 목록",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "id": "zDmdkBs",
+                      "type": "ref",
+                      "ref": "newslittle:h46F8",
+                      "descendants": {
+                        "pB8R7": {
+                          "content": "출처 / 대상"
+                        },
+                        "ct0H4": {
+                          "content": "근거 종류"
+                        },
+                        "LyoXE": {
+                          "content": "상태"
+                        },
+                        "ADtbS": {
+                          "content": "이용 기간"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "열 제목",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zGl6Sot",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "리틀데일리 / 메타데이터"
+                        },
+                        "qOHjO": {
+                          "content": "계약·라이선스"
+                        },
+                        "FkEoq": {
+                          "content": "조건부 사용 가능"
+                        },
+                        "ia0ZY": {
+                          "content": "09.01–09.30"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 1",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zGQq69c",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "시사랩 / 이미지"
+                        },
+                        "qOHjO": {
+                          "content": "개별 공정이용 검토"
+                        },
+                        "FkEoq": {
+                          "content": "검토 대기"
+                        },
+                        "ia0ZY": {
+                          "content": "미확정"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 2",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wbX6O",
+                  "name": "근거 상세 LIC-004",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-bg",
+                  "cornerRadius": 12,
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "xz4EL",
+                      "name": "LIC-004 · 메타데이터 이용 근거",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "LIC-004 · 메타데이터 이용 근거",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "axiIJ",
+                      "name": "근거 필드",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "M21Ot1",
+                          "name": "계약 정보",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 16,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "gh6qj",
+                              "name": "적용 대상",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "적용 대상",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "id": "zrh5bP7",
+                              "type": "ref",
+                              "ref": "newslittle:Iy0mI",
+                              "descendants": {
+                                "jZtN9": {
+                                  "content": "리틀데일리 / 기사 제목·매체·게시일·링크"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "적용 대상"
+                            },
+                            {
+                              "type": "text",
+                              "id": "Jfv8B",
+                              "name": "근거 문서·버전",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "근거 문서·버전",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "id": "zcbH1hN",
+                              "type": "ref",
+                              "ref": "newslittle:Iy0mI",
+                              "descendants": {
+                                "jZtN9": {
+                                  "content": "license-004.pdf · v2 · 문서 열기 ↗"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "근거 문서·버전"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "cdsJq",
+                          "name": "승인 정보",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 16,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "c33486",
+                              "name": "검토자·검토일",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "검토자·검토일",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "id": "zqQaRxw",
+                              "type": "ref",
+                              "ref": "newslittle:Iy0mI",
+                              "descendants": {
+                                "jZtN9": {
+                                  "content": "검토자 A · 2026.09.13"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "검토자·검토일"
+                            },
+                            {
+                              "type": "text",
+                              "id": "P0THH",
+                              "name": "서비스 책임자 사용 결정",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "서비스 책임자 사용 결정",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "id": "zm3S1Fy",
+                              "type": "ref",
+                              "ref": "newslittle:Iy0mI",
+                              "descendants": {
+                                "jZtN9": {
+                                  "content": "승인자: 현재 실행 계정 · 자동 기록"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "서비스 책임자 사용 결정"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "fT16X",
+                      "name": "허용 범위",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "허용 범위",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "PTbcn",
+                      "name": "☑ 수집   ☑ 저장   ☐ 외부 AI 전송   ☐ 생성   ☑ 노출  ",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "☑ 수집   ☑ 저장   ☐ 외부 AI 전송   ☐ 생성   ☑ 노출   ☑ 보관",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "kgQYu",
+                      "name": "표시 의무: 매체명·게시일·원문 링크 / 더 좁은 개별 자산 조건 우선",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "표시 의무: 매체명·게시일·원문 링크 / 더 좁은 개별 자산 조건 우선",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "m4jLjf",
+                      "name": "상태 전환 사유 · 필수",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "상태 전환 사유 · 필수",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "id": "z8v9wbK",
+                      "type": "ref",
+                      "ref": "newslittle:Iy0mI",
+                      "descendants": {
+                        "jZtN9": {
+                          "content": "검토 결과 및 사용 조건을 입력하세요."
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "상태 전환 사유 · 필수"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ShWDh",
+                      "name": "근거 동작",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "zdRuIrD",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "primary",
+                            "newslittle:btn-size": "xs",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "조건부 사용 승인"
+                            }
+                          },
+                          "name": "조건부 사용 승인"
+                        },
+                        {
+                          "id": "z4UqZwZ",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "xs",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "사용 중단"
+                            }
+                          },
+                          "name": "사용 중단"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "kA1Te",
+                      "name": "실행 직전 재인증 · 문서 누락 시 승인 불가 · 검토 대기 자산은 모든",
+                      "fill": "$newslittle:nl-negative",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "실행 직전 재인증 · 문서 누락 시 승인 불가 · 검토 대기 자산은 모든 운영 작업 차단",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "VLXG7",
+                  "name": "변경 이력 · 09.13 16:20 / 운영자 A / v2 조건 변경 /",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "변경 이력 · 09.13 16:20 / 운영자 A / v2 조건 변경 / 수정·삭제 불가",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "Aab1e",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "65812d59-ac3c-4dde-a41a-7b511d94dc58"
+}

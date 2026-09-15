@@ -1,0 +1,451 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "u3HlGE",
+      "x": 0,
+      "y": 240,
+      "name": "ADM-03 검수 대기열",
+      "clip": true,
+      "width": 1440,
+      "height": 1140,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "KEtBJ",
+          "type": "ref",
+          "ref": "newslittle:Vdadc",
+          "name": "관리자 주 내비게이션"
+        },
+        {
+          "type": "frame",
+          "id": "SlwHZ",
+          "name": "운영 레이아웃",
+          "width": "fill_container",
+          "height": "fill_container",
+          "children": [
+            {
+              "id": "d6qzVR",
+              "type": "ref",
+              "ref": "newslittle:S5ny8w",
+              "name": "운영 메뉴",
+              "height": "fill_container",
+              "descendants": {
+                "newslittle:GGNRB": {
+                  "fill": "#F0F0FA",
+                  "cornerRadius": 8
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "T5GfI",
+              "name": "운영 본문",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "E7jqSc",
+                  "name": "ADM-03 검수 대기열",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "ADM-03 검수 대기열",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 28,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "OSLPJ",
+                  "name": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "I0vfv5",
+                  "name": "본문 삭제까지 18시간 · 기한이 지나면 대조·통과할 수 없습니다.",
+                  "fill": "$newslittle:nl-negative",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "본문 삭제까지 18시간 · 기한이 지나면 대조·통과할 수 없습니다.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 14,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "gQTk2",
+                  "name": "검수 선택",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "zBFLFsO",
+                      "type": "ref",
+                      "ref": "newslittle:gBhCc",
+                      "descendants": {
+                        "C1iyX": {
+                          "content": "N-0913-08 ▾"
+                        }
+                      },
+                      "name": "N-0913-08 ▾"
+                    },
+                    {
+                      "id": "zuw3LEH",
+                      "type": "ref",
+                      "ref": "newslittle:gBhCc",
+                      "descendants": {
+                        "C1iyX": {
+                          "content": "자산: 요약 ▾"
+                        }
+                      },
+                      "name": "자산: 요약 ▾"
+                    },
+                    {
+                      "type": "text",
+                      "id": "w9ZPD",
+                      "name": "본문 삭제 기한순 · 1 / 12 · 이용 근거: 조건부 사용 가능",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "본문 삭제 기한순 · 1 / 12 · 이용 근거: 조건부 사용 가능",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "qen9S",
+                  "name": "원문 및 생성물 대조",
+                  "width": "fill_container",
+                  "gap": 24,
+                  "children": [
+                    {
+                      "id": "zagUJIg",
+                      "type": "ref",
+                      "ref": "newslittle:N0Vy7",
+                      "theme": {
+                        "newslittle:notice-tone": "plain"
+                      },
+                      "descendants": {
+                        "KYmif": {
+                          "content": "수집 본문 · 보유 중",
+                          "fontSize": 18
+                        },
+                        "wjhIh": {
+                          "content": "도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                          "fill": "$newslittle:nl-text",
+                          "fontWeight": "700",
+                          "fontSize": 16
+                        },
+                        "njeyp": {
+                          "type": "frame",
+                          "name": "액션",
+                          "width": "fill_container",
+                          "gap": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "cBsTF",
+                              "name": "가로수는 직사광선을 막아 보행자에게 그늘을 제공한다. 잎에서 수분이 증발",
+                              "fill": "$newslittle:nl-text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "가로수는 직사광선을 막아 보행자에게 그늘을 제공한다. 잎에서 수분이 증발하는 과정에서도 주변 열을 흡수한다. 도시 녹지의 배치와 지속적인 관리가 폭염 대응에 중요한 요소로 언급됐다.",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "j31o1s",
+                              "name": "리틀데일리(가상) · 2026.09.13",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "리틀데일리(가상) · 2026.09.13",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "수집 본문 · 보유 중"
+                    },
+                    {
+                      "id": "zcVjbd4",
+                      "type": "ref",
+                      "ref": "newslittle:N0Vy7",
+                      "theme": {
+                        "newslittle:notice-tone": "plain"
+                      },
+                      "descendants": {
+                        "KYmif": {
+                          "content": "AI 생성 요약 · 검수 대기",
+                          "fontSize": 18
+                        },
+                        "wjhIh": {
+                          "content": "도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                          "fill": "$newslittle:nl-text",
+                          "fontWeight": "700",
+                          "fontSize": 16
+                        },
+                        "njeyp": {
+                          "type": "frame",
+                          "name": "액션",
+                          "width": "fill_container",
+                          "gap": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "HHq44",
+                              "name": "가로수는 그늘을 만들고 수분을 내보내 도시의 열을 낮춰요. 나무의 수만큼",
+                              "fill": "$newslittle:nl-text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "가로수는 그늘을 만들고 수분을 내보내 도시의 열을 낮춰요. 나무의 수만큼 위치와 관리도 중요해요.",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "s36SDo",
+                              "name": "리틀데일리(가상) · 2026.09.13",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "리틀데일리(가상) · 2026.09.13",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "AI 생성 요약 · 검수 대기"
+                    }
+                  ]
+                },
+                {
+                  "id": "zSGADmy",
+                  "type": "ref",
+                  "ref": "newslittle:N0Vy7",
+                  "theme": {
+                    "newslittle:notice-tone": "plain"
+                  },
+                  "descendants": {
+                    "KYmif": {
+                      "content": "☑ 사실·숫자 대조    ☑ 전망·의견 구분    ☑ 기준 시점 확인",
+                      "fontWeight": "normal",
+                      "fontSize": 14
+                    },
+                    "wjhIh": {
+                      "content": "☑ 랜덤 사전 독해 불필요    ☑ 이미지 오인·권리 확인",
+                      "fill": "$newslittle:nl-text",
+                      "fontSize": 14
+                    },
+                    "njeyp": {
+                      "type": "frame",
+                      "name": "액션",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "bMgf3",
+                          "name": "형식 유형",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "id": "z3pDHBi",
+                              "type": "ref",
+                              "ref": "newslittle:gBhCc",
+                              "descendants": {
+                                "C1iyX": {
+                                  "content": "형식: OX ▾"
+                                }
+                              },
+                              "name": "형식: OX ▾"
+                            },
+                            {
+                              "id": "zAMk8t1",
+                              "type": "ref",
+                              "ref": "newslittle:gBhCc",
+                              "descendants": {
+                                "C1iyX": {
+                                  "content": "유형: 사실형 ▾"
+                                }
+                              },
+                              "name": "유형: 사실형 ▾"
+                            },
+                            {
+                              "type": "text",
+                              "id": "PXJDd",
+                              "name": "통과 범위  ☑ 홈 게시  ☐ 퀴즈 출제",
+                              "fill": "$newslittle:nl-text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "통과 범위  ☑ 홈 게시  ☐ 퀴즈 출제",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "nu9SD",
+                          "name": "반려·재생성 사유",
+                          "fill": "$newslittle:nl-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "반려·재생성 사유",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "id": "zS8YOlA",
+                          "type": "ref",
+                          "ref": "newslittle:Iy0mI",
+                          "descendants": {
+                            "jZtN9": {
+                              "content": "반려 시 필수 입력"
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "반려·재생성 사유"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "I7myJ",
+                          "name": "검수 동작",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "id": "zB80DVF",
+                              "type": "ref",
+                              "ref": "newslittle:Rd5Tc",
+                              "theme": {
+                                "newslittle:btn-variant": "primary",
+                                "newslittle:btn-size": "xs",
+                                "newslittle:btn-state": "enabled"
+                              },
+                              "descendants": {
+                                "yZaSP": {
+                                  "content": "선택 범위 통과"
+                                }
+                              },
+                              "name": "선택 범위 통과"
+                            },
+                            {
+                              "id": "zxgC8Ax",
+                              "type": "ref",
+                              "ref": "newslittle:Rd5Tc",
+                              "theme": {
+                                "newslittle:btn-variant": "secondary",
+                                "newslittle:btn-size": "xs",
+                                "newslittle:btn-state": "enabled"
+                              },
+                              "descendants": {
+                                "yZaSP": {
+                                  "content": "반려"
+                                }
+                              },
+                              "name": "반려"
+                            },
+                            {
+                              "id": "zQINrvE",
+                              "type": "ref",
+                              "ref": "newslittle:Rd5Tc",
+                              "theme": {
+                                "newslittle:btn-variant": "secondary",
+                                "newslittle:btn-size": "xs",
+                                "newslittle:btn-state": "enabled"
+                              },
+                              "descendants": {
+                                "yZaSP": {
+                                  "content": "재생성 요청"
+                                }
+                              },
+                              "name": "재생성 요청"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "width": "fill_container",
+                  "name": "검수 판정"
+                },
+                {
+                  "type": "text",
+                  "id": "xHQSM",
+                  "name": "개별 통과만 허용 · 원문 복사·내보내기 없음 · 검토자는 실행 계정으로",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "개별 통과만 허용 · 원문 복사·내보내기 없음 · 검토자는 실행 계정으로 기록",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "oZKFC",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "59fd76fb-8b15-42ba-beb5-22bc18e22276"
+}

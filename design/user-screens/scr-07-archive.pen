@@ -1,0 +1,500 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "n7Lns",
+      "x": 0,
+      "y": 240,
+      "name": "SCR-07 아카이브 / 최신 날짜 펼침",
+      "clip": true,
+      "width": 1440,
+      "height": 1080,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zHOaR5H",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-07 아카이브 / 최신 날짜 펼침 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "화면 식별"
+        },
+        {
+          "id": "CbtYW",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:Fnwbc": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "Ac3hs",
+          "name": "콘텐츠 정렬",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            40,
+            220
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "YpBtg",
+              "name": "주 콘텐츠",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "CY5DK",
+                  "name": "아카이브",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "아카이브",
+                  "lineHeight": 1.375,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 32,
+                  "fontWeight": "700",
+                  "letterSpacing": -0.32
+                },
+                {
+                  "type": "text",
+                  "id": "cAjic",
+                  "name": "고른 날짜별로, 다시 읽고 싶은 기사를 찾아보세요.",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "고른 날짜별로, 다시 읽고 싶은 기사를 찾아보세요.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 16,
+                  "fontWeight": "normal",
+                  "letterSpacing": -0.16
+                },
+                {
+                  "type": "frame",
+                  "id": "pU6oS",
+                  "name": "상태 안내",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-accent-subtle",
+                  "cornerRadius": 8,
+                  "layout": "vertical",
+                  "gap": 8,
+                  "padding": 16,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "mL9iP",
+                      "name": "제목과 원문 링크만 보관해요. 기사 본문·요약은 저장하지 않으며, 다시 푸는 퀴즈",
+                      "fill": "$newslittle:nl-accent",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "제목과 원문 링크만 보관해요. 기사 본문·요약은 저장하지 않으며, 다시 푸는 퀴즈는 제공하지 않아요.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal",
+                      "letterSpacing": -0.14
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "xMwAn",
+                  "name": "날짜별 보관 목록",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-bg",
+                  "cornerRadius": 12,
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "id": "eULL6",
+                      "type": "ref",
+                      "ref": "newslittle:X7imC",
+                      "name": "날짜 그룹 헤더 · 펼침",
+                      "width": "fill_container"
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "t1mEi",
+                      "name": "구분선",
+                      "fill": "$newslittle:nl-border",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "L264T4",
+                      "name": "보관 기사",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "L2oddg",
+                          "name": "기사 정보",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 16,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "j0VWwV",
+                              "name": "도심의 열을 낮추는 나무, 그늘 이상의 역할 ↗",
+                              "fill": "$newslittle:nl-text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "도심의 열을 낮추는 나무, 그늘 이상의 역할 ↗",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 16,
+                              "fontWeight": "700",
+                              "letterSpacing": -0.16
+                            },
+                            {
+                              "type": "text",
+                              "id": "fiPg0",
+                              "name": "리틀데일리(가상) · 원문 게시 2026.09.12",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "리틀데일리(가상) · 원문 게시 2026.09.12",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal",
+                              "letterSpacing": -0.12
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "MxtKk",
+                          "name": "신고",
+                          "fill": "$newslittle:nl-negative",
+                          "content": "신고",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "letterSpacing": -0.12
+                        },
+                        {
+                          "id": "zUkufJN",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "l",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "삭제"
+                            }
+                          },
+                          "name": "삭제"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "r6nrz",
+                      "name": "구분선",
+                      "fill": "$newslittle:nl-border",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "gX0Lw",
+                      "name": "보관 기사",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "GOXwr",
+                          "name": "기사 정보",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 16,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "zVTx5",
+                              "name": "기준금리가 내려가면 우리 생활은 어떻게 달라질까 ↗",
+                              "fill": "$newslittle:nl-text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "기준금리가 내려가면 우리 생활은 어떻게 달라질까 ↗",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 16,
+                              "fontWeight": "700",
+                              "letterSpacing": -0.16
+                            },
+                            {
+                              "type": "text",
+                              "id": "rgRLm",
+                              "name": "리틀데일리(가상) · 원문 게시 2026.09.12",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "리틀데일리(가상) · 원문 게시 2026.09.12",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal",
+                              "letterSpacing": -0.12
+                            },
+                            {
+                              "id": "z7BOjbC",
+                              "type": "ref",
+                              "ref": "newslittle:MtY9u",
+                              "theme": {
+                                "newslittle:badge-status": "default"
+                              },
+                              "descendants": {
+                                "Lm9jq": {
+                                  "content": "원문 접근 실패 · 보관 기록 유지"
+                                }
+                              },
+                              "name": "원문 접근 실패 · 보관 기록 유지"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "bqh8c",
+                          "name": "신고",
+                          "fill": "$newslittle:nl-negative",
+                          "content": "신고",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "letterSpacing": -0.12
+                        },
+                        {
+                          "id": "zVug363",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "l",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "삭제"
+                            }
+                          },
+                          "name": "삭제"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "ZufWg",
+                      "name": "구분선",
+                      "fill": "$newslittle:nl-border",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "TuQZv",
+                      "name": "보관 기사",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "YLW8s",
+                          "name": "기사 정보",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 16,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "q96xd7",
+                              "name": "이용 중단으로 표시가 제한된 기사",
+                              "fill": "$newslittle:nl-text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "이용 중단으로 표시가 제한된 기사",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 16,
+                              "fontWeight": "700",
+                              "letterSpacing": -0.16
+                            },
+                            {
+                              "type": "text",
+                              "id": "BorcG",
+                              "name": "이용 조건이 종료되어 제목과 원문 링크를 표시할 수 없습니다.",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "이용 조건이 종료되어 제목과 원문 링크를 표시할 수 없습니다.",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal",
+                              "letterSpacing": -0.12
+                            },
+                            {
+                              "id": "zJvhNEs",
+                              "type": "ref",
+                              "ref": "newslittle:MtY9u",
+                              "theme": {
+                                "newslittle:badge-status": "negative"
+                              },
+                              "descendants": {
+                                "Lm9jq": {
+                                  "content": "이용 중단"
+                                }
+                              },
+                              "name": "이용 중단"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "apuHa",
+                          "name": "신고",
+                          "fill": "$newslittle:nl-negative",
+                          "content": "신고",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 12,
+                          "fontWeight": "normal",
+                          "letterSpacing": -0.12
+                        },
+                        {
+                          "id": "zvNIJk0",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "l",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "삭제"
+                            }
+                          },
+                          "name": "삭제"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "u1hA9G",
+                  "name": "2026.09.12 선택  ·  2개",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-bg",
+                  "cornerRadius": 12,
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "id": "pN8HR",
+                      "type": "ref",
+                      "ref": "newslittle:X7imC",
+                      "name": "날짜 그룹 헤더 · 접힘",
+                      "width": "fill_container",
+                      "descendants": {
+                        "newslittle:rNYW1": {
+                          "content": "2026.09.12 선택 · 2개"
+                        },
+                        "newslittle:nFGck": {
+                          "icon": "chevron-down"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "IlNqY",
+                  "name": "2026.08.10 선택  ·  1개",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-bg",
+                  "cornerRadius": 12,
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "id": "xkret",
+                      "type": "ref",
+                      "ref": "newslittle:X7imC",
+                      "name": "날짜 그룹 헤더 · 접힘",
+                      "width": "fill_container",
+                      "descendants": {
+                        "newslittle:rNYW1": {
+                          "content": "2026.08.10 선택 · 1개"
+                        },
+                        "newslittle:nFGck": {
+                          "icon": "chevron-down"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "L0u6s",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "19547124-b4b8-4168-a34a-71ae0f698dd9"
+}

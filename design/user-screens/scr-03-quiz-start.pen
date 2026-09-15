@@ -1,0 +1,380 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "rLT7a",
+      "x": 0,
+      "y": 240,
+      "name": "SCR-03 숏폼 퀴즈 시작",
+      "clip": true,
+      "width": 1440,
+      "height": 1000,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zqacxaN",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-03 숏폼 퀴즈 시작 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "화면 식별"
+        },
+        {
+          "id": "QHRDK",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "ALjeQ",
+          "name": "콘텐츠 정렬",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            40,
+            280
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "WijP9",
+              "name": "주 콘텐츠",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "G4PlHX",
+                  "name": "내가 고른 뉴스, 얼마나 기억할까요?",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "내가 고른 뉴스, 얼마나 기억할까요?",
+                  "lineHeight": 1.375,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 32,
+                  "fontWeight": "700",
+                  "letterSpacing": -0.32
+                },
+                {
+                  "type": "text",
+                  "id": "KnXjJ",
+                  "name": "오늘 목록에서 출제 가능한 기사만 문제로 만나요.",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "오늘 목록에서 출제 가능한 기사만 문제로 만나요.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 16,
+                  "fontWeight": "normal",
+                  "letterSpacing": -0.16
+                },
+                {
+                  "type": "frame",
+                  "id": "o4g5lX",
+                  "name": "퀴즈 구성",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-bg",
+                  "cornerRadius": 12,
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 32,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "hrNrd",
+                      "name": "출제 범위",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "zP7YLhT",
+                          "type": "ref",
+                          "ref": "newslittle:MtY9u",
+                          "theme": {
+                            "newslittle:badge-status": "accent"
+                          },
+                          "descendants": {
+                            "Lm9jq": {
+                              "content": "숏폼 퀴즈 · 회원"
+                            }
+                          },
+                          "name": "숏폼 퀴즈 · 회원"
+                        },
+                        {
+                          "type": "text",
+                          "id": "yAym5",
+                          "name": "이번 회 3문제",
+                          "fill": "$newslittle:nl-text",
+                          "content": "이번 회 3문제",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 20,
+                          "fontWeight": "700",
+                          "letterSpacing": -0.2
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "s9903",
+                      "name": "어떤 방식으로 답할까요?",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "어떤 방식으로 답할까요?",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 20,
+                      "fontWeight": "700",
+                      "letterSpacing": -0.2
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Z4rE9z",
+                      "name": "형식 선택",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "znBEvfU",
+                          "type": "ref",
+                          "ref": "newslittle:N0Vy7",
+                          "theme": {
+                            "newslittle:notice-tone": "accent"
+                          },
+                          "descendants": {
+                            "KYmif": {
+                              "content": "◉ OX·객관식",
+                              "fill": "$newslittle:nl-accent",
+                              "fontSize": 18
+                            },
+                            "wjhIh": {
+                              "content": "주어진 보기에서 답을 골라요.",
+                              "fontSize": 14
+                            },
+                            "njeyp": {
+                              "enabled": false
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "OX·객관식"
+                        },
+                        {
+                          "id": "zJ1bmUX",
+                          "type": "ref",
+                          "ref": "newslittle:N0Vy7",
+                          "theme": {
+                            "newslittle:notice-tone": "plain"
+                          },
+                          "descendants": {
+                            "KYmif": {
+                              "content": "○ 주관식형",
+                              "fontSize": 18
+                            },
+                            "wjhIh": {
+                              "content": "자신의 말로 답하고 힌트를 받아요.",
+                              "fontSize": 14
+                            },
+                            "njeyp": {
+                              "enabled": false
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "주관식형"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "rectangle",
+                      "id": "dwrSL",
+                      "name": "구분선",
+                      "fill": "$newslittle:nl-border",
+                      "width": "fill_container",
+                      "height": 1
+                    },
+                    {
+                      "type": "text",
+                      "id": "XkK6c",
+                      "name": "이번 회 출제 대상",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "이번 회 출제 대상",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 18,
+                      "fontWeight": "700",
+                      "letterSpacing": -0.18
+                    },
+                    {
+                      "type": "text",
+                      "id": "DQ2B6",
+                      "name": "1. 도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "1. 도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal",
+                      "letterSpacing": -0.14
+                    },
+                    {
+                      "type": "text",
+                      "id": "x3V6BW",
+                      "name": "2. 기준금리가 내려가면 우리 생활은 어떻게 달라질까",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "2. 기준금리가 내려가면 우리 생활은 어떻게 달라질까",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal",
+                      "letterSpacing": -0.14
+                    },
+                    {
+                      "type": "text",
+                      "id": "zvyAT",
+                      "name": "3. 공공도서관에서 만나는 일상 속 인공지능",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "3. 공공도서관에서 만나는 일상 속 인공지능",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal",
+                      "letterSpacing": -0.14
+                    },
+                    {
+                      "type": "frame",
+                      "id": "xWX9X",
+                      "name": "상태 안내",
+                      "width": "fill_container",
+                      "fill": "$newslittle:nl-accent-subtle",
+                      "cornerRadius": 8,
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "P8UAV2",
+                          "name": "제외 1개 · 바다 관측 위성, 해수면 변화를 살피다 — 문항 준비 중",
+                          "fill": "$newslittle:nl-accent",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "제외 1개 · 바다 관측 위성, 해수면 변화를 살피다 — 문항 준비 중",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 14,
+                          "fontWeight": "normal",
+                          "letterSpacing": -0.14
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "oa41f",
+                      "name": "기사당 1문제 · 남은 대상 0개 · 최대 10문제씩 출제",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "기사당 1문제 · 남은 대상 0개 · 최대 10문제씩 출제",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal",
+                      "letterSpacing": -0.12
+                    },
+                    {
+                      "type": "frame",
+                      "id": "FykGA",
+                      "name": "시작 및 취소",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "zZksep4",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "primary",
+                            "newslittle:btn-size": "l",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "3문제 시작하기"
+                            }
+                          },
+                          "name": "3문제 시작하기"
+                        },
+                        {
+                          "id": "ziWahpb",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "l",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "취소"
+                            }
+                          },
+                          "name": "취소"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "uJFEe",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "d84915b0-7110-458e-941d-4ed922eb53fb"
+}

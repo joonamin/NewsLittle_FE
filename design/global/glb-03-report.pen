@@ -1,0 +1,366 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "G4Pz0h",
+      "x": 0,
+      "y": 240,
+      "name": "GLB-03 신고 / 권리 유형 선택",
+      "clip": true,
+      "width": 1440,
+      "height": 1080,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zTEXg9k",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-01 홈 · SCR-02 오늘 목록 / 회원 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "화면 식별"
+        },
+        {
+          "id": "TxWlM",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "lntQe",
+          "name": "콘텐츠 정렬 · 독립 숏폼 피드와 보조 목록",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            24,
+            72
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "nVtHN",
+              "name": "주 콘텐츠",
+              "width": "fill_container",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Cb4dR",
+                  "name": "기사와 오늘 목록",
+                  "width": "fill_container",
+                  "gap": 48,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "DMefe",
+                      "name": "홈 · 쇼츠형 뉴스 피드",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "padding": [
+                        24,
+                        48
+                      ],
+                      "children": [
+                        {
+                          "id": "xBHd2",
+                          "type": "ref",
+                          "ref": "newslittle:faiKJ",
+                          "name": "독립 제스처 영역 · 카드와 세로 탐색",
+                          "theme": {
+                            "newslittle:saved": "unsaved"
+                          },
+                          "width": "fill_container"
+                        }
+                      ],
+                      "height": "fill_container"
+                    },
+                    {
+                      "id": "e04bZ",
+                      "type": "ref",
+                      "ref": "newslittle:BtNvT",
+                      "name": "홈 · 오늘 목록 사이드바",
+                      "theme": {
+                        "newslittle:auth": "logged-in"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "p0IIc",
+          "layoutPosition": "absolute",
+          "x": 0,
+          "y": 0,
+          "name": "모달 배경",
+          "width": 1440,
+          "height": 1080,
+          "fill": "$newslittle:nl-modal-overlay",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "o52DBi",
+              "type": "ref",
+              "ref": "newslittle:ppksg",
+              "name": "GLB-03 신고 / 권리 유형 선택 · 공통 모달",
+              "width": 600,
+              "theme": {
+                "newslittle:modal": "standard"
+              },
+              "descendants": {
+                "newslittle:e8fZqS": {
+                  "content": "문제를 알려주세요"
+                },
+                "newslittle:QHfuw": {
+                  "type": "frame",
+                  "id": "zB6Ib",
+                  "name": "Body / 화면별 콘텐츠",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$newslittle:nl-modal-gap",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "p5knzf",
+                      "name": "신고 대상 · 도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "신고 대상 · 도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "mRhHq",
+                      "name": "○ 내용 오류   ○ 판정 오류   ● 권리   ○ 원문 접근 실패",
+                      "fill": "$newslittle:nl-accent",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "○ 내용 오류   ○ 판정 오류   ● 권리   ○ 원문 접근 실패",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "YKF0C",
+                      "name": "신고 내용",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "신고 내용",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Zpijt",
+                      "name": "신고 내용 입력란",
+                      "width": "fill_container",
+                      "height": 104,
+                      "fill": "$newslittle:nl-bg",
+                      "cornerRadius": 8,
+                      "stroke": "$newslittle:nl-border",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "JN4eG",
+                          "name": "권리자와 요청 범위, 문제가 되는 내용을 알려주세요.",
+                          "fill": "$newslittle:nl-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "권리자와 요청 범위, 문제가 되는 내용을 알려주세요.",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "g8InM",
+                      "name": "연락 경로 · 권리 신고는 필수",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "연락 경로 · 권리 신고는 필수",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "kdrzy",
+                      "name": "연락 경로 · 권리 신고는 필수 입력란",
+                      "width": "fill_container",
+                      "height": 56,
+                      "fill": "$newslittle:nl-bg",
+                      "cornerRadius": 8,
+                      "stroke": "$newslittle:nl-border",
+                      "strokeWidth": 1,
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": 16,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "B7mqxV",
+                          "name": "이메일 또는 연락 가능한 경로",
+                          "fill": "$newslittle:nl-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "이메일 또는 연락 가능한 경로",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "HXmqS",
+                      "name": "신고 확인과 처리 결과 회신을 위해 사용합니다. 계정 이메일은 자동으로 ",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "신고 확인과 처리 결과 회신을 위해 사용합니다. 계정 이메일은 자동으로 입력하지 않습니다.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                "newslittle:o4NaL": {
+                  "type": "frame",
+                  "id": "geX3d",
+                  "name": "Footer / 화면별 액션",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$newslittle:nl-modal-gap",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ZlSnF",
+                      "name": "신고 동작",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "H2FlN9",
+                          "name": "신고 접수",
+                          "height": 48,
+                          "fill": "#EAEBEE",
+                          "cornerRadius": 8,
+                          "stroke": "$newslittle:nl-border",
+                          "padding": [
+                            0,
+                            24
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "kalee",
+                              "name": "신고 접수",
+                              "fill": "#80858E",
+                              "content": "신고 접수",
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 14,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "a8qmr",
+                          "name": "취소",
+                          "height": 48,
+                          "fill": "$newslittle:nl-bg",
+                          "cornerRadius": 8,
+                          "stroke": "$newslittle:nl-border",
+                          "strokeWidth": 1,
+                          "padding": [
+                            0,
+                            24
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "JSm6Q",
+                              "name": "취소",
+                              "fill": "$newslittle:nl-text",
+                              "content": "취소",
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 14,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "newslittle:JxfkW": {
+                  "x": 540,
+                  "y": 16,
+                  "layoutPosition": "absolute"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "u26rm",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "c809b695-548e-4a57-89a0-2df9799ba561"
+}
