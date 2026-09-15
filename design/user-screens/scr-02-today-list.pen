@@ -1,0 +1,136 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "zWzJ8P",
+      "x": 0,
+      "y": 240,
+      "name": "SCR-02 오늘 목록 패널 / 회원",
+      "clip": true,
+      "width": 1440,
+      "height": 1080,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zEkykYi",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-01 홈 · SCR-02 오늘 목록 / 회원 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "화면 식별"
+        },
+        {
+          "id": "iYQ1I",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "theme": {
+            "newslittle:auth": "logged-in"
+          },
+          "descendants": {
+            "newslittle:jQNJS/newslittle:to759": {
+              "content": "짧게 읽는 하루 뉴스"
+            },
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            },
+            "newslittle:r0ien": {
+              "context": ""
+            },
+            "newslittle:ynQdU": {
+              "content": "로그인",
+              "fill": "$newslittle:nl-accent",
+              "width": "fit_content(97)",
+              "height": "fit_content(21)",
+              "textGrowth": "auto",
+              "enabled": "$newslittle:nl-auth-logged-out-visible"
+            },
+            "newslittle:i50VwS": {
+              "content": "강민준"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "XvxZc",
+          "name": "홈 본문 · 뉴스 피드와 우측 사이드바",
+          "width": "fill_container",
+          "height": "fill_container",
+          "children": [
+            {
+              "type": "frame",
+              "id": "uD6BP",
+              "name": "홈 · 쇼츠형 뉴스 피드",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 16,
+              "padding": [
+                24,
+                48
+              ],
+              "children": [
+                {
+                  "id": "dwTtJ",
+                  "type": "ref",
+                  "ref": "newslittle:faiKJ",
+                  "name": "독립 제스처 영역 · 카드와 세로 탐색",
+                  "theme": {
+                    "newslittle:saved": "saved"
+                  },
+                  "width": "fill_container"
+                }
+              ]
+            },
+            {
+              "id": "exQ2Y",
+              "type": "ref",
+              "ref": "newslittle:BtNvT",
+              "name": "홈 · 오늘 목록 사이드바",
+              "theme": {
+                "newslittle:auth": "logged-in"
+              },
+              "height": "fill_container"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "kXRwS",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        },
+        {
+          "id": "uD3kb",
+          "type": "ref",
+          "ref": "newslittle:PnlA2",
+          "name": "사용자 설정 드롭다운 · 열린 상태",
+          "layoutPosition": "absolute",
+          "x": 1208,
+          "y": 114,
+          "theme": {
+            "newslittle:auth": "logged-in"
+          }
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "b464e3fa-8dac-4c62-b6ce-293f026954ef"
+}

@@ -1,0 +1,325 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "c1E0Zs",
+      "x": 0,
+      "y": 240,
+      "name": "SCR-05 숏폼 회차 결과",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zQe2hSu",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-05 숏폼 회차 결과 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "K0rjDK",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "fAYC4",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "L8K5QE",
+              "name": "고른 뉴스의 퀴즈를 마쳤어요",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "고른 뉴스의 퀴즈를 마쳤어요",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "aeOG4",
+              "name": "결과 요약",
+              "width": "fill_container",
+              "fill": "$newslittle:nl-bg",
+              "cornerRadius": 12,
+              "stroke": "$newslittle:nl-border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "E0KDbl",
+                  "name": "최초 계획 3문제 · 실제 처리 3문제",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "최초 계획 3문제 · 실제 처리 3문제",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "O4Y9R5",
+                  "name": "결과 분류",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "zUKdRkr",
+                      "type": "ref",
+                      "ref": "newslittle:aemf3",
+                      "descendants": {
+                        "t4DMRh": {
+                          "content": "2",
+                          "fontSize": 28
+                        },
+                        "pkCz6": {
+                          "content": "정답",
+                          "fontSize": 12
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "정답"
+                    },
+                    {
+                      "id": "z8YXyjn",
+                      "type": "ref",
+                      "ref": "newslittle:aemf3",
+                      "descendants": {
+                        "t4DMRh": {
+                          "content": "1",
+                          "fill": "$newslittle:nl-text",
+                          "fontSize": 28
+                        },
+                        "pkCz6": {
+                          "content": "선택형 오답",
+                          "fontSize": 12
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "선택형 오답"
+                    },
+                    {
+                      "id": "z5Auznj",
+                      "type": "ref",
+                      "ref": "newslittle:aemf3",
+                      "descendants": {
+                        "t4DMRh": {
+                          "content": "0",
+                          "fill": "$newslittle:nl-text",
+                          "fontSize": 28
+                        },
+                        "pkCz6": {
+                          "content": "포기",
+                          "fontSize": 12
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "포기"
+                    },
+                    {
+                      "id": "zaE7CgU",
+                      "type": "ref",
+                      "ref": "newslittle:aemf3",
+                      "descendants": {
+                        "t4DMRh": {
+                          "content": "0",
+                          "fill": "$newslittle:nl-text",
+                          "fontSize": 28
+                        },
+                        "pkCz6": {
+                          "content": "서비스 제외",
+                          "fontSize": 12
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "서비스 제외"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "StMJ2",
+                  "name": "오늘 목록 4개는 그대로 남아 있어요. 남은 출제 대상은 없어요.",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "오늘 목록 4개는 그대로 남아 있어요. 남은 출제 대상은 없어요.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Q2SlP",
+              "name": "문항별 복기",
+              "width": "fill_container",
+              "fill": "$newslittle:nl-bg",
+              "cornerRadius": 12,
+              "stroke": "$newslittle:nl-border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "id": "hXveX",
+                  "type": "ref",
+                  "ref": "newslittle:qs9uT",
+                  "name": "01 정답 · 펼침",
+                  "theme": {
+                    "newslittle:recap-expand": "expanded"
+                  },
+                  "descendants": {
+                    "newslittle:siimm": {
+                      "content": "01  나무가 주변의 열을 낮추는 원리는?"
+                    },
+                    "newslittle:zJILE": {
+                      "content": "정답",
+                      "fill": "$newslittle:nl-positive"
+                    },
+                    "newslittle:T3mFk": {
+                      "content": "∧"
+                    }
+                  }
+                },
+                {
+                  "id": "MaY9S",
+                  "type": "ref",
+                  "ref": "newslittle:qs9uT",
+                  "name": "02 오답 · 접힘",
+                  "theme": {
+                    "newslittle:recap-expand": "collapsed"
+                  },
+                  "descendants": {
+                    "newslittle:siimm": {
+                      "content": "02  금리 인하가 대출 이자에 미치는 영향은?"
+                    },
+                    "newslittle:zJILE": {
+                      "content": "오답",
+                      "fill": "$newslittle:nl-negative"
+                    },
+                    "newslittle:T3mFk": {
+                      "content": "∨"
+                    }
+                  }
+                },
+                {
+                  "id": "bZELj",
+                  "type": "ref",
+                  "ref": "newslittle:qs9uT",
+                  "name": "03 정답 · 접힘",
+                  "theme": {
+                    "newslittle:recap-expand": "collapsed"
+                  },
+                  "descendants": {
+                    "newslittle:siimm": {
+                      "content": "03  공공도서관의 AI 활용 목적은?"
+                    },
+                    "newslittle:zJILE": {
+                      "content": "정답"
+                    },
+                    "newslittle:T3mFk": {
+                      "content": "∨"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "O32jR",
+              "name": "다음 행동",
+              "width": "fill_container",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "zPNTwGT",
+                  "type": "ref",
+                  "ref": "newslittle:Rd5Tc",
+                  "theme": {
+                    "newslittle:btn-variant": "primary",
+                    "newslittle:btn-size": "l",
+                    "newslittle:btn-state": "enabled"
+                  },
+                  "descendants": {
+                    "yZaSP": {
+                      "content": "홈으로"
+                    }
+                  },
+                  "name": "홈으로"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "XSPRN",
+              "name": "여기서 이용을 마쳐도 괜찮아요. 정답 수는 학습 효과를 뜻하지 않아요.",
+              "fill": "$newslittle:nl-muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "여기서 이용을 마쳐도 괜찮아요. 정답 수는 학습 효과를 뜻하지 않아요.",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "p10b3y",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "1e816731-1dc6-4fc3-8007-11d7a31e24e5"
+}

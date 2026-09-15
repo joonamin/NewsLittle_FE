@@ -1,0 +1,215 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "pET0W",
+      "x": 0,
+      "y": 240,
+      "name": "SCR-11 랜덤 문제 풀이 / 정답·해설",
+      "clip": true,
+      "width": 1440,
+      "height": 1040,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zTkoxMI",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-11 랜덤 문제 풀이 / 정답·해설 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "식별"
+        },
+        {
+          "id": "XoM5y",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:wGpGD": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "QLRT7",
+          "name": "주 콘텐츠",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            36,
+            280
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "QJaOg",
+              "name": "랜덤 퀴즈",
+              "fill": "$newslittle:nl-text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "랜덤 퀴즈",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 28,
+              "fontWeight": "700"
+            },
+            {
+              "type": "text",
+              "id": "rs2P6",
+              "name": "OX·객관식                                  ",
+              "fill": "$newslittle:nl-accent",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "OX·객관식                                     01 / 05",
+              "lineHeight": 1.5,
+              "fontFamily": "$newslittle:nl-font",
+              "fontSize": 14,
+              "fontWeight": "700"
+            },
+            {
+              "type": "frame",
+              "id": "bOkDy",
+              "name": "정답과 해설",
+              "width": "fill_container",
+              "fill": "$newslittle:nl-bg",
+              "cornerRadius": 12,
+              "stroke": "$newslittle:nl-border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "dYWnv",
+                  "name": "✓ 정답이에요",
+                  "fill": "$newslittle:nl-positive",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "✓ 정답이에요",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 20,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "Kd4tg",
+                  "name": "나무는 수분을 내보내 주변 온도를 낮춘다.",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "나무는 수분을 내보내 주변 온도를 낮춘다.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 24,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "H6vJYX",
+                  "name": "내 답 O  ·  정답 O",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "내 답 O  ·  정답 O",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "q3n6UY",
+                  "name": "잎에서 물이 증발할 때 주변의 열을 흡수해요. 그늘과 함께 주변 온도를 ",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "잎에서 물이 증발할 때 주변의 열을 흡수해요. 그늘과 함께 주변 온도를 낮추는 데 도움이 돼요.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 16,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "buo1h",
+                  "name": "판정 오류 신고",
+                  "fill": "$newslittle:nl-negative",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "판정 오류 신고",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "id": "zlNzfhH",
+                  "type": "ref",
+                  "ref": "newslittle:dpVYL",
+                  "descendants": {
+                    "TeFt3": {
+                      "content": "이 문제의 뉴스",
+                      "fill": "$newslittle:nl-accent",
+                      "fontWeight": "700",
+                      "fontSize": 12
+                    },
+                    "j7d72": {
+                      "content": "도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                      "fontSize": 20
+                    }
+                  },
+                  "width": "fill_container",
+                  "name": "근거 기사 요약 카드"
+                }
+              ]
+            },
+            {
+              "id": "zfGNFd0",
+              "type": "ref",
+              "ref": "newslittle:Rd5Tc",
+              "theme": {
+                "newslittle:btn-variant": "primary",
+                "newslittle:btn-size": "l",
+                "newslittle:btn-state": "enabled"
+              },
+              "descendants": {
+                "yZaSP": {
+                  "content": "다음 문제 →"
+                }
+              },
+              "name": "다음 문제 →"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "EEtne",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "b291c67d-6bd5-4d99-b675-31371d65618b"
+}

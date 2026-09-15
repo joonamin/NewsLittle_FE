@@ -1,0 +1,347 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "m7VapI",
+      "x": 0,
+      "y": 240,
+      "name": "SCR-06 이전 목록 처리 / 여러 날짜",
+      "clip": true,
+      "width": 1440,
+      "height": 1080,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "zTPLF4g",
+          "type": "ref",
+          "ref": "newslittle:dybma",
+          "descendants": {
+            "F47Mgq": {
+              "content": "SCR-01 홈 · SCR-02 오늘 목록 / 회원 · 가상 콘텐츠"
+            }
+          },
+          "width": "fill_container",
+          "name": "화면 식별"
+        },
+        {
+          "id": "pRfUI",
+          "type": "ref",
+          "ref": "newslittle:O5rYI2",
+          "name": "주 내비게이션",
+          "width": "fill_container",
+          "descendants": {
+            "newslittle:G5dI5N": {
+              "fill": "$newslittle:nl-accent"
+            }
+          }
+        },
+        {
+          "type": "frame",
+          "id": "KjaLl",
+          "name": "콘텐츠 정렬 · 독립 숏폼 피드와 보조 목록",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            24,
+            72
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "ezWh5",
+              "name": "주 콘텐츠",
+              "width": "fill_container",
+              "layout": "vertical",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ffato",
+                  "name": "기사와 오늘 목록",
+                  "width": "fill_container",
+                  "gap": 48,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "tOV3M",
+                      "name": "홈 · 쇼츠형 뉴스 피드",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 16,
+                      "padding": [
+                        24,
+                        48
+                      ],
+                      "children": [
+                        {
+                          "id": "XfnDc",
+                          "type": "ref",
+                          "ref": "newslittle:faiKJ",
+                          "name": "독립 제스처 영역 · 카드와 세로 탐색",
+                          "theme": {
+                            "newslittle:saved": "unsaved"
+                          },
+                          "width": "fill_container"
+                        }
+                      ],
+                      "height": "fill_container"
+                    },
+                    {
+                      "id": "tfqRv",
+                      "type": "ref",
+                      "ref": "newslittle:BtNvT",
+                      "name": "홈 · 오늘 목록 사이드바",
+                      "theme": {
+                        "newslittle:auth": "logged-in"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "bLtdS",
+          "layoutPosition": "absolute",
+          "x": 0,
+          "y": 0,
+          "name": "모달 배경",
+          "width": 1440,
+          "height": 1080,
+          "fill": "$newslittle:nl-modal-overlay",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "hv7M8",
+              "type": "ref",
+              "ref": "newslittle:ppksg",
+              "name": "SCR-06 이전 목록 처리 / 여러 날짜 · 공통 모달",
+              "width": 600,
+              "theme": {
+                "newslittle:modal": "standard"
+              },
+              "descendants": {
+                "newslittle:e8fZqS": {
+                  "content": "지난번에 고른 기사를 보관할까요?"
+                },
+                "newslittle:QHfuw": {
+                  "type": "frame",
+                  "id": "PCYe6",
+                  "name": "Body / 화면별 콘텐츠",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$newslittle:nl-modal-gap",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "pJkWD",
+                      "name": "이전 목록 3개가 남아 있어요. 전체 보관 또는 전체 버리기를 선택해 주",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "이전 목록 3개가 남아 있어요. 전체 보관 또는 전체 버리기를 선택해 주세요.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "G8vgL",
+                      "name": "2026.09.13 선택",
+                      "fill": "$newslittle:nl-accent",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "2026.09.13 선택",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zzvMH",
+                      "name": "도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "도심의 열을 낮추는 나무, 그늘 이상의 역할",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Z6SEul",
+                      "name": "기준금리가 내려가면 우리 생활은 어떻게 달라질까",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "기준금리가 내려가면 우리 생활은 어떻게 달라질까",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "fUz1W",
+                      "name": "2026.09.12 선택",
+                      "fill": "$newslittle:nl-accent",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "2026.09.12 선택",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wVCbe",
+                      "name": "공공도서관에서 만나는 일상 속 인공지능",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "공공도서관에서 만나는 일상 속 인공지능",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "hfZMk",
+                      "name": "아카이브에는 제목과 원문 링크만 보관합니다. 본문·요약은 저장하지 않습니",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "아카이브에는 제목과 원문 링크만 보관합니다. 본문·요약은 저장하지 않습니다.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                "newslittle:o4NaL": {
+                  "type": "frame",
+                  "id": "Q5TsOr",
+                  "name": "Footer / 화면별 액션",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": "$newslittle:nl-modal-gap",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Tzz5g",
+                      "name": "이전 목록 결정",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "HhgrC",
+                          "name": "전체 보관",
+                          "height": 48,
+                          "fill": "$newslittle:nl-accent",
+                          "cornerRadius": 8,
+                          "stroke": "$newslittle:nl-border",
+                          "padding": [
+                            0,
+                            24
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "zcnu9",
+                              "name": "전체 보관",
+                              "fill": "#FFFFFF",
+                              "content": "전체 보관",
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 14,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "pT8F2",
+                          "name": "전체 버리기",
+                          "height": 48,
+                          "fill": "$newslittle:nl-bg",
+                          "cornerRadius": 8,
+                          "stroke": "$newslittle:nl-border",
+                          "strokeWidth": 1,
+                          "padding": [
+                            0,
+                            24
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "F5Cu8Z",
+                              "name": "전체 버리기",
+                              "fill": "$newslittle:nl-text",
+                              "content": "전체 버리기",
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 14,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "A61Zj",
+                      "name": "보관·버리기를 완료하면 시도한 기사를 오늘 목록에 담아요.",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "X로 닫아도 이전 목록은 그대로 남아요. 보관하거나 버리기 전까지 미처리 상태를 유지해요.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                "newslittle:JxfkW": {
+                  "x": 540,
+                  "y": 16,
+                  "layoutPosition": "absolute"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "vFmJ0",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "665ac97c-4638-48c7-a5d7-75ab72fbd9fd"
+}

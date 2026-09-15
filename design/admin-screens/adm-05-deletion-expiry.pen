@@ -1,0 +1,527 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "GH2EA",
+      "x": 0,
+      "y": 240,
+      "name": "ADM-05 삭제·만료 상태",
+      "clip": true,
+      "width": 1440,
+      "height": 1140,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "w7LmJ",
+          "type": "ref",
+          "ref": "newslittle:Vdadc",
+          "name": "관리자 주 내비게이션"
+        },
+        {
+          "type": "frame",
+          "id": "IwJyY",
+          "name": "운영 레이아웃",
+          "width": "fill_container",
+          "height": "fill_container",
+          "children": [
+            {
+              "id": "Q2eDZ1",
+              "type": "ref",
+              "ref": "newslittle:S5ny8w",
+              "name": "운영 메뉴",
+              "height": "fill_container",
+              "descendants": {
+                "newslittle:aAhmw": {
+                  "fill": "#F0F0FA",
+                  "cornerRadius": 8
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "rlP7x",
+              "name": "운영 본문",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "qz8ZK",
+                  "name": "ADM-05 삭제·만료 상태",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "ADM-05 삭제·만료 상태",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 28,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "jSMgP",
+                  "name": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "NEhNu",
+                  "name": "삭제 상태 탭",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "zde5oER",
+                      "type": "ref",
+                      "ref": "newslittle:Rd5Tc",
+                      "theme": {
+                        "newslittle:btn-variant": "secondary",
+                        "newslittle:btn-size": "xs",
+                        "newslittle:btn-state": "enabled"
+                      },
+                      "descendants": {
+                        "yZaSP": {
+                          "content": "대기 6"
+                        }
+                      },
+                      "name": "대기 6"
+                    },
+                    {
+                      "id": "zVYAd1h",
+                      "type": "ref",
+                      "ref": "newslittle:Rd5Tc",
+                      "theme": {
+                        "newslittle:btn-variant": "secondary",
+                        "newslittle:btn-size": "xs",
+                        "newslittle:btn-state": "enabled"
+                      },
+                      "descendants": {
+                        "yZaSP": {
+                          "content": "진행 3"
+                        }
+                      },
+                      "name": "진행 3"
+                    },
+                    {
+                      "id": "z1T5HiQ",
+                      "type": "ref",
+                      "ref": "newslittle:Rd5Tc",
+                      "theme": {
+                        "newslittle:btn-variant": "primary",
+                        "newslittle:btn-size": "xs",
+                        "newslittle:btn-state": "enabled"
+                      },
+                      "descendants": {
+                        "yZaSP": {
+                          "content": "실패 2"
+                        }
+                      },
+                      "name": "실패 2"
+                    },
+                    {
+                      "id": "zXYrB6T",
+                      "type": "ref",
+                      "ref": "newslittle:Rd5Tc",
+                      "theme": {
+                        "newslittle:btn-variant": "secondary",
+                        "newslittle:btn-size": "xs",
+                        "newslittle:btn-state": "enabled"
+                      },
+                      "descendants": {
+                        "yZaSP": {
+                          "content": "확인 18"
+                        }
+                      },
+                      "name": "확인 18"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "Q4AOsr",
+                  "name": "삭제 요청과 삭제 확인을 구분합니다. 모든 범위가 확인되기 전에는 완료되",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "삭제 요청과 삭제 확인을 구분합니다. 모든 범위가 확인되기 전에는 완료되지 않습니다.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "id": "zI2LMa8",
+                  "type": "ref",
+                  "ref": "newslittle:N0Vy7",
+                  "theme": {
+                    "newslittle:notice-tone": "plain"
+                  },
+                  "descendants": {
+                    "KYmif": {
+                      "content": "N-0907-03 · 본문 보존 기한 도달 · 일부 범위 실패",
+                      "fill": "$newslittle:nl-negative",
+                      "fontSize": 18
+                    },
+                    "wjhIh": {
+                      "content": "최초 수집 09.07 09:00 → 본문 7일 / 파생물은 게시일 +30일과 계약 기한 중 이른 날",
+                      "fontSize": 12
+                    },
+                    "njeyp": {
+                      "type": "frame",
+                      "name": "액션",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "e828f",
+                          "name": "데이터 목록",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "children": [
+                            {
+                              "id": "zNVHggx",
+                              "type": "ref",
+                              "ref": "newslittle:h46F8",
+                              "descendants": {
+                                "pB8R7": {
+                                  "content": "삭제 범위"
+                                },
+                                "ct0H4": {
+                                  "content": "요청 시각"
+                                },
+                                "LyoXE": {
+                                  "content": "확인 상태"
+                                },
+                                "ADtbS": {
+                                  "content": "비고"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "열 제목"
+                            },
+                            {
+                              "id": "z8SFpXC",
+                              "type": "ref",
+                              "ref": "newslittle:wAiVB",
+                              "descendants": {
+                                "g5zTQ": {
+                                  "content": "원본 저장소"
+                                },
+                                "qOHjO": {
+                                  "content": "09:00"
+                                },
+                                "FkEoq": {
+                                  "content": "삭제 확인"
+                                },
+                                "ia0ZY": {
+                                  "content": "09:02 확인"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "데이터 행 1"
+                            },
+                            {
+                              "id": "zs6HpiT",
+                              "type": "ref",
+                              "ref": "newslittle:wAiVB",
+                              "descendants": {
+                                "g5zTQ": {
+                                  "content": "처리 대기열"
+                                },
+                                "qOHjO": {
+                                  "content": "09:00"
+                                },
+                                "FkEoq": {
+                                  "content": "삭제 확인"
+                                },
+                                "ia0ZY": {
+                                  "content": "09:02 확인"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "데이터 행 2"
+                            },
+                            {
+                              "id": "z4E1FoP",
+                              "type": "ref",
+                              "ref": "newslittle:wAiVB",
+                              "descendants": {
+                                "g5zTQ": {
+                                  "content": "임시 데이터"
+                                },
+                                "qOHjO": {
+                                  "content": "09:00"
+                                },
+                                "FkEoq": {
+                                  "content": "삭제 확인"
+                                },
+                                "ia0ZY": {
+                                  "content": "09:03 확인"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "데이터 행 3"
+                            },
+                            {
+                              "id": "zLGroFa",
+                              "type": "ref",
+                              "ref": "newslittle:wAiVB",
+                              "descendants": {
+                                "g5zTQ": {
+                                  "content": "프롬프트·로그"
+                                },
+                                "qOHjO": {
+                                  "content": "09:00"
+                                },
+                                "FkEoq": {
+                                  "content": "삭제 확인"
+                                },
+                                "ia0ZY": {
+                                  "content": "09:04 확인"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "데이터 행 4"
+                            },
+                            {
+                              "id": "zJ95KQG",
+                              "type": "ref",
+                              "ref": "newslittle:wAiVB",
+                              "descendants": {
+                                "g5zTQ": {
+                                  "content": "이미지 배포본"
+                                },
+                                "qOHjO": {
+                                  "content": "09:00"
+                                },
+                                "FkEoq": {
+                                  "content": "삭제 확인"
+                                },
+                                "ia0ZY": {
+                                  "content": "09:04 확인"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "데이터 행 5"
+                            },
+                            {
+                              "id": "zH1GdVN",
+                              "type": "ref",
+                              "ref": "newslittle:wAiVB",
+                              "descendants": {
+                                "g5zTQ": {
+                                  "content": "검색·캐시"
+                                },
+                                "qOHjO": {
+                                  "content": "09:00"
+                                },
+                                "FkEoq": {
+                                  "content": "실패"
+                                },
+                                "ia0ZY": {
+                                  "content": "CDN 응답 시간 초과"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "데이터 행 6"
+                            },
+                            {
+                              "id": "z5zNoNd",
+                              "type": "ref",
+                              "ref": "newslittle:wAiVB",
+                              "descendants": {
+                                "g5zTQ": {
+                                  "content": "백업"
+                                },
+                                "qOHjO": {
+                                  "content": "09:00"
+                                },
+                                "FkEoq": {
+                                  "content": "확인 대기"
+                                },
+                                "ia0ZY": {
+                                  "content": "보존 정책 검증 중"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "데이터 행 7"
+                            },
+                            {
+                              "id": "zTfYNL1",
+                              "type": "ref",
+                              "ref": "newslittle:wAiVB",
+                              "descendants": {
+                                "g5zTQ": {
+                                  "content": "외부 처리자 사본"
+                                },
+                                "qOHjO": {
+                                  "content": "09:00"
+                                },
+                                "FkEoq": {
+                                  "content": "확인 대기"
+                                },
+                                "ia0ZY": {
+                                  "content": "처리자 증빙 미수신"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "데이터 행 8"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "e1U38Y",
+                          "name": "삭제 동작",
+                          "width": "fill_container",
+                          "gap": 16,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "id": "zxJfNMF",
+                              "type": "ref",
+                              "ref": "newslittle:Rd5Tc",
+                              "theme": {
+                                "newslittle:btn-variant": "primary",
+                                "newslittle:btn-size": "xs",
+                                "newslittle:btn-state": "enabled"
+                              },
+                              "descendants": {
+                                "yZaSP": {
+                                  "content": "실패 범위만 재시도"
+                                }
+                              },
+                              "name": "실패 범위만 재시도"
+                            },
+                            {
+                              "id": "z6kQ4AO",
+                              "type": "ref",
+                              "ref": "newslittle:Rd5Tc",
+                              "theme": {
+                                "newslittle:btn-variant": "secondary",
+                                "newslittle:btn-size": "xs",
+                                "newslittle:btn-state": "enabled"
+                              },
+                              "descendants": {
+                                "yZaSP": {
+                                  "content": "확인 증빙 등록"
+                                }
+                              },
+                              "name": "확인 증빙 등록"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "YsvIZ",
+                          "name": "확인 대기 범위를 삭제 완료로 넘기지 않으며, 실패 자산은 재게시할 수 ",
+                          "fill": "$newslittle:nl-negative",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "확인 대기 범위를 삭제 완료로 넘기지 않으며, 실패 자산은 재게시할 수 없습니다.",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  },
+                  "width": "fill_container",
+                  "name": "자산 삭제 상태"
+                },
+                {
+                  "id": "zzWwzsQ",
+                  "type": "ref",
+                  "ref": "newslittle:N0Vy7",
+                  "theme": {
+                    "newslittle:notice-tone": "plain"
+                  },
+                  "descendants": {
+                    "KYmif": {
+                      "content": "법정 보존 예외 · 서비스 데이터와 분리",
+                      "fontSize": 16
+                    },
+                    "wjhIh": {
+                      "content": "근거 / 대상 / 기간 / 접근 권한을 기록합니다. 등록·수동 확인 시 재인증합니다.",
+                      "fontSize": 12
+                    },
+                    "njeyp": {
+                      "type": "frame",
+                      "name": "액션",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "id": "z8AXZBx",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "xs",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "보존 예외 등록"
+                            }
+                          },
+                          "name": "보존 예외 등록"
+                        }
+                      ]
+                    }
+                  },
+                  "width": "fill_container",
+                  "name": "법정 보존 예외"
+                },
+                {
+                  "type": "text",
+                  "id": "Zzrla",
+                  "name": "사용자 요청은 계정·아카이브·관심사 범위를 확인합니다. 개별 이용 기록의",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "사용자 요청은 계정·아카이브·관심사 범위를 확인합니다. 개별 이용 기록의 내용은 열람하지 않습니다.",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "xMvLA",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "97810bed-cb33-4a90-95fc-bc4458a2e230"
+}

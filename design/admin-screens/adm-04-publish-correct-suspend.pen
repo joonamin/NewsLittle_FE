@@ -1,0 +1,567 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "rwKsX",
+      "x": 0,
+      "y": 240,
+      "name": "ADM-04 게시·정정·중단",
+      "clip": true,
+      "width": 1440,
+      "height": 1140,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "dur82",
+          "type": "ref",
+          "ref": "newslittle:Vdadc",
+          "name": "관리자 주 내비게이션"
+        },
+        {
+          "type": "frame",
+          "id": "YCFRw",
+          "name": "운영 레이아웃",
+          "width": "fill_container",
+          "height": "fill_container",
+          "children": [
+            {
+              "id": "KlDHJ",
+              "type": "ref",
+              "ref": "newslittle:S5ny8w",
+              "name": "운영 메뉴",
+              "height": "fill_container",
+              "descendants": {
+                "newslittle:cwIN7": {
+                  "fill": "#F0F0FA",
+                  "cornerRadius": 8
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "fOLc9",
+              "name": "운영 본문",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "AsdGb",
+                  "name": "ADM-04 게시·정정·중단",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "ADM-04 게시·정정·중단",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 28,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "QoFDI",
+                  "name": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "rHOlD",
+                  "name": "게시 필터",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "zU4EjLU",
+                      "type": "ref",
+                      "ref": "newslittle:Rd5Tc",
+                      "theme": {
+                        "newslittle:btn-variant": "secondary",
+                        "newslittle:btn-size": "xs",
+                        "newslittle:btn-state": "enabled"
+                      },
+                      "descendants": {
+                        "yZaSP": {
+                          "content": "게시 대기 8"
+                        }
+                      },
+                      "name": "게시 대기 8"
+                    },
+                    {
+                      "id": "z2ra9jN",
+                      "type": "ref",
+                      "ref": "newslittle:Rd5Tc",
+                      "theme": {
+                        "newslittle:btn-variant": "secondary",
+                        "newslittle:btn-size": "xs",
+                        "newslittle:btn-state": "enabled"
+                      },
+                      "descendants": {
+                        "yZaSP": {
+                          "content": "게시 중 12"
+                        }
+                      },
+                      "name": "게시 중 12"
+                    },
+                    {
+                      "id": "z1qGFH9",
+                      "type": "ref",
+                      "ref": "newslittle:Rd5Tc",
+                      "theme": {
+                        "newslittle:btn-variant": "secondary",
+                        "newslittle:btn-size": "xs",
+                        "newslittle:btn-state": "enabled"
+                      },
+                      "descendants": {
+                        "yZaSP": {
+                          "content": "정정·중단 2"
+                        }
+                      },
+                      "name": "정정·중단 2"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "IMMNQ",
+                  "name": "자산 찾기",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "자산 찾기",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "id": "zTcYvvp",
+                  "type": "ref",
+                  "ref": "newslittle:Iy0mI",
+                  "descendants": {
+                    "jZtN9": {
+                      "content": "N-0913-08 · 도심의 열을 낮추는 나무"
+                    }
+                  },
+                  "width": "fill_container",
+                  "name": "자산 찾기"
+                },
+                {
+                  "type": "frame",
+                  "id": "HGxia",
+                  "name": "연결 자산",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-bg",
+                  "cornerRadius": 12,
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Q9uAfP",
+                      "name": "N-0913-08 · 이용 근거 유효 / 본문 보유 중",
+                      "fill": "$newslittle:nl-text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "N-0913-08 · 이용 근거 유효 / 본문 보유 중",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "cW0aU",
+                      "name": "데이터 목록",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "id": "zUFb5Ym",
+                          "type": "ref",
+                          "ref": "newslittle:h46F8",
+                          "descendants": {
+                            "pB8R7": {
+                              "content": "연결 자산"
+                            },
+                            "ct0H4": {
+                              "content": "현재 상태"
+                            },
+                            "LyoXE": {
+                              "content": "게시 / 만료"
+                            },
+                            "ADtbS": {
+                              "content": "개별 조치"
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "열 제목"
+                        },
+                        {
+                          "id": "z1f8jj6",
+                          "type": "ref",
+                          "ref": "newslittle:wAiVB",
+                          "descendants": {
+                            "g5zTQ": {
+                              "content": "요약 S-008"
+                            },
+                            "qOHjO": {
+                              "content": "홈 게시 중"
+                            },
+                            "FkEoq": {
+                              "content": "09.13 / 10.13"
+                            },
+                            "ia0ZY": {
+                              "content": "중단"
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "데이터 행 1"
+                        },
+                        {
+                          "id": "zE1dUSC",
+                          "type": "ref",
+                          "ref": "newslittle:wAiVB",
+                          "descendants": {
+                            "g5zTQ": {
+                              "content": "문항 Q-008"
+                            },
+                            "qOHjO": {
+                              "content": "퀴즈 출제 중"
+                            },
+                            "FkEoq": {
+                              "content": "09.13 / 10.13"
+                            },
+                            "ia0ZY": {
+                              "content": "중단"
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "데이터 행 2"
+                        },
+                        {
+                          "id": "zvXUB5F",
+                          "type": "ref",
+                          "ref": "newslittle:wAiVB",
+                          "descendants": {
+                            "g5zTQ": {
+                              "content": "이미지 I-008"
+                            },
+                            "qOHjO": {
+                              "content": "검수 통과"
+                            },
+                            "FkEoq": {
+                              "content": "게시 전 / 10.13"
+                            },
+                            "ia0ZY": {
+                              "content": "게시"
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "데이터 행 3"
+                        },
+                        {
+                          "id": "zYSF7P9",
+                          "type": "ref",
+                          "ref": "newslittle:wAiVB",
+                          "descendants": {
+                            "g5zTQ": {
+                              "content": "검색·캐시"
+                            },
+                            "qOHjO": {
+                              "content": "배포됨"
+                            },
+                            "FkEoq": {
+                              "content": "09.13 / 연결 만료"
+                            },
+                            "ia0ZY": {
+                              "content": "삭제 상태 ↗"
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "데이터 행 4"
+                        },
+                        {
+                          "id": "zE03kPK",
+                          "type": "ref",
+                          "ref": "newslittle:wAiVB",
+                          "descendants": {
+                            "g5zTQ": {
+                              "content": "아카이브 메타데이터"
+                            },
+                            "qOHjO": {
+                              "content": "제목·링크 표시"
+                            },
+                            "FkEoq": {
+                              "content": "근거 기간 내"
+                            },
+                            "ia0ZY": {
+                              "content": "이용 근거 ↗"
+                            }
+                          },
+                          "width": "fill_container",
+                          "name": "데이터 행 5"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "M7rEE",
+                      "name": "진행 중 퀴즈 영향 2회차 · 중단 시 해당 문항은 서비스 제외, 오답 ",
+                      "fill": "$newslittle:nl-accent",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "진행 중 퀴즈 영향 2회차 · 중단 시 해당 문항은 서비스 제외, 오답 미기록",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "M1lYpR",
+                  "name": "정정 등록",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-bg",
+                  "cornerRadius": 12,
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "jMz2L",
+                      "name": "정정 정보",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "s7iKAq",
+                          "name": "정정 내용",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 16,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "X8Ukr2",
+                              "name": "정정 내용·사유 · 필수",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "정정 내용·사유 · 필수",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "id": "z7J54yG",
+                              "type": "ref",
+                              "ref": "newslittle:Iy0mI",
+                              "descendants": {
+                                "jZtN9": {
+                                  "content": "원문 정정 내용을 입력하세요."
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "정정 내용·사유 · 필수"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "X8HrtW",
+                          "name": "출처",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 16,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "cCG7o",
+                              "name": "정정 출처·시각",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "정정 출처·시각",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "id": "z5EwH1u",
+                              "type": "ref",
+                              "ref": "newslittle:Iy0mI",
+                              "descendants": {
+                                "jZtN9": {
+                                  "content": "원문 URL / 2026.09.14 09:30"
+                                }
+                              },
+                              "width": "fill_container",
+                              "name": "정정 출처·시각"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "YBrsN",
+                      "name": "본문 보유: 정정 등록 후 노출 보류 → 재검수 대기열 / 본문 삭제: ",
+                      "fill": "$newslittle:nl-muted",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "본문 보유: 정정 등록 후 노출 보류 → 재검수 대기열 / 본문 삭제: 재검수 불가, 회수만 허용",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Kn3q4",
+                      "name": "조치",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "id": "zsmOEtG",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "primary",
+                            "newslittle:btn-size": "xs",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "정정 등록·재검수"
+                            }
+                          },
+                          "name": "정정 등록·재검수"
+                        },
+                        {
+                          "id": "zw8OBxs",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "xs",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "중단"
+                            }
+                          },
+                          "name": "중단"
+                        },
+                        {
+                          "id": "z3Sd8Ct",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "xs",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "회수"
+                            }
+                          },
+                          "name": "회수"
+                        },
+                        {
+                          "id": "zDgDy6U",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "xs",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "복구 검토"
+                            }
+                          },
+                          "name": "복구 검토"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "Cy0r8",
+                      "name": "중단·회수·복구는 사유와 재인증 필수. 검토 기록 없이 자동 복구하지 않",
+                      "fill": "$newslittle:nl-negative",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "중단·회수·복구는 사유와 재인증 필수. 검토 기록 없이 자동 복구하지 않습니다.",
+                      "lineHeight": 1.5,
+                      "fontFamily": "$newslittle:nl-font",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "qFuVm",
+                  "name": "처리 기록 · 운영자 A / 09.14 09:30 / Q-008 / 정정",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "처리 기록 · 운영자 A / 09.14 09:30 / Q-008 / 정정 접수 / 수정·삭제 불가",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "CTLh8",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "b54cd6a8-4020-46db-a856-5f0631539c55"
+}

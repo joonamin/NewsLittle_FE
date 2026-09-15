@@ -1,0 +1,684 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "Y06mJ",
+      "x": 0,
+      "y": 240,
+      "name": "ADM-01 운영 대시보드",
+      "clip": true,
+      "width": 1440,
+      "height": 1140,
+      "fill": "$newslittle:nl-subtle",
+      "layout": "vertical",
+      "children": [
+        {
+          "id": "L9NPEi",
+          "type": "ref",
+          "ref": "newslittle:Vdadc",
+          "name": "관리자 주 내비게이션"
+        },
+        {
+          "type": "frame",
+          "id": "w89pga",
+          "name": "운영 레이아웃",
+          "width": "fill_container",
+          "height": "fill_container",
+          "children": [
+            {
+              "id": "njwEK",
+              "type": "ref",
+              "ref": "newslittle:S5ny8w",
+              "name": "운영 메뉴",
+              "height": "fill_container",
+              "descendants": {
+                "newslittle:aWfuo": {
+                  "fill": "#F0F0FA",
+                  "cornerRadius": 8
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "kFmjo",
+              "name": "운영 본문",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 20,
+              "padding": 32,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "xJIc8",
+                  "name": "ADM-01 운영 대시보드",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "ADM-01 운영 대시보드",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 28,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "text",
+                  "id": "NrihU",
+                  "name": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "2026.09.14 · 관리자 세션 · 모든 데이터는 가상 예시",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "WF1SV",
+                  "name": "삭제 실패 경고",
+                  "width": "fill_container",
+                  "fill": "$newslittle:nl-negative-subtle",
+                  "cornerRadius": 12,
+                  "stroke": "$newslittle:nl-border",
+                  "strokeWidth": 1,
+                  "layout": "vertical",
+                  "gap": 16,
+                  "padding": 24,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "K3QTJg",
+                      "name": "삭제 경고",
+                      "width": "fill_container",
+                      "gap": 16,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "e4Jyf",
+                          "name": "삭제 실패 2건 · 확인되지 않은 자산은 재게시할 수 없습니다.",
+                          "fill": "$newslittle:nl-negative",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "삭제 실패 2건 · 확인되지 않은 자산은 재게시할 수 없습니다.",
+                          "lineHeight": 1.5,
+                          "fontFamily": "$newslittle:nl-font",
+                          "fontSize": 14,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "id": "zdYcI87",
+                          "type": "ref",
+                          "ref": "newslittle:Rd5Tc",
+                          "theme": {
+                            "newslittle:btn-variant": "secondary",
+                            "newslittle:btn-size": "xs",
+                            "newslittle:btn-state": "enabled"
+                          },
+                          "descendants": {
+                            "yZaSP": {
+                              "content": "삭제 상태 확인"
+                            }
+                          },
+                          "name": "삭제 상태 확인"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "HIzVY",
+                  "name": "마지막 집계 09:42 · 조회 전용",
+                  "fill": "$newslittle:nl-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "마지막 집계 09:42 · 조회 전용",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "FwWMZ",
+                  "name": "대기 건수",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "id": "zb1YMCe",
+                      "type": "ref",
+                      "ref": "newslittle:dpVYL",
+                      "descendants": {
+                        "TeFt3": {
+                          "content": "검수 대기",
+                          "fontSize": 12
+                        },
+                        "j7d72": {
+                          "content": "12 →",
+                          "fill": "$newslittle:nl-accent",
+                          "fontSize": 28
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "검수 대기"
+                    },
+                    {
+                      "id": "zd2Sc15",
+                      "type": "ref",
+                      "ref": "newslittle:dpVYL",
+                      "descendants": {
+                        "TeFt3": {
+                          "content": "이용 근거 검토",
+                          "fontSize": 12
+                        },
+                        "j7d72": {
+                          "content": "3 →",
+                          "fill": "$newslittle:nl-accent",
+                          "fontSize": 28
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "이용 근거 검토"
+                    },
+                    {
+                      "id": "zueogwH",
+                      "type": "ref",
+                      "ref": "newslittle:dpVYL",
+                      "descendants": {
+                        "TeFt3": {
+                          "content": "삭제 실패",
+                          "fontSize": 12
+                        },
+                        "j7d72": {
+                          "content": "2 →",
+                          "fill": "$newslittle:nl-accent",
+                          "fontSize": 28
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "삭제 실패"
+                    },
+                    {
+                      "id": "zaFvabI",
+                      "type": "ref",
+                      "ref": "newslittle:dpVYL",
+                      "descendants": {
+                        "TeFt3": {
+                          "content": "미처리 신고",
+                          "fontSize": 12
+                        },
+                        "j7d72": {
+                          "content": "4 →",
+                          "fill": "$newslittle:nl-accent",
+                          "fontSize": 28
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "미처리 신고"
+                    },
+                    {
+                      "id": "z8iooAi",
+                      "type": "ref",
+                      "ref": "newslittle:dpVYL",
+                      "descendants": {
+                        "TeFt3": {
+                          "content": "정정 대기",
+                          "fontSize": 12
+                        },
+                        "j7d72": {
+                          "content": "1 →",
+                          "fill": "$newslittle:nl-accent",
+                          "fontSize": 28
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "정정 대기"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "HqAK7",
+                  "name": "기한 및 공급",
+                  "width": "fill_container",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "id": "zvUFKRR",
+                      "type": "ref",
+                      "ref": "newslittle:N0Vy7",
+                      "theme": {
+                        "newslittle:notice-tone": "plain"
+                      },
+                      "descendants": {
+                        "KYmif": {
+                          "content": "기한 경고",
+                          "fontSize": 18
+                        },
+                        "wjhIh": {
+                          "content": "본문 삭제 임박 · N-0913-08 · 18시간",
+                          "fill": "$newslittle:nl-text",
+                          "fontSize": 14
+                        },
+                        "njeyp": {
+                          "type": "frame",
+                          "name": "액션",
+                          "width": "fill_container",
+                          "gap": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "xbrA5",
+                              "name": "파생물 만료 임박 · Q-0815-02 · 1일",
+                              "fill": "$newslittle:nl-text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "파생물 만료 임박 · Q-0815-02 · 1일",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "text",
+                              "id": "s439ZT",
+                              "name": "계약 종료 임박 · LIC-004 · 2일",
+                              "fill": "$newslittle:nl-text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "계약 종료 임박 · LIC-004 · 2일",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "기한 경고"
+                    },
+                    {
+                      "id": "zU1GGEn",
+                      "type": "ref",
+                      "ref": "newslittle:N0Vy7",
+                      "theme": {
+                        "newslittle:notice-tone": "plain"
+                      },
+                      "descendants": {
+                        "KYmif": {
+                          "content": "오늘의 공급 상태",
+                          "fontSize": 18
+                        },
+                        "wjhIh": {
+                          "content": "게시 가능 기사 12개 · 선택형 문항 24개",
+                          "fill": "$newslittle:nl-text",
+                          "fontSize": 14
+                        },
+                        "njeyp": {
+                          "type": "frame",
+                          "name": "액션",
+                          "width": "fill_container",
+                          "gap": 8,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "MridS",
+                              "name": "주관식 문항 3개 · 랜덤 주관식 시작 보류",
+                              "fill": "$newslittle:nl-negative",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "주관식 문항 3개 · 랜덤 주관식 시작 보류",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 14,
+                              "fontWeight": "700"
+                            },
+                            {
+                              "type": "text",
+                              "id": "G5VQi",
+                              "name": "5문제 미만인 형식만 보류합니다.",
+                              "fill": "$newslittle:nl-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "5문제 미만인 형식만 보류합니다.",
+                              "lineHeight": 1.5,
+                              "fontFamily": "$newslittle:nl-font",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "공급 상태"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "ZMIhC",
+                  "name": "최근 처리 기록 · 10건",
+                  "fill": "$newslittle:nl-text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "최근 처리 기록 · 10건",
+                  "lineHeight": 1.5,
+                  "fontFamily": "$newslittle:nl-font",
+                  "fontSize": 18,
+                  "fontWeight": "700"
+                },
+                {
+                  "type": "frame",
+                  "id": "sGkdW",
+                  "name": "데이터 목록",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "id": "zqtq5h1",
+                      "type": "ref",
+                      "ref": "newslittle:h46F8",
+                      "descendants": {
+                        "pB8R7": {
+                          "content": "시각"
+                        },
+                        "ct0H4": {
+                          "content": "대상 자산"
+                        },
+                        "LyoXE": {
+                          "content": "조치"
+                        },
+                        "ADtbS": {
+                          "content": "행위자"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "열 제목",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zXL5ojm",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:40"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-12"
+                        },
+                        "FkEoq": {
+                          "content": "검수 통과"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 1",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "z3QDvqd",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:38"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-11"
+                        },
+                        "FkEoq": {
+                          "content": "게시 확인"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 2",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zdrgjl7",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:36"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-10"
+                        },
+                        "FkEoq": {
+                          "content": "삭제 요청"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 3",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zdYzwRy",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:34"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-09"
+                        },
+                        "FkEoq": {
+                          "content": "검수 통과"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 4",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zGGA7L6",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:32"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-08"
+                        },
+                        "FkEoq": {
+                          "content": "게시 확인"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 5",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zXvL67w",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:30"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-07"
+                        },
+                        "FkEoq": {
+                          "content": "삭제 요청"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 6",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "z6VUOov",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:28"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-06"
+                        },
+                        "FkEoq": {
+                          "content": "검수 통과"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 7",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zjq97vL",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:26"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-05"
+                        },
+                        "FkEoq": {
+                          "content": "게시 확인"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 8",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zqnL0N1",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:24"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-04"
+                        },
+                        "FkEoq": {
+                          "content": "삭제 요청"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 9",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    },
+                    {
+                      "id": "zpt8Anv",
+                      "type": "ref",
+                      "ref": "newslittle:wAiVB",
+                      "descendants": {
+                        "g5zTQ": {
+                          "content": "09:22"
+                        },
+                        "qOHjO": {
+                          "content": "N-0914-03"
+                        },
+                        "FkEoq": {
+                          "content": "검수 통과"
+                        },
+                        "ia0ZY": {
+                          "content": "운영자 A"
+                        }
+                      },
+                      "width": "fill_container",
+                      "name": "데이터 행 10",
+                      "padding": [
+                        6,
+                        16
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "hCWeM",
+          "layoutPosition": "absolute",
+          "x": 1240,
+          "y": 12,
+          "name": "브라우저 프로토타입 안내",
+          "fill": "$newslittle:nl-accent",
+          "content": "라우트는 02 흐름도 참고",
+          "fontFamily": "$newslittle:nl-font",
+          "fontSize": 12,
+          "fontWeight": "normal"
+        }
+      ]
+    }
+  ],
+  "imports": {
+    "newslittle": "../library/newslittle.lib.pen"
+  },
+  "fileToken": "0ddc2347-b5c4-4283-b84f-dff5b22a0e0d"
+}

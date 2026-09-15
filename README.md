@@ -132,6 +132,6 @@ npm test
 
 ## Wireframes
 
-전체 중간 충실도 와이어프레임은 [`design/wireframe/mid-fi.pen`](design/wireframe/mid-fi.pen)에 있습니다. 화면과 Pages Router 파일의 매핑은 [`design/wireframe/README.md`](design/wireframe/README.md)를 따릅니다.
+전체 중간 충실도 와이어프레임 원본은 [`design/wireframe/wireframe.pen`](design/wireframe/wireframe.pen)입니다. 화면 ID별 추출 파일과 공통 라이브러리는 [`design/README.md`](design/README.md)를 따릅니다. 화면과 Pages Router 파일의 매핑은 [`design/wireframe/README.md`](design/wireframe/README.md)에 있습니다.
 
-현재 화면은 와이어프레임 반영 전의 라우트 골격입니다. API 계약과 View Model은 준비되어 있으므로, 화면별 hi-fi pen 파일과 UI를 추가할 때 이 모델 경계를 그대로 사용합니다.
+현재 화면은 와이어프레임 반영 전의 라우트 골격입니다. API 계약과 View Model은 준비되어 있으므로, 화면별 pen 파일과 UI를 추가할 때 이 모델 경계를 그대로 사용합니다.
