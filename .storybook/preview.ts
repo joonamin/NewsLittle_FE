@@ -4,7 +4,7 @@ import "../src/styles/globals.css";
 
 const preview: Preview = {
   parameters: {
-    layout: "centered",
+    layout: "padded",
     controls: {
       matchers: {
         color: /(background|color)$/i,

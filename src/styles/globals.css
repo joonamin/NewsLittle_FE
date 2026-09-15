@@ -1,16 +1,56 @@
 @import "tailwindcss";
 
-html {
-  min-width: 320px;
+@theme {
+  --color-nl-bg: #ffffff;
+  --color-nl-subtle: #f4f5f7;
+  --color-nl-border: #e0e2e6;
+  --color-nl-text: #1b1d22;
+  --color-nl-muted: #4d5159;
+  --color-nl-accent: #5055b1;
+  --color-nl-accent-subtle: #f0f0fa;
+  --color-nl-accent-wash: #f8f8fd;
+  --color-nl-on-accent: #ffffff;
+  --color-nl-positive: #2a6614;
+  --color-nl-positive-subtle: #eef6e9;
+  --color-nl-negative: #ec1f2d;
+  --color-nl-negative-subtle: #fff0f1;
+  --color-nl-disabled: #eaebee;
+  --color-nl-disabled-content: #80858e;
+  --color-nl-overlay: rgb(27 29 34 / 0.4);
+
+  --font-sans: var(--font-noto-sans-kr), "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+
+  --text-nl-title-xl: 32px;
+  --text-nl-title-xl--line-height: 44px;
+  --text-nl-title: 24px;
+  --text-nl-title--line-height: 34px;
+  --text-nl-body: 16px;
+  --text-nl-body--line-height: 24px;
+  --text-nl-caption: 14px;
+  --text-nl-caption--line-height: 22px;
+  --text-nl-micro: 12px;
+  --text-nl-micro--line-height: 18px;
+
+  --radius-nl-badge: 4px;
+  --radius-nl-button: 8px;
+  --radius-nl-card: 12px;
+
+  --tracking-nl-tight: -0.01em;
+
+  --shadow-nl-menu: 0 4px 12px rgb(27 29 34 / 0.2);
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
-}
+@layer base {
+  html {
+    min-width: 320px;
+  }
 
-*:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
+  body {
+    min-height: 100vh;
+    @apply bg-nl-bg text-nl-text font-sans;
+  }
+
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-nl-accent;
+  }
 }
