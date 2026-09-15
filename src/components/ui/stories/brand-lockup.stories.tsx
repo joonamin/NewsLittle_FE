@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { BrandLockup } from "./brand-lockup";
+import { BrandLockup } from "../brand-lockup";
 
 const meta = {
   title: "UI/BrandLockup",

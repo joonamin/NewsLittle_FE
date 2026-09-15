@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { ExplanationBlock } from "./explanation-block";
+import { ExplanationBlock } from "../explanation-block";
 
 const meta = {
   title: "UI/ExplanationBlock",

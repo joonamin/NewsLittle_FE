@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { FilterSelect } from "./select";
+import { FilterSelect } from "../select";
 
 const meta = {
   title: "UI/FilterSelect",

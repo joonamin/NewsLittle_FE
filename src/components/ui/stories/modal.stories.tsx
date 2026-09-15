@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Modal } from "./modal";
+import { Modal } from "../modal";
 
 function ModalDemo(props: Omit<Parameters<typeof Modal>[0], "open" | "onClose">) {
   const [open, setOpen] = useState(true);

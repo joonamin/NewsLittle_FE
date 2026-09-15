@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { ReadonlyField } from "./field-box";
+import { ReadonlyField } from "../field-box";
 
 const meta = {
   title: "UI/ReadonlyField",

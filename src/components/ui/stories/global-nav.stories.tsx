@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { GlobalNav } from "./global-nav";
+import { GlobalNav } from "../global-nav";
 
 const menus = [
   { label: "홈", href: "/" },

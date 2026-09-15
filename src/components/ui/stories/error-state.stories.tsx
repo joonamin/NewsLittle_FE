@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { ErrorState } from "./state-view";
+import { ErrorState } from "../state-view";
 
 const meta = {
   title: "UI/ErrorState",

@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, within } from "storybook/test";
 
-import { ProgressLabel } from "./progress";
+import { StatPair } from "../stat";
 
 const meta = {
-  title: "UI/ProgressLabel",
-  component: ProgressLabel,
+  title: "UI/StatPair",
+  component: StatPair,
   args: {
-    category: "오늘 목록 · OX·객관식",
-    progress: "01 / 03",
+    value: 8,
+    label: "정답 문항",
   },
-} satisfies Meta<typeof ProgressLabel>;
+} satisfies Meta<typeof StatPair>;
 
 export default meta;
 
@@ -19,6 +19,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText("01 / 03")).toBeVisible();
+    await expect(canvas.getByText("8")).toBeVisible();
+    await expect(canvas.getByText("정답 문항")).toBeVisible();
   },
 };

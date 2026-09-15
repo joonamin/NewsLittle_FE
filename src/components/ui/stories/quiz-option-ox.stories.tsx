@@ -1,17 +1,16 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { QuizOptionChoice } from "./quiz-option";
+import { QuizOptionOX } from "../quiz-option";
 
 const meta = {
-  title: "UI/QuizOptionChoice",
-  component: QuizOptionChoice,
+  title: "UI/QuizOptionOX",
+  component: QuizOptionOX,
   args: {
-    index: 2,
-    text: "잎에서 물을 증발시켜서",
+    label: "○  X  아니에요",
     onClick: fn(),
   },
-} satisfies Meta<typeof QuizOptionChoice>;
+} satisfies Meta<typeof QuizOptionOX>;
 
 export default meta;
 
@@ -29,7 +28,7 @@ export const Unselected: Story = {
 };
 
 export const Selected: Story = {
-  args: { selected: true },
+  args: { selected: true, label: "◉  O  맞아요" },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole("radio")).toHaveAttribute("aria-checked", "true");

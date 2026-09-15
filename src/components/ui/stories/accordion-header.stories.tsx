@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { DateGroupHeader } from "./accordion-header";
+import { DateGroupHeader } from "../accordion-header";
 
 const meta = {
   title: "UI/DateGroupHeader",

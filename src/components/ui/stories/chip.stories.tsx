@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Chip } from "./chip";
+import { Chip } from "../chip";
 
 const meta = {
   title: "UI/Chip",
