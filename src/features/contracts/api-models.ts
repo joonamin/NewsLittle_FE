@@ -6,10 +6,47 @@
 
 export type ApiTimestamp = string;
 
+export type ApiMeta = {
+  requestId: string;
+  pagination?: {
+    nextCursor: string | null;
+    hasMore: boolean;
+  } | null;
+};
+
+export type ApiResponse<T> = {
+  data: T;
+  meta: ApiMeta;
+};
+
 export type ViewerRole = "guest" | "member";
 export type QuizDomain = "shortform" | "random";
 export type QuizFormat = "choice" | "written";
 export type QuestionKind = "fact" | "semantic";
+
+export type NavigationItemId = "home" | "random" | "archive" | "settings" | "operations";
+
+export type NavigationMenuItemApiModel = {
+  id: NavigationItemId;
+  label: string;
+  href: string;
+};
+
+export type AccountMenuItemApiModel =
+  | { id: string; label: string; type: "link"; href: string }
+  | { id: string; label: string; type: "action"; action: "logout" };
+
+/**
+ * The server returns only the items the current session is allowed to see.
+ * In particular, a client must never infer administrator access from a role flag.
+ */
+export type NavigationApiModel = {
+  primaryItems: NavigationMenuItemApiModel[];
+  account:
+    | { status: "guest"; loginLabel: string }
+    | { status: "member"; displayName: string; menuItems: AccountMenuItemApiModel[] };
+  todayListCount: number | null;
+};
 
 export type ViewerApiModel = {
   id: string | null;

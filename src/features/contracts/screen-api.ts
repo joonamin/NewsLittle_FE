@@ -6,9 +6,11 @@
 
 import type {
   AddToTodayListRequest,
+  ApiResponse,
   ArchiveApiModel,
   CreateQuizSessionRequest,
   HomeApiModel,
+  NavigationApiModel,
   QuizDomain,
   QuizPreviewApiModel,
   QuizResultApiModel,
@@ -18,6 +20,7 @@ import type {
 } from "./api-models";
 import {
   toArchiveViewModel,
+  toGlobalNavigationViewModel,
   toHomeViewModel,
   toQuizPlayViewModel,
   toQuizResultViewModel,
@@ -34,6 +37,7 @@ function apiUrl(path: string) {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(apiUrl(path), {
     ...init,
+    credentials: "include",
     headers: {
       Accept: "application/json",
       ...init?.headers,
@@ -44,7 +48,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(`API request failed: ${response.status}`);
   }
 
-  return response.json() as Promise<T>;
+  return ((await response.json()) as ApiResponse<T>).data;
 }
 
 function jsonRequest<T>(method: "POST" | "PUT", body: T) {
@@ -56,6 +60,8 @@ function jsonRequest<T>(method: "POST" | "PUT", body: T) {
 }
 
 export const screenApi = {
+  navigation: () =>
+    request<NavigationApiModel>("/api/v1/navigation").then(toGlobalNavigationViewModel),
   home: () => request<HomeApiModel>("/api/v1/home").then(toHomeViewModel),
   shortformPreview: () =>
     request<QuizPreviewApiModel>("/api/v1/quiz/shortform/preview").then(

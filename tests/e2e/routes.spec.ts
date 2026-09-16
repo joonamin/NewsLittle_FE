@@ -19,3 +19,40 @@ for (const route of routes) {
     await expect(page.getByRole("heading", { name: route.heading })).toBeVisible();
   });
 }
+
+test("guest archive navigation opens the login prompt instead of changing routes", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("navigation", { name: "주 내비게이션" }).getByRole("link", { name: "아카이브" }).click();
+
+  await expect(page).toHaveURL("/");
+  await expect(page.getByRole("dialog", { name: "로그인이 필요해요" })).toBeVisible();
+});
+
+test("navigation controls render the glass interaction and primary current state", async ({ page }) => {
+  await page.goto("/");
+
+  const desktopNav = page.getByRole("navigation", { name: "주 내비게이션" });
+  const home = desktopNav.getByRole("link", { name: "홈", exact: true });
+  const random = desktopNav.getByRole("link", { name: "랜덤 퀴즈", exact: true });
+
+  await expect(home).toHaveClass(/nl-nav-glass/);
+  await expect(home).toHaveClass(/text-nl-accent/);
+  await random.hover();
+  await expect(random).toHaveCSS("backdrop-filter", "blur(12px)");
+});
+
+test("quiz play navigation asks once before leaving", async ({ page }) => {
+  await page.goto("/random/random-session");
+
+  const desktopNav = page.getByRole("navigation", { name: "주 내비게이션" });
+  await desktopNav.getByRole("link", { name: "홈", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "퀴즈를 그만둘까요?" })).toBeVisible();
+
+  await page.getByRole("button", { name: "계속 풀기" }).click();
+  await expect(page).toHaveURL("/random/random-session");
+
+  await desktopNav.getByRole("link", { name: "홈", exact: true }).click();
+  await page.getByRole("button", { name: "나가기" }).click();
+  await expect(page).toHaveURL("/");
+});

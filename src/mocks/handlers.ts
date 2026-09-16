@@ -3,6 +3,7 @@ import { http, HttpResponse } from "msw";
 import {
   archiveFixture,
   homeFixture,
+  memberNavigationFixture,
   randomPreviewFixture,
   randomResultFixture,
   randomSessionFixture,
@@ -14,34 +15,39 @@ import {
 
 const api = "/api/v1";
 
+function successResponse<T>(data: T, init?: ResponseInit) {
+  return HttpResponse.json({ data, meta: { requestId: "mock-request-id" } }, init);
+}
+
 export const handlers = [
-  http.get(`${api}/home`, () => HttpResponse.json(homeFixture)),
+  http.get(`${api}/navigation`, () => successResponse(memberNavigationFixture)),
+  http.get(`${api}/home`, () => successResponse(homeFixture)),
   http.get(`${api}/quiz/shortform/preview`, () =>
-    HttpResponse.json(shortformPreviewFixture),
+    successResponse(shortformPreviewFixture),
   ),
-  http.get(`${api}/quiz/random/preview`, () => HttpResponse.json(randomPreviewFixture)),
+  http.get(`${api}/quiz/random/preview`, () => successResponse(randomPreviewFixture)),
   http.post(`${api}/quiz/shortform/sessions`, () =>
-    HttpResponse.json(shortformSessionFixture, { status: 201 }),
+    successResponse(shortformSessionFixture, { status: 201 }),
   ),
   http.post(`${api}/quiz/random/sessions`, () =>
-    HttpResponse.json(randomSessionFixture, { status: 201 }),
+    successResponse(randomSessionFixture, { status: 201 }),
   ),
   http.get(`${api}/quiz/shortform/sessions/:sessionId`, () =>
-    HttpResponse.json(shortformSessionFixture),
+    successResponse(shortformSessionFixture),
   ),
   http.get(`${api}/quiz/random/sessions/:sessionId`, () =>
-    HttpResponse.json(randomSessionFixture),
+    successResponse(randomSessionFixture),
   ),
   http.get(`${api}/quiz/shortform/sessions/:sessionId/result`, () =>
-    HttpResponse.json(shortformResultFixture),
+    successResponse(shortformResultFixture),
   ),
   http.get(`${api}/quiz/random/sessions/:sessionId/result`, () =>
-    HttpResponse.json(randomResultFixture),
+    successResponse(randomResultFixture),
   ),
-  http.get(`${api}/archive`, () => HttpResponse.json(archiveFixture)),
-  http.get(`${api}/settings`, () => HttpResponse.json(settingsFixture)),
+  http.get(`${api}/archive`, () => successResponse(archiveFixture)),
+  http.get(`${api}/settings`, () => successResponse(settingsFixture)),
   http.post(`${api}/today-list`, () =>
-    HttpResponse.json({ todayList: homeFixture.todayList }, { status: 201 }),
+    successResponse({ todayList: homeFixture.todayList }, { status: 201 }),
   ),
-  http.put(`${api}/settings/topics`, () => HttpResponse.json(settingsFixture)),
+  http.put(`${api}/settings/topics`, () => successResponse(settingsFixture)),
 ];

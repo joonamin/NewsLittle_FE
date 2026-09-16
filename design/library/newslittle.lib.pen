@@ -278,7 +278,7 @@
           "type": "frame",
           "id": "O5rYI2",
           "name": "GLB-01 · 주 내비게이션",
-          "context": "nav:primary — 서비스 상단에 고정되는 전역 내비게이션 바. 브랜드 로고, 주요 메뉴(홈/랜덤 퀴즈/아카이브), 인증 상태를 담아 모든 회원용 화면에서 화면 간 이동을 담당한다.\n@viewmodel {\"model\":\"GlobalNavVM\",\"fields\":[{\"name\":\"isLoggedIn\",\"type\":\"boolean\",\"bind\":\"theme:auth\",\"required\":true},{\"name\":\"userName\",\"type\":\"string|null\",\"bind\":\"i50VwS.content\"},{\"name\":\"loginLabel\",\"type\":\"string\",\"bind\":\"ynQdU.content\"},{\"name\":\"menus\",\"type\":\"string[]\",\"bind\":\"[G5dI5N,wGpGD,Fnwbc].content\",\"required\":true}],\"actions\":[{\"name\":\"onLogin\",\"bind\":\"ynQdU\"},{\"name\":\"onOpenUserMenu\",\"bind\":\"K9Ls5\"}]}",
+          "context": "nav:primary — 서비스 상단에 고정되는 전역 내비게이션 바. 브랜드 로고, 주요 메뉴(홈/랜덤 퀴즈/아카이브), 인증 상태를 담아 모든 회원용 화면에서 화면 간 이동을 담당한다.\ninteraction:glass — 주 메뉴·인증 제어·사용자 메뉴 항목은 hover/focus에서 #FFFFFFC2 fill, #FFFFFFCC stroke, 12px background blur, 0 6px 16px #1B1D2214 shadow를 사용한다. 현재 위치는 glass 고정 없이 primary 색상으로 표시한다. 모바일은 hover 대신 focus/pressed로 같은 피드백을 제공한다.\n@viewmodel {\"model\":\"GlobalNavVM\",\"fields\":[{\"name\":\"isLoggedIn\",\"type\":\"boolean\",\"bind\":\"theme:auth\",\"required\":true},{\"name\":\"userName\",\"type\":\"string|null\",\"bind\":\"i50VwS.content\"},{\"name\":\"loginLabel\",\"type\":\"string\",\"bind\":\"ynQdU.content\"},{\"name\":\"menus\",\"type\":\"string[]\",\"bind\":\"[G5dI5N,wGpGD,Fnwbc].content\",\"required\":true}],\"actions\":[{\"name\":\"onLogin\",\"bind\":\"ynQdU\"},{\"name\":\"onOpenUserMenu\",\"bind\":\"K9Ls5\"}]}",
           "theme": {
             "auth": "logged-out"
           },
