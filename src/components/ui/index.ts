@@ -1,4 +1,5 @@
 export * from "./accordion-header";
+export * from "./article-gesture";
 export * from "./badge";
 export * from "./brand-lockup";
 export * from "./button";

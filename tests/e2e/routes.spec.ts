@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 const routes = [
-  { path: "/", heading: "뉴스 탐색" },
+  { path: "/", heading: "뉴스를 불러오지 못했어요" },
   { path: "/random", heading: "랜덤 퀴즈 시작" },
   { path: "/random/random-session", heading: "랜덤 퀴즈 풀이" },
   { path: "/random/random-session/result", heading: "랜덤 퀴즈 결과" },
