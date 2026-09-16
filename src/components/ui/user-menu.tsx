@@ -1,19 +1,24 @@
 // lib: User Menu / 사용자 설정 드롭다운 (PnlA2), Menu Item / 사용자 메뉴 항목 (z37PUu)
-import type { ButtonHTMLAttributes, HTMLAttributes } from "react";
+import { forwardRef } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, HTMLAttributes } from "react";
 
 import { cn } from "@/lib/cn";
 
 export type UserMenuProps = HTMLAttributes<HTMLDivElement>;
 
-export function UserMenu({ className, ...props }: UserMenuProps) {
+export const UserMenu = forwardRef<HTMLDivElement, UserMenuProps>(function UserMenu(
+  { className, ...props },
+  ref,
+) {
   return (
     <div
+      ref={ref}
       role="menu"
       className={cn("shadow-nl-menu w-[220px] rounded-nl-button border border-nl-border bg-nl-bg p-2", className)}
       {...props}
     />
   );
-}
+});
 
 export type UserMenuItemTone = "default" | "danger";
 
@@ -50,6 +55,27 @@ export function UserMenuItem({
     >
       {label}
     </button>
+  );
+}
+
+export type UserMenuLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  label: string;
+  emphasis?: boolean;
+};
+
+export function UserMenuLink({ label, emphasis = false, className, ...props }: UserMenuLinkProps) {
+  return (
+    <a
+      role="menuitem"
+      className={cn(
+        "flex h-10 w-full items-center px-3 text-left text-nl-caption text-nl-text",
+        emphasis ? "font-bold" : "font-normal",
+        className,
+      )}
+      {...props}
+    >
+      {label}
+    </a>
   );
 }
 
