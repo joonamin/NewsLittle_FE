@@ -17,6 +17,8 @@
   --color-nl-disabled: #eaebee;
   --color-nl-disabled-content: #80858e;
   --color-nl-overlay: rgb(27 29 34 / 0.4);
+  --color-nl-glass-fill: rgb(255 255 255 / 0.76);
+  --color-nl-glass-border: rgb(255 255 255 / 0.8);
 
   --font-sans: var(--font-noto-sans-kr), "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
 
@@ -38,6 +40,40 @@
   --tracking-nl-tight: -0.01em;
 
   --shadow-nl-menu: 0 4px 12px rgb(27 29 34 / 0.2);
+  --shadow-nl-glass: 0 6px 16px rgb(27 29 34 / 0.08);
+}
+
+@layer components {
+  .nl-nav-glass {
+    border: 1px solid transparent;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .nl-nav-glass:focus-visible,
+  .nl-nav-glass:active {
+    border-color: var(--color-nl-glass-border);
+    background-color: var(--color-nl-glass-fill);
+    box-shadow: var(--shadow-nl-glass);
+    backdrop-filter: blur(12px);
+  }
+
+  @media (hover: hover) {
+    .nl-nav-glass:hover {
+      border-color: var(--color-nl-glass-border);
+      background-color: var(--color-nl-glass-fill);
+      box-shadow: var(--shadow-nl-glass);
+      backdrop-filter: blur(12px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nl-nav-glass {
+      transition: none;
+    }
+  }
 }
 
 @layer base {
