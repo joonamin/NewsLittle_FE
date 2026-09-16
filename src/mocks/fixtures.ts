@@ -51,7 +51,7 @@ export const mockViewer: ViewerApiModel = {
   storageScope: "account",
 };
 
-const firstArticle: ArticleApiModel = {
+export const firstArticle: ArticleApiModel = {
   id: "article-library-program",
   title: "모의 기사: 지역 공공도서관이 주말 프로그램을 확대합니다",
   source: {
@@ -67,11 +67,17 @@ const firstArticle: ArticleApiModel = {
     aiGenerated: true,
     reviewedAt: "2026-09-13T09:30:00+09:00",
   },
-  image: null,
+  image: {
+    status: "available",
+    origin: "article",
+    url: "https://images.unsplash.com/photo-1776583235002-016ed6dffa31?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixlib=rb-4.1.0&q=80&w=1080",
+    alt: "나무가 우거진 공원 산책로",
+    attribution: "Unsplash · Bernd Dittrich",
+  },
   availability: { feed: "published", original: "available" },
 };
 
-const secondArticle: ArticleApiModel = {
+export const secondArticle: ArticleApiModel = {
   id: "article-science-class",
   title: "모의 기사: 청소년 과학 교실의 참가 신청이 시작됐습니다",
   source: {
@@ -94,7 +100,10 @@ const secondArticle: ArticleApiModel = {
 export const homeFixture: HomeApiModel = {
   viewer: mockViewer,
   feed: {
-    items: [firstArticle, secondArticle],
+    items: [
+      { article: firstArticle, isFromPreviousFeedDate: false },
+      { article: secondArticle, isFromPreviousFeedDate: false },
+    ],
     currentIndex: 0,
     nextCursor: "demo-next-cursor",
     canLoadPreviousDates: true,
@@ -111,7 +120,7 @@ export const homeFixture: HomeApiModel = {
       },
     ],
   },
-  pendingPreviousList: null,
+  pendingPreviousLists: [],
 };
 
 export const shortformPreviewFixture: QuizPreviewApiModel = {

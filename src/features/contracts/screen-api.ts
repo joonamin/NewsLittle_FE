@@ -6,6 +6,7 @@
 
 import type {
   AddToTodayListRequest,
+  AuthenticationApiModel,
   ApiResponse,
   ArchiveApiModel,
   CreateQuizSessionRequest,
@@ -16,6 +17,7 @@ import type {
   QuizResultApiModel,
   QuizSessionApiModel,
   SettingsApiModel,
+  TodayListApiModel,
   UpdateInterestTopicsRequest,
 } from "./api-models";
 import {
@@ -63,6 +65,8 @@ export const screenApi = {
   navigation: () =>
     request<NavigationApiModel>("/api/v1/navigation").then(toGlobalNavigationViewModel),
   home: () => request<HomeApiModel>("/api/v1/home").then(toHomeViewModel),
+  signInWithGoogle: () => request<AuthenticationApiModel>("/api/v1/auth/google", { method: "POST" }),
+  signOut: () => request<AuthenticationApiModel>("/api/v1/auth/logout", { method: "POST" }),
   shortformPreview: () =>
     request<QuizPreviewApiModel>("/api/v1/quiz/shortform/preview").then(
       toQuizStartViewModel,
@@ -80,7 +84,13 @@ export const screenApi = {
   archive: () => request<ArchiveApiModel>("/api/v1/archive").then(toArchiveViewModel),
   settings: () => request<SettingsApiModel>("/api/v1/settings").then(toSettingsViewModel),
   addToTodayList: (payload: AddToTodayListRequest) =>
-    request("/api/v1/today-list", jsonRequest("POST", payload)),
+    request<TodayListApiModel>("/api/v1/today-list", jsonRequest("POST", payload)),
+  removeFromTodayList: (articleId: string) =>
+    request<TodayListApiModel>(`/api/v1/today-list/${encodeURIComponent(articleId)}`, {
+      method: "DELETE",
+    }),
+  archivePreviousLists: () => request<HomeApiModel>("/api/v1/previous-lists/archive", { method: "POST" }).then(toHomeViewModel),
+  discardPreviousLists: () => request<HomeApiModel>("/api/v1/previous-lists", { method: "DELETE" }).then(toHomeViewModel),
   createSession: (domain: QuizDomain, payload: CreateQuizSessionRequest) =>
     request<QuizSessionApiModel>(
       `/api/v1/quiz/${domain}/sessions`,

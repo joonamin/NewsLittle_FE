@@ -3,6 +3,7 @@ import Head from "next/head";
 import { Noto_Sans_KR } from "next/font/google";
 
 import { AppShell } from "@/components/layout/app-shell";
+import { HomeFlowProvider } from "@/features/home/home-flow";
 import { MockingProvider } from "@/mocks/mocking-provider";
 
 import "@/styles/globals.css";
@@ -30,9 +31,11 @@ export default function App({ Component, pageProps }: AppProps) {
         }
       `}</style>
       <MockingProvider>
-        <AppShell>
-          <Component {...pageProps} />
-        </AppShell>
+        <HomeFlowProvider>
+          <AppShell>
+            <Component {...pageProps} />
+          </AppShell>
+        </HomeFlowProvider>
       </MockingProvider>
     </>
   );

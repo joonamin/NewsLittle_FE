@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/router";
 
 import { GlobalNav } from "@/components/ui/global-nav";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
-import {
-  defaultGuestNavigation,
-  type GlobalNavigationViewModel,
-} from "@/features/contracts/view-models";
-import { screenApi } from "@/features/contracts/screen-api";
+import { useHomeFlow } from "@/features/home/home-flow";
 
 type AppShellProps = { children: ReactNode };
 type NavigationTarget = { id: string; label: string; href: string };
@@ -30,28 +26,12 @@ function isQuizPlayRoute(pathname: string) {
 
 export function AppShell({ children }: AppShellProps) {
   const router = useRouter();
-  const [navigation, setNavigation] = useState<GlobalNavigationViewModel>(defaultGuestNavigation);
+  const { closeLogin, completeLogin, loginOpen, navigation, logout, requestLogin } = useHomeFlow();
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation>(null);
-  const [loginPromptOpen, setLoginPromptOpen] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    void screenApi.navigation().then(
-      (value) => {
-        if (!cancelled) setNavigation(value);
-      },
-      () => {
-        // No backend yet: retain the safe guest shell, which never exposes operations.
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const completeNavigation = (item: NavigationTarget) => {
     if (navigation.account.status === "guest" && item.id === "archive") {
-      setLoginPromptOpen(true);
+      requestLogin();
       return;
     }
     void router.push(item.href);
@@ -74,11 +54,9 @@ export function AppShell({ children }: AppShellProps) {
         account={navigation.account}
         todayListCount={navigation.todayListCount}
         onNavigate={requestNavigation}
-        onLogin={() => setLoginPromptOpen(true)}
+        onLogin={requestLogin}
         onAccountNavigate={(item) => requestNavigation({ id: item.id, label: item.label, href: item.href })}
-        onAccountAction={() => {
-          // Authentication/session mutation is supplied by the future auth integration.
-        }}
+        onAccountAction={() => void logout()}
       />
       <main>{children}</main>
 
@@ -100,12 +78,12 @@ export function AppShell({ children }: AppShellProps) {
       </Modal>
 
       <Modal
-        open={loginPromptOpen}
-        onClose={() => setLoginPromptOpen(false)}
+        open={loginOpen}
+        onClose={closeLogin}
         title="로그인이 필요해요"
         footer={
           <div className="space-y-3">
-            <Button variant="primary" className="w-full">구글로 계속하기</Button>
+            <Button variant="primary" className="w-full" onClick={() => void completeLogin()}>구글로 계속하기</Button>
             <p className="text-nl-caption text-nl-muted">홈 탐색과 랜덤 퀴즈는 로그인 없이 이용할 수 있어요.</p>
             <p className="text-nl-micro text-nl-muted">
               첫 구글 로그인이 곧 가입입니다. 계정 인증, 관심 주제 설정 및 보관 기록 제공을 위해 정보를 처리합니다.

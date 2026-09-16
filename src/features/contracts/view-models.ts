@@ -60,10 +60,37 @@ function formatDate(value: string) {
   return dateFormatter.format(new Date(value));
 }
 
-function mapArticleCard(article: ArticleApiModel) {
+const topicLabels: Record<string, string> = {
+  economy: "경제",
+  society: "사회",
+  "ai-it": "AI·IT",
+  science: "과학",
+};
+
+export type HomeArticleCardViewModel = {
+  id: string;
+  category: string;
+  title: string;
+  bodyText: string | null;
+  sourceName: string;
+  publishedLabel: string;
+  originalUrl: string;
+  summaryText: string | null;
+  showsAiSummary: boolean;
+  image: { url: string; alt: string; label: string | null } | null;
+  originalIsAvailable: boolean;
+  isFromPreviousFeedDate: boolean;
+};
+
+function mapArticleCard(
+  article: ArticleApiModel,
+  isFromPreviousFeedDate = false,
+): HomeArticleCardViewModel {
   return {
     id: article.id,
+    category: topicLabels[article.topicIds[0] ?? ""] ?? "뉴스",
     title: article.title,
+    bodyText: article.summary.status === "available" ? article.summary.text : null,
     sourceName: article.source.name,
     publishedLabel: formatDate(article.source.publishedAt),
     originalUrl: article.source.originalUrl,
@@ -78,6 +105,7 @@ function mapArticleCard(article: ArticleApiModel) {
           }
         : null,
     originalIsAvailable: article.availability.original === "available",
+    isFromPreviousFeedDate,
   };
 }
 
@@ -90,13 +118,20 @@ export type HomeViewModel = {
   };
   todayList: {
     count: number;
+    dateLabel: string;
     items: Array<{
       articleId: string;
       title: string;
+      originalUrl: string;
+      publishedLabel: string;
       quizStatusLabel: string;
       isFromPreviousFeedDate: boolean;
     }>;
   } | null;
+  pendingPreviousLists: Array<{
+    dateLabel: string;
+    items: Array<{ articleId: string; title: string; originalUrl: string }>;
+  }>;
   needsPreviousListDecision: boolean;
 };
 
@@ -114,22 +149,35 @@ export function toHomeViewModel(api: HomeApiModel): HomeViewModel {
       displayName: api.viewer.displayName,
     },
     feed: {
-      cards: api.feed.items.map(mapArticleCard),
+      cards: api.feed.items.map((item) =>
+        mapArticleCard(item.article, item.isFromPreviousFeedDate),
+      ),
       currentPositionLabel: `${api.feed.currentIndex + 1}/${api.feed.items.length}`,
       canLoadPreviousDates: api.feed.canLoadPreviousDates,
     },
     todayList: api.todayList
       ? {
           count: api.todayList.items.length,
+          dateLabel: formatDate(api.todayList.selectedForDate),
           items: api.todayList.items.map((item) => ({
             articleId: item.article.id,
             title: item.article.title,
+            originalUrl: item.article.source.originalUrl,
+            publishedLabel: formatDate(item.article.source.publishedAt),
             quizStatusLabel: quizStatusLabel[item.quizStatus],
             isFromPreviousFeedDate: item.isFromPreviousFeedDate,
           })),
         }
       : null,
-    needsPreviousListDecision: api.pendingPreviousList !== null,
+    pendingPreviousLists: api.pendingPreviousLists.map((list) => ({
+      dateLabel: formatDate(list.date),
+      items: list.items.map((item) => ({
+        articleId: item.article.id,
+        title: item.article.title,
+        originalUrl: item.article.source.originalUrl,
+      })),
+    })),
+    needsPreviousListDecision: api.pendingPreviousLists.length > 0,
   };
 }
 
