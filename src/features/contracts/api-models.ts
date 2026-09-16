@@ -6,6 +6,19 @@
 
 export type ApiTimestamp = string;
 
+export type ApiMeta = {
+  requestId: string;
+  pagination?: {
+    nextCursor: string | null;
+    hasMore: boolean;
+  } | null;
+};
+
+export type ApiResponse<T> = {
+  data: T;
+  meta: ApiMeta;
+};
+
 export type ViewerRole = "guest" | "member";
 export type QuizDomain = "shortform" | "random";
 export type QuizFormat = "choice" | "written";

@@ -6,6 +6,7 @@
 
 import type {
   AddToTodayListRequest,
+  ApiResponse,
   ArchiveApiModel,
   CreateQuizSessionRequest,
   HomeApiModel,
@@ -36,6 +37,7 @@ function apiUrl(path: string) {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(apiUrl(path), {
     ...init,
+    credentials: "include",
     headers: {
       Accept: "application/json",
       ...init?.headers,
@@ -46,7 +48,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(`API request failed: ${response.status}`);
   }
 
-  return response.json() as Promise<T>;
+  return ((await response.json()) as ApiResponse<T>).data;
 }
 
 function jsonRequest<T>(method: "POST" | "PUT", body: T) {
