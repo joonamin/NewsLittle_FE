@@ -8,7 +8,13 @@ import {
 } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import {
+  homeQueryOptions,
+  navigationQueryOptions,
+  queryKeys,
+} from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
 import {
   defaultGuestNavigation,
@@ -16,33 +22,22 @@ import {
   type HomeViewModel,
 } from "@/features/contracts/view-models";
 
-type LoadState = "loading" | "ready" | "error";
 type PendingAction = { type: "select-article"; articleId: string } | null;
 
 export type HomeFlowState = {
-  home: HomeViewModel | null;
   loginOpen: boolean;
-  navigation: GlobalNavigationViewModel;
   pendingAction: PendingAction;
-  status: LoadState;
 };
 
 type HomeFlowAction =
-  | { type: "load-start" }
-  | { type: "load-success"; home: HomeViewModel; navigation: GlobalNavigationViewModel }
-  | { type: "navigation-success"; navigation: GlobalNavigationViewModel }
-  | { type: "load-failure" }
   | { type: "set-pending-selection"; articleId: string }
   | { type: "clear-pending-action" }
   | { type: "open-login" }
   | { type: "close-login" };
 
 export const initialHomeFlowState: HomeFlowState = {
-  home: null,
   loginOpen: false,
-  navigation: defaultGuestNavigation,
   pendingAction: null,
-  status: "loading",
 };
 
 export function isHomeRoute(url: string) {
@@ -51,14 +46,6 @@ export function isHomeRoute(url: string) {
 
 export function homeFlowReducer(state: HomeFlowState, action: HomeFlowAction): HomeFlowState {
   switch (action.type) {
-    case "load-start":
-      return { ...state, status: "loading" };
-    case "load-success":
-      return { ...state, home: action.home, navigation: action.navigation, status: "ready" };
-    case "navigation-success":
-      return { ...state, navigation: action.navigation };
-    case "load-failure":
-      return { ...state, status: "error" };
     case "set-pending-selection":
       return { ...state, pendingAction: { type: "select-article", articleId: action.articleId } };
     case "clear-pending-action":
@@ -80,11 +67,14 @@ export type ArticleSelectionResult =
 export type PreviousListDecision = "archive" | "discard";
 
 type HomeFlowContextValue = HomeFlowState & {
+  home: HomeViewModel | null;
+  navigation: GlobalNavigationViewModel;
   cancelPendingAction: () => void;
   closeLogin: () => void;
   completeLogin: () => Promise<ArticleSelectionResult>;
   logout: () => Promise<void>;
-  refresh: () => Promise<HomeViewModel | null>;
+  previousListDecision: PreviousListDecision | null;
+  previousListError: boolean;
   removeArticle: (articleId: string) => Promise<void>;
   requestLogin: () => void;
   requestArticleSelection: (articleId: string) => Promise<ArticleSelectionResult>;
@@ -99,68 +89,69 @@ function isAlreadySelected(home: HomeViewModel, articleId: string) {
 
 export function HomeFlowProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(homeFlowReducer, initialHomeFlowState);
+  const homeQuery = useQuery(homeQueryOptions);
+  const navigationQuery = useQuery(navigationQueryOptions);
+  const home = homeQuery.data ?? null;
+  const navigation = navigationQuery.data ?? defaultGuestNavigation;
 
-  const refresh = useCallback(async () => {
-    dispatch({ type: "load-start" });
-    try {
-      const [homeResult, navigationResult] = await Promise.allSettled([
-        screenApi.home(),
-        screenApi.navigation(),
-      ]);
-      const navigation =
-        navigationResult.status === "fulfilled" ? navigationResult.value : defaultGuestNavigation;
-      if (navigationResult.status === "fulfilled") {
-        dispatch({ type: "navigation-success", navigation });
-      }
-      if (homeResult.status === "fulfilled") {
-        dispatch({ type: "load-success", home: homeResult.value, navigation });
-        return homeResult.value;
-      }
-      dispatch({ type: "load-failure" });
-      return null;
-    } catch {
-      dispatch({ type: "load-failure" });
-      return null;
-    }
-  }, []);
-
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+  const invalidateHomeQueries = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: queryKeys.home }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigation }),
+    ]);
+  }, [queryClient]);
 
   useEffect(() => {
     const refreshWhenHomeReturns = (url: string) => {
-      if (isHomeRoute(url)) void refresh();
-    };
-    const refreshWhenVisible = () => {
-      if (document.visibilityState === "visible") void refresh();
+      if (isHomeRoute(url)) {
+        void queryClient.invalidateQueries({ queryKey: queryKeys.home });
+      }
     };
 
     router.events.on("routeChangeComplete", refreshWhenHomeReturns);
-    window.addEventListener("focus", refreshWhenVisible);
-    document.addEventListener("visibilitychange", refreshWhenVisible);
     return () => {
       router.events.off("routeChangeComplete", refreshWhenHomeReturns);
-      window.removeEventListener("focus", refreshWhenVisible);
-      document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
-  }, [refresh, router.events]);
+  }, [queryClient, router.events]);
+
+  const addToTodayList = useMutation({
+    mutationFn: (articleId: string) => screenApi.addToTodayList({ articleId }),
+    onSuccess: invalidateHomeQueries,
+  });
+  const removeFromTodayList = useMutation({
+    mutationFn: screenApi.removeFromTodayList,
+    onSuccess: invalidateHomeQueries,
+  });
+  const signIn = useMutation({
+    mutationFn: screenApi.signInWithGoogle,
+    onSuccess: invalidateHomeQueries,
+  });
+  const signOut = useMutation({
+    mutationFn: screenApi.signOut,
+    onSuccess: invalidateHomeQueries,
+  });
+  const resolvePreviousListsMutation = useMutation({
+    mutationFn: (decision: PreviousListDecision) =>
+      decision === "archive"
+        ? screenApi.archivePreviousLists()
+        : screenApi.discardPreviousLists(),
+    onSuccess: invalidateHomeQueries,
+  });
 
   const addArticle = useCallback(
-    async (articleId: string, home: HomeViewModel): Promise<ArticleSelectionResult> => {
-      if (isAlreadySelected(home, articleId)) return "already-selected";
-      await screenApi.addToTodayList({ articleId });
-      await refresh();
+    async (articleId: string, currentHome: HomeViewModel): Promise<ArticleSelectionResult> => {
+      if (isAlreadySelected(currentHome, articleId)) return "already-selected";
+      await addToTodayList.mutateAsync(articleId);
       dispatch({ type: "clear-pending-action" });
       return "added";
     },
-    [refresh],
+    [addToTodayList],
   );
 
   const requestArticleSelection = useCallback(
     async (articleId: string): Promise<ArticleSelectionResult> => {
-      const home = state.home;
       if (!home) return "unavailable";
       if (!home.viewer.isMember) {
         dispatch({ type: "set-pending-selection", articleId });
@@ -173,52 +164,52 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
       }
       return addArticle(articleId, home);
     },
-    [addArticle, state.home],
+    [addArticle, home],
   );
 
   const completeLogin = useCallback(async (): Promise<ArticleSelectionResult> => {
-    await screenApi.signInWithGoogle();
-    const home = await refresh();
+    await signIn.mutateAsync();
     dispatch({ type: "close-login" });
-    if (!home) return "unavailable";
-    if (home.needsPreviousListDecision) return "previous-list-required";
+    const nextHome = await queryClient.ensureQueryData(homeQueryOptions);
+    if (nextHome.needsPreviousListDecision) return "previous-list-required";
     const pendingArticleId = state.pendingAction?.articleId;
-    return pendingArticleId ? addArticle(pendingArticleId, home) : "added";
-  }, [addArticle, refresh, state.pendingAction]);
+    return pendingArticleId ? addArticle(pendingArticleId, nextHome) : "added";
+  }, [addArticle, queryClient, signIn, state.pendingAction]);
 
   const resolvePreviousLists = useCallback(
     async (decision: PreviousListDecision): Promise<ArticleSelectionResult> => {
-      const home =
-        decision === "archive"
-          ? await screenApi.archivePreviousLists()
-          : await screenApi.discardPreviousLists();
-      await refresh();
-
-      const pendingArticleId = state.pendingAction?.articleId;
-      if (!pendingArticleId) return "added";
-      if (home.needsPreviousListDecision || !home.viewer.isMember) return "previous-list-required";
-      return addArticle(pendingArticleId, home);
+      try {
+        const nextHome = await resolvePreviousListsMutation.mutateAsync(decision);
+        const pendingArticleId = state.pendingAction?.articleId;
+        if (!pendingArticleId) return "added";
+        if (nextHome.needsPreviousListDecision || !nextHome.viewer.isMember) {
+          return "previous-list-required";
+        }
+        return addArticle(pendingArticleId, nextHome);
+      } catch {
+        return "unavailable";
+      }
     },
-    [addArticle, refresh, state.pendingAction],
+    [addArticle, resolvePreviousListsMutation, state.pendingAction],
   );
 
   const removeArticle = useCallback(
     async (articleId: string) => {
-      await screenApi.removeFromTodayList(articleId);
-      await refresh();
+      await removeFromTodayList.mutateAsync(articleId);
     },
-    [refresh],
+    [removeFromTodayList],
   );
 
   const logout = useCallback(async () => {
-    await screenApi.signOut();
     dispatch({ type: "clear-pending-action" });
-    await refresh();
-  }, [refresh]);
+    await signOut.mutateAsync();
+  }, [signOut]);
 
   const value = useMemo<HomeFlowContextValue>(
     () => ({
       ...state,
+      home,
+      navigation,
       cancelPendingAction: () => dispatch({ type: "clear-pending-action" }),
       closeLogin: () => {
         dispatch({ type: "clear-pending-action" });
@@ -226,13 +217,28 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
       },
       completeLogin,
       logout,
-      refresh,
+      previousListDecision: resolvePreviousListsMutation.isPending
+        ? (resolvePreviousListsMutation.variables ?? null)
+        : null,
+      previousListError: resolvePreviousListsMutation.isError,
       removeArticle,
       requestLogin: () => dispatch({ type: "open-login" }),
       requestArticleSelection,
       resolvePreviousLists,
     }),
-    [completeLogin, logout, refresh, removeArticle, requestArticleSelection, resolvePreviousLists, state],
+    [
+      completeLogin,
+      home,
+      logout,
+      navigation,
+      removeArticle,
+      requestArticleSelection,
+      resolvePreviousLists,
+      resolvePreviousListsMutation.isError,
+      resolvePreviousListsMutation.isPending,
+      resolvePreviousListsMutation.variables,
+      state,
+    ],
   );
 
   return <HomeFlowContext value={value}>{children}</HomeFlowContext>;

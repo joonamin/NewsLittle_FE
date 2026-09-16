@@ -1,5 +1,6 @@
 export * from "./accordion-header";
 export * from "./article-gesture";
+export * from "./async-boundary";
 export * from "./badge";
 export * from "./brand-lockup";
 export * from "./button";

@@ -16,3 +16,6 @@ test-results/
 .DS_Store
 .idea/
 .vscode/
+
+# typescript incremental build info
+tsconfig.tsbuildinfo
