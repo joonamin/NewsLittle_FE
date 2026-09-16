@@ -9,6 +9,7 @@ import type {
   ArchiveApiModel,
   CreateQuizSessionRequest,
   HomeApiModel,
+  NavigationApiModel,
   QuizDomain,
   QuizPreviewApiModel,
   QuizResultApiModel,
@@ -18,6 +19,7 @@ import type {
 } from "./api-models";
 import {
   toArchiveViewModel,
+  toGlobalNavigationViewModel,
   toHomeViewModel,
   toQuizPlayViewModel,
   toQuizResultViewModel,
@@ -56,6 +58,8 @@ function jsonRequest<T>(method: "POST" | "PUT", body: T) {
 }
 
 export const screenApi = {
+  navigation: () =>
+    request<NavigationApiModel>("/api/v1/navigation").then(toGlobalNavigationViewModel),
   home: () => request<HomeApiModel>("/api/v1/home").then(toHomeViewModel),
   shortformPreview: () =>
     request<QuizPreviewApiModel>("/api/v1/quiz/shortform/preview").then(

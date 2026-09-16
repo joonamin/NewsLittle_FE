@@ -2,12 +2,47 @@ import type {
   ArchiveApiModel,
   ArticleApiModel,
   HomeApiModel,
+  NavigationApiModel,
   QuizPreviewApiModel,
   QuizResultApiModel,
   QuizSessionApiModel,
   SettingsApiModel,
   ViewerApiModel,
 } from "@/features/contracts/api-models";
+
+const baseNavigationItems = [
+  { id: "home", label: "홈", href: "/" },
+  { id: "random", label: "랜덤 퀴즈", href: "/random" },
+  { id: "archive", label: "아카이브", href: "/archive" },
+  { id: "settings", label: "설정", href: "/settings" },
+] as const;
+
+export const guestNavigationFixture: NavigationApiModel = {
+  primaryItems: [...baseNavigationItems],
+  account: { status: "guest", loginLabel: "로그인" },
+  todayListCount: null,
+};
+
+export const memberNavigationFixture: NavigationApiModel = {
+  primaryItems: [...baseNavigationItems],
+  account: {
+    status: "member",
+    displayName: "뉴스리틀 사용자",
+    menuItems: [
+      { id: "settings", label: "설정", type: "link", href: "/settings" },
+      { id: "logout", label: "로그아웃", type: "action", action: "logout" },
+    ],
+  },
+  todayListCount: 1,
+};
+
+export const adminNavigationFixture: NavigationApiModel = {
+  ...memberNavigationFixture,
+  primaryItems: [
+    ...baseNavigationItems,
+    { id: "operations", label: "운영", href: "/admin" },
+  ],
+};
 
 export const mockViewer: ViewerApiModel = {
   id: "member-demo",

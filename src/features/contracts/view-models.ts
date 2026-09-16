@@ -5,14 +5,52 @@
  */
 
 import type {
+  AccountMenuItemApiModel,
   ArchiveApiModel,
   ArticleApiModel,
   HomeApiModel,
+  NavigationApiModel,
+  NavigationItemId,
   QuizPreviewApiModel,
   QuizResultApiModel,
   QuizSessionApiModel,
   SettingsApiModel,
 } from "./api-models";
+
+export type GlobalNavigationMenuItem = {
+  id: NavigationItemId;
+  label: string;
+  href: string;
+};
+
+export type GlobalNavigationAccount =
+  | { status: "guest"; loginLabel: string }
+  | { status: "member"; displayName: string; menuItems: AccountMenuItemApiModel[] };
+
+export type GlobalNavigationViewModel = {
+  primaryItems: GlobalNavigationMenuItem[];
+  account: GlobalNavigationAccount;
+  todayListCount: number | null;
+};
+
+export const defaultGuestNavigation: GlobalNavigationViewModel = {
+  primaryItems: [
+    { id: "home", label: "홈", href: "/" },
+    { id: "random", label: "랜덤 퀴즈", href: "/random" },
+    { id: "archive", label: "아카이브", href: "/archive" },
+    { id: "settings", label: "설정", href: "/settings" },
+  ],
+  account: { status: "guest", loginLabel: "로그인" },
+  todayListCount: null,
+};
+
+export function toGlobalNavigationViewModel(api: NavigationApiModel): GlobalNavigationViewModel {
+  return {
+    primaryItems: api.primaryItems,
+    account: api.account,
+    todayListCount: api.account.status === "member" ? api.todayListCount : null,
+  };
+}
 
 const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   dateStyle: "medium",

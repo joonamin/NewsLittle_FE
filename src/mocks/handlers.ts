@@ -3,6 +3,7 @@ import { http, HttpResponse } from "msw";
 import {
   archiveFixture,
   homeFixture,
+  memberNavigationFixture,
   randomPreviewFixture,
   randomResultFixture,
   randomSessionFixture,
@@ -15,6 +16,7 @@ import {
 const api = "/api/v1";
 
 export const handlers = [
+  http.get(`${api}/navigation`, () => HttpResponse.json(memberNavigationFixture)),
   http.get(`${api}/home`, () => HttpResponse.json(homeFixture)),
   http.get(`${api}/quiz/shortform/preview`, () =>
     HttpResponse.json(shortformPreviewFixture),
