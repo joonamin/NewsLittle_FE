@@ -2,6 +2,7 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Noto_Sans_KR } from "next/font/google";
 
+import { AppShell } from "@/components/layout/app-shell";
 import { MockingProvider } from "@/mocks/mocking-provider";
 
 import "@/styles/globals.css";
@@ -29,7 +30,9 @@ export default function App({ Component, pageProps }: AppProps) {
         }
       `}</style>
       <MockingProvider>
-        <Component {...pageProps} />
+        <AppShell>
+          <Component {...pageProps} />
+        </AppShell>
       </MockingProvider>
     </>
   );
