@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { firstArticle, secondArticle } from "../../src/mocks/fixtures";
 
-test("member home uses the PEN feed card interaction", async ({ page }) => {
+test("member home uses the PEN feed card and today-list sidebar interaction", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByRole("heading", { name: firstArticle.title })).toBeVisible();
@@ -15,6 +15,10 @@ test("member home uses the PEN feed card interaction", async ({ page }) => {
 
   await page.getByRole("button", { name: "오늘 목록에 담기" }).click();
   await expect(page.getByRole("button", { name: "오늘 목록에 담김" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(secondArticle.title);
+
+  await page.getByRole("button", { name: `${secondArticle.title} 삭제` }).click();
+  await expect(page.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
 });
 
 test("MSW returns the home API contract before a backend exists", async ({ page }) => {

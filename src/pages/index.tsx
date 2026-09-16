@@ -3,11 +3,13 @@ import { useRouter } from "next/router";
 
 import { ArticleGesture } from "@/components/ui/article-gesture";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
+import { TodayListSidebar } from "@/components/ui/today-list-sidebar";
 import { useHomeFlow } from "@/features/home/home-flow";
 
 export default function HomePage() {
   const router = useRouter();
-  const { home, requestArticleSelection, refresh, status } = useHomeFlow();
+  const { home, requestLogin, requestArticleSelection, removeArticle, refresh, status } =
+    useHomeFlow();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   if (status === "loading" && !home) {
@@ -56,6 +58,14 @@ export default function HomePage() {
           <LoadingState title="표시할 뉴스가 없어요" />
         )}
       </main>
+      <TodayListSidebar
+        isLoggedIn={home.viewer.isMember}
+        list={home.todayList}
+        onLogin={requestLogin}
+        onOpenArticle={(url) => window.open(url, "_blank", "noopener,noreferrer")}
+        onRemoveArticle={(articleId) => void removeArticle(articleId)}
+        onStartQuiz={() => void router.push("/quiz")}
+      />
     </div>
   );
 }
