@@ -28,3 +28,24 @@ export const navigationQueryOptions = queryOptions({
   queryFn: screenApi.navigation,
   placeholderData: defaultGuestNavigation,
 });
+
+export function quizPreviewQueryOptions(domain: QuizDomain) {
+  return queryOptions({
+    queryKey: queryKeys.quiz.preview(domain),
+    queryFn: domain === "random" ? screenApi.randomPreview : screenApi.shortformPreview,
+  });
+}
+
+export function quizSessionQueryOptions(domain: QuizDomain, sessionId: string) {
+  return queryOptions({
+    queryKey: queryKeys.quiz.session(domain, sessionId),
+    queryFn: () => screenApi.session(domain, sessionId),
+  });
+}
+
+export function quizResultQueryOptions(domain: QuizDomain, sessionId: string) {
+  return queryOptions({
+    queryKey: queryKeys.quiz.result(domain, sessionId),
+    queryFn: () => screenApi.result(domain, sessionId),
+  });
+}

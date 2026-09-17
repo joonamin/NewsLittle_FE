@@ -14,6 +14,7 @@ import {
   memberNavigationFixture,
   mockViewer,
 } from "./fixtures";
+import { articles as randomQuizArticles } from "./random-quiz-fixtures";
 
 type AccountId = "member-demo" | "member-alt";
 type ActiveAccountId = AccountId | "guest";
@@ -76,7 +77,11 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
   }
 
   function feedItem(articleId: string) {
-    return homeFixture.feed.items.find((item) => item.article.id === articleId) ?? null;
+    const homeItem = homeFixture.feed.items.find((item) => item.article.id === articleId);
+    if (homeItem) return homeItem;
+
+    const quizArticle = randomQuizArticles.find((article) => article.id === articleId);
+    return quizArticle ? { article: quizArticle, isFromPreviousFeedDate: false } : null;
   }
 
   function home(): HomeApiModel {

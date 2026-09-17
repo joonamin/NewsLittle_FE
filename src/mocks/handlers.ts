@@ -2,14 +2,20 @@ import { http, HttpResponse } from "msw";
 
 import {
   randomPreviewFixture,
-  randomResultFixture,
-  randomSessionFixture,
   settingsFixture,
   shortformPreviewFixture,
   shortformResultFixture,
   shortformSessionFixture,
 } from "./fixtures";
 import { mockHomeStore } from "./home-store";
+import {
+  createRandomQuizSession,
+  getRandomQuizResult,
+  getRandomQuizSession,
+  giveUpRandomQuizQuestion,
+  nextRandomQuizQuestion,
+  submitRandomQuizAnswer,
+} from "./random-quiz-store";
 
 const api = "/api/v1";
 
@@ -36,23 +42,37 @@ export const handlers = [
     successResponse(shortformPreviewFixture),
   ),
   http.get(`${api}/quiz/random/preview`, () => successResponse(randomPreviewFixture)),
-  http.post(`${api}/quiz/shortform/sessions`, () =>
-    successResponse(shortformSessionFixture, { status: 201 }),
-  ),
-  http.post(`${api}/quiz/random/sessions`, () =>
-    successResponse(randomSessionFixture, { status: 201 }),
-  ),
   http.get(`${api}/quiz/shortform/sessions/:sessionId`, () =>
     successResponse(shortformSessionFixture),
   ),
-  http.get(`${api}/quiz/random/sessions/:sessionId`, () =>
-    successResponse(randomSessionFixture),
+  http.get(`${api}/quiz/random/sessions/:sessionId`, ({ params }) => {
+    const sessionId = String(params.sessionId);
+    return successResponse(getRandomQuizSession(sessionId));
+  }),
+  http.post(`${api}/quiz/shortform/sessions`, () =>
+    successResponse(shortformSessionFixture, { status: 201 }),
   ),
+  http.post(`${api}/quiz/random/sessions`, async ({ request }) => {
+    const payload = await request.json() as { format?: "choice" | "written" };
+    return successResponse(createRandomQuizSession(payload.format ?? "choice"), { status: 201 });
+  }),
+  http.post(`${api}/quiz/random/sessions/:sessionId/answers`, async ({ params, request }) => {
+    const payload = await request.json() as { answer?: string };
+    return successResponse(submitRandomQuizAnswer(String(params.sessionId), payload.answer ?? ""));
+  }),
+  http.post(`${api}/quiz/random/sessions/:sessionId/give-up`, ({ params }) => {
+    const sessionId = String(params.sessionId);
+    return successResponse(giveUpRandomQuizQuestion(sessionId));
+  }),
+  http.post(`${api}/quiz/random/sessions/:sessionId/next`, ({ params }) => {
+    const sessionId = String(params.sessionId);
+    return successResponse(nextRandomQuizQuestion(sessionId));
+  }),
   http.get(`${api}/quiz/shortform/sessions/:sessionId/result`, () =>
     successResponse(shortformResultFixture),
   ),
-  http.get(`${api}/quiz/random/sessions/:sessionId/result`, () =>
-    successResponse(randomResultFixture),
+  http.get(`${api}/quiz/random/sessions/:sessionId/result`, ({ params }) =>
+    successResponse(getRandomQuizResult(String(params.sessionId))),
   ),
   http.get(`${api}/archive`, () => successResponse(mockHomeStore.archive())),
   http.get(`${api}/settings`, () => successResponse(settingsFixture)),

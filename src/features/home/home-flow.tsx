@@ -152,19 +152,19 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
 
   const requestArticleSelection = useCallback(
     async (articleId: string): Promise<ArticleSelectionResult> => {
-      if (!home) return "unavailable";
-      if (!home.viewer.isMember) {
+      const currentHome = home ?? (await queryClient.ensureQueryData(homeQueryOptions));
+      if (!currentHome.viewer.isMember) {
         dispatch({ type: "set-pending-selection", articleId });
         dispatch({ type: "open-login" });
         return "login-required";
       }
-      if (home.needsPreviousListDecision) {
+      if (currentHome.needsPreviousListDecision) {
         dispatch({ type: "set-pending-selection", articleId });
         return "previous-list-required";
       }
-      return addArticle(articleId, home);
+      return addArticle(articleId, currentHome);
     },
-    [addArticle, home],
+    [addArticle, home, queryClient],
   );
 
   const completeLogin = useCallback(async (): Promise<ArticleSelectionResult> => {
