@@ -3,9 +3,7 @@ import { http, HttpResponse } from "msw";
 import {
   randomPreviewFixture,
   settingsFixture,
-  shortformPreviewFixture,
   shortformResultFixture,
-  shortformSessionFixture,
 } from "./fixtures";
 import { mockHomeStore } from "./home-store";
 import {
@@ -16,6 +14,12 @@ import {
   nextRandomQuizQuestion,
   submitRandomQuizAnswer,
 } from "./random-quiz-store";
+import {
+  createShortformQuizSession,
+  getShortformQuizPreview,
+  getShortformQuizSession,
+  isShortformPreviewScenario,
+} from "./shortform-quiz-store";
 
 const api = "/api/v1";
 
@@ -38,20 +42,29 @@ export const handlers = [
   http.post(`${api}/auth/logout`, () =>
     successResponse({ viewer: mockHomeStore.logout() }),
   ),
-  http.get(`${api}/quiz/shortform/preview`, () =>
-    successResponse(shortformPreviewFixture),
-  ),
+  http.get(`${api}/quiz/shortform/preview`, ({ request }) => {
+    const url = new URL(request.url);
+    const scenario = url.searchParams.get("scenario");
+    const previousFormat = url.searchParams.get("previousFormat") === "written" ? "written" : "choice";
+    return successResponse(
+      getShortformQuizPreview({
+        scenario: isShortformPreviewScenario(scenario) ? scenario : "normal",
+        previousFormat,
+      }),
+    );
+  }),
   http.get(`${api}/quiz/random/preview`, () => successResponse(randomPreviewFixture)),
-  http.get(`${api}/quiz/shortform/sessions/:sessionId`, () =>
-    successResponse(shortformSessionFixture),
+  http.get(`${api}/quiz/shortform/sessions/:sessionId`, ({ params }) =>
+    successResponse(getShortformQuizSession(String(params.sessionId))),
   ),
   http.get(`${api}/quiz/random/sessions/:sessionId`, ({ params }) => {
     const sessionId = String(params.sessionId);
     return successResponse(getRandomQuizSession(sessionId));
   }),
-  http.post(`${api}/quiz/shortform/sessions`, () =>
-    successResponse(shortformSessionFixture, { status: 201 }),
-  ),
+  http.post(`${api}/quiz/shortform/sessions`, async ({ request }) => {
+    const payload = (await request.json()) as { format?: "choice" | "written" };
+    return successResponse(createShortformQuizSession(payload.format ?? "choice"), { status: 201 });
+  }),
   http.post(`${api}/quiz/random/sessions`, async ({ request }) => {
     const payload = await request.json() as { format?: "choice" | "written" };
     return successResponse(createRandomQuizSession(payload.format ?? "choice"), { status: 201 });
