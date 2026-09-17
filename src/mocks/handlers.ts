@@ -1,9 +1,9 @@
 import { http, HttpResponse } from "msw";
 
 import {
+  createShortformSessionFixture,
   randomPreviewFixture,
   settingsFixture,
-  shortformPreviewFixture,
   shortformResultFixture,
   shortformSessionFixture,
 } from "./fixtures";
@@ -38,9 +38,13 @@ export const handlers = [
   http.post(`${api}/auth/logout`, () =>
     successResponse({ viewer: mockHomeStore.logout() }),
   ),
-  http.get(`${api}/quiz/shortform/preview`, () =>
-    successResponse(shortformPreviewFixture),
-  ),
+  http.get(`${api}/quiz/shortform/preview`, () => {
+    try {
+      return successResponse(mockHomeStore.shortformPreview());
+    } catch (error) {
+      return failureResponse(error);
+    }
+  }),
   http.get(`${api}/quiz/random/preview`, () => successResponse(randomPreviewFixture)),
   http.get(`${api}/quiz/shortform/sessions/:sessionId`, () =>
     successResponse(shortformSessionFixture),
@@ -49,9 +53,10 @@ export const handlers = [
     const sessionId = String(params.sessionId);
     return successResponse(getRandomQuizSession(sessionId));
   }),
-  http.post(`${api}/quiz/shortform/sessions`, () =>
-    successResponse(shortformSessionFixture, { status: 201 }),
-  ),
+  http.post(`${api}/quiz/shortform/sessions`, async ({ request }) => {
+    const payload = (await request.json()) as { format?: "choice" | "written" };
+    return successResponse(createShortformSessionFixture(payload.format ?? "choice"), { status: 201 });
+  }),
   http.post(`${api}/quiz/random/sessions`, async ({ request }) => {
     const payload = await request.json() as { format?: "choice" | "written" };
     return successResponse(createRandomQuizSession(payload.format ?? "choice"), { status: 201 });

@@ -3,6 +3,7 @@ import type {
   ArticleApiModel,
   HomeApiModel,
   NavigationApiModel,
+  QuizFormat,
   QuizPreviewApiModel,
   QuizResultApiModel,
   QuizSessionApiModel,
@@ -192,6 +193,14 @@ export const shortformSessionFixture: QuizSessionApiModel = {
   },
   resolution: null,
 };
+
+export function createShortformSessionFixture(format: QuizFormat): QuizSessionApiModel {
+  return {
+    ...shortformSessionFixture,
+    id: `shortform-demo-${format}-session`,
+    format,
+  };
+}
 
 export const randomSessionFixture: QuizSessionApiModel = {
   ...shortformSessionFixture,
