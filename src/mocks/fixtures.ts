@@ -138,6 +138,7 @@ export const randomPreviewFixture: QuizPreviewApiModel = {
   domain: "random",
   plannedQuestionCount: 5,
   remainingCandidateCount: 12,
+  candidates: [],
 };
 
 export const shortformSessionFixture: QuizSessionApiModel = {

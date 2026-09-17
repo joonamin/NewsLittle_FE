@@ -20,6 +20,7 @@ describe("screen view-model mappers", () => {
     const viewModel = toQuizStartViewModel(shortformPreviewFixture);
 
     expect(viewModel.domainLabel).toBe("숏폼 퀴즈");
+    expect(viewModel.defaultFormatId).toBe("choice");
     expect(viewModel.formats).toContainEqual({
       id: "written",
       label: "주관식형",

@@ -135,6 +135,7 @@ export function toHomeViewModel(api: HomeApiModel): HomeViewModel {
 
 export type QuizStartViewModel = {
   domainLabel: string;
+  defaultFormatId: "choice" | "written";
   defaultFormat: "선택형" | "주관식형";
   formats: Array<{ id: "choice" | "written"; label: string; enabled: boolean; reason: string | null }>;
   plannedQuestionCount: number;
@@ -152,6 +153,7 @@ export function toQuizStartViewModel(api: QuizPreviewApiModel): QuizStartViewMod
 
   return {
     domainLabel: api.domain === "shortform" ? "숏폼 퀴즈" : "랜덤 퀴즈",
+    defaultFormatId: api.defaultFormat,
     defaultFormat: formatLabel[api.defaultFormat],
     formats: (["choice", "written"] as const).map((format) => ({
       id: format,
