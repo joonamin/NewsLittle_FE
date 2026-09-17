@@ -4,7 +4,6 @@ import {
   randomPreviewFixture,
   settingsFixture,
   shortformResultFixture,
-  shortformSessionFixture,
 } from "./fixtures";
 import { mockHomeStore } from "./home-store";
 import {
@@ -18,6 +17,8 @@ import {
 import {
   createShortformQuizSession,
   getShortformQuizPreview,
+  getShortformQuizSession,
+  isShortformPreviewScenario,
 } from "./shortform-quiz-store";
 
 const api = "/api/v1";
@@ -41,10 +42,20 @@ export const handlers = [
   http.post(`${api}/auth/logout`, () =>
     successResponse({ viewer: mockHomeStore.logout() }),
   ),
-  http.get(`${api}/quiz/shortform/preview`, () => successResponse(getShortformQuizPreview())),
+  http.get(`${api}/quiz/shortform/preview`, ({ request }) => {
+    const url = new URL(request.url);
+    const scenario = url.searchParams.get("scenario");
+    const previousFormat = url.searchParams.get("previousFormat") === "written" ? "written" : "choice";
+    return successResponse(
+      getShortformQuizPreview({
+        scenario: isShortformPreviewScenario(scenario) ? scenario : "normal",
+        previousFormat,
+      }),
+    );
+  }),
   http.get(`${api}/quiz/random/preview`, () => successResponse(randomPreviewFixture)),
-  http.get(`${api}/quiz/shortform/sessions/:sessionId`, () =>
-    successResponse(shortformSessionFixture),
+  http.get(`${api}/quiz/shortform/sessions/:sessionId`, ({ params }) =>
+    successResponse(getShortformQuizSession(String(params.sessionId))),
   ),
   http.get(`${api}/quiz/random/sessions/:sessionId`, ({ params }) => {
     const sessionId = String(params.sessionId);
