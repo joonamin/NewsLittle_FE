@@ -175,6 +175,8 @@ export function toQuizStartViewModel(api: QuizPreviewApiModel): QuizStartViewMod
 
 export type QuizPlayViewModel = {
   isFinished: boolean;
+  format: "choice" | "written";
+  progress: { current: number; total: number };
   progressLabel: string;
   question: {
     title: string;
@@ -182,10 +184,14 @@ export type QuizPlayViewModel = {
     context: string | null;
     choices: Array<{ id: string; label: string }> | null;
     hint: string | null;
+    hintLevel: 0 | 1 | 2;
+    semanticFeedback: { similarityScore: number; missingDirection: string } | null;
     showsSemanticFeedback: boolean;
   } | null;
   resolution: {
     outcomeLabel: string;
+    outcome: "correct" | "incorrect" | "given-up" | "pending" | "service-excluded";
+    userAnswer: string | null;
     answer: string | null;
     explanation: string | null;
     evidence: ReturnType<typeof mapArticleCard> | null;
@@ -198,10 +204,13 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
     incorrect: "오답",
     "given-up": "포기",
     pending: "판정 중",
+    "service-excluded": "문항 서비스 제외",
   } as const;
 
   return {
     isFinished: api.status !== "in-progress",
+    format: api.format,
+    progress: { current: api.progress.current, total: api.progress.total },
     progressLabel: `${api.progress.current}/${api.progress.total}`,
     question: api.question
       ? {
@@ -210,12 +219,16 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
           context: api.question.context,
           choices: api.question.choices,
           hint: api.question.hint.text,
+          hintLevel: api.question.hint.level,
+          semanticFeedback: api.question.judgementFeedback ?? null,
           showsSemanticFeedback: api.question.kind === "semantic",
         }
       : null,
     resolution: api.resolution
       ? {
           outcomeLabel: outcomeLabel[api.resolution.outcome],
+          outcome: api.resolution.outcome,
+          userAnswer: api.resolution.userAnswer,
           answer: api.resolution.correctAnswer,
           explanation: api.resolution.explanation,
           evidence: mapArticleCard(api.resolution.evidence),

@@ -16,6 +16,7 @@ import type {
   QuizResultApiModel,
   QuizSessionApiModel,
   SettingsApiModel,
+  SubmitQuizAnswerRequest,
   UpdateInterestTopicsRequest,
 } from "./api-models";
 import {
@@ -86,6 +87,21 @@ export const screenApi = {
       `/api/v1/quiz/${domain}/sessions`,
       jsonRequest("POST", payload),
     ),
+  submitAnswer: (domain: QuizDomain, sessionId: string, payload: SubmitQuizAnswerRequest) =>
+    request<QuizSessionApiModel>(
+      `/api/v1/quiz/${domain}/sessions/${sessionId}/answers`,
+      jsonRequest("POST", payload),
+    ).then(toQuizPlayViewModel),
+  giveUpQuestion: (domain: QuizDomain, sessionId: string) =>
+    request<QuizSessionApiModel>(
+      `/api/v1/quiz/${domain}/sessions/${sessionId}/give-up`,
+      jsonRequest("POST", {}),
+    ).then(toQuizPlayViewModel),
+  nextQuestion: (domain: QuizDomain, sessionId: string) =>
+    request<QuizSessionApiModel>(
+      `/api/v1/quiz/${domain}/sessions/${sessionId}/next`,
+      jsonRequest("POST", {}),
+    ).then(toQuizPlayViewModel),
   updateInterestTopics: (payload: UpdateInterestTopicsRequest) =>
     request<SettingsApiModel>("/api/v1/settings/topics", jsonRequest("PUT", payload)).then(
       toSettingsViewModel,
