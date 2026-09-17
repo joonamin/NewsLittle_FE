@@ -2,6 +2,7 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
 import { Button } from "@/components/ui/button";
 import { ExplanationBlock } from "@/components/ui/explanation-block";
 import { ProgressBar, ProgressLabel } from "@/components/ui/progress";
@@ -192,12 +193,16 @@ function Resolution({ session, onNext }: { session: QuizPlayViewModel; onNext: (
             <p className="text-nl-micro font-bold text-nl-accent">이 문제의 뉴스</p>
             <h3 className="text-[20px] font-bold">{evidence.title}</h3>
             {evidence.summaryText ? <p className="text-nl-caption text-nl-muted">{evidence.summaryText}</p> : null}
-            <p className="text-nl-micro text-nl-muted">{evidence.sourceName} · {evidence.publishedLabel}{evidence.showsAiSummary ? " · AI 요약" : ""}</p>
+            <ArticleSourceMeta
+              sourceName={evidence.sourceName}
+              publishedLabel={evidence.publishedLabel}
+              originalUrl={evidence.originalIsAvailable ? evidence.originalUrl : null}
+              showsAiSummary={evidence.showsAiSummary}
+            />
             <div className="flex flex-wrap items-center gap-4">
               <Button variant={isSaved ? "default" : "secondary"} size="s" disabled={isSaved || isSaving} onClick={() => void saveArticle()}>
                 {isSaved ? "오늘 목록에 담김" : isSaving ? "담는 중…" : "오늘 목록에 담기"}
               </Button>
-              {evidence.originalIsAvailable ? <a href={evidence.originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption font-bold text-nl-accent">원문 보기 ↗</a> : null}
             </div>
           </article>
         ) : null}
