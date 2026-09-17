@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { adminNavigationFixture, homeFixture, shortformPreviewFixture } from "@/mocks/fixtures";
+import { adminNavigationFixture, homeFixture, shortformPreviewFixture, shortformResultFixture } from "@/mocks/fixtures";
 
-import { toGlobalNavigationViewModel, toHomeViewModel, toQuizStartViewModel } from "./view-models";
+import { toGlobalNavigationViewModel, toHomeViewModel, toQuizResultViewModel, toQuizStartViewModel } from "./view-models";
 
 describe("screen view-model mappers", () => {
   it("keeps API-only article fields out of the home view model", () => {
@@ -20,6 +20,7 @@ describe("screen view-model mappers", () => {
     const viewModel = toQuizStartViewModel(shortformPreviewFixture);
 
     expect(viewModel.domainLabel).toBe("숏폼 퀴즈");
+    expect(viewModel.defaultFormatId).toBe("choice");
     expect(viewModel.formats).toContainEqual({
       id: "written",
       label: "주관식형",
@@ -35,5 +36,20 @@ describe("screen view-model mappers", () => {
       expect.objectContaining({ id: "operations", href: "/admin" }),
     );
     expect(viewModel).not.toHaveProperty("isAdmin");
+  });
+
+  it("maps quiz result into recap items with outcome labels and evidence card", () => {
+    const viewModel = toQuizResultViewModel(shortformResultFixture);
+
+    expect(viewModel.sessionId).toBe(shortformResultFixture.sessionId);
+    expect(viewModel.format).toBe("choice");
+    expect(viewModel.isServiceEnded).toBe(false);
+    expect(viewModel.recapItems).toHaveLength(1);
+    expect(viewModel.recapItems[0]).toMatchObject({
+      index: 1,
+      outcome: "correct",
+      outcomeLabel: "정답",
+    });
+    expect(viewModel.recapItems[0].evidence?.title).toBe(shortformResultFixture.explanations[0].evidence.title);
   });
 });

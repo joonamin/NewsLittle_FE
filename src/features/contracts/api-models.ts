@@ -143,10 +143,13 @@ export type QuizQuestionApiModel = {
   context: string | null;
   choices: Array<{ id: string; label: string }> | null;
   hint: { level: 0 | 1 | 2; text: string | null };
+  judgementFeedback?: { similarityScore: number; missingDirection: string } | null;
 };
 
 export type QuizResolutionApiModel = {
-  outcome: "correct" | "incorrect" | "given-up" | "pending";
+  prompt?: string;
+  outcome: "correct" | "incorrect" | "given-up" | "pending" | "service-excluded";
+  userAnswer: string | null;
   correctAnswer: string | null;
   explanation: string | null;
   semanticFeedback: { score: number; missingDirection: string } | null;
