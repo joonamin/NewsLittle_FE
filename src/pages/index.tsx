@@ -62,8 +62,8 @@ function HomeContent() {
 
   return (
     <>
-      <div className="flex min-h-[calc(100vh-80px)] bg-nl-subtle">
-        <main className="flex min-w-0 flex-1 flex-col p-6 md:px-12">
+      <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-nl-subtle">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col p-6 md:px-12">
           {card ? (
             <ArticleGesture
               card={card}
@@ -72,7 +72,13 @@ function HomeContent() {
               canGoNext={cardIndex < home.feed.cards.length - 1}
               onPrevious={() => setCurrentIndex((index) => Math.max(index - 1, 0))}
               onNext={() => setCurrentIndex((index) => Math.min(index + 1, home.feed.cards.length - 1))}
-              onSave={() => void requestArticleSelection(card.id)}
+              onToggleSave={() => {
+                if (isSaved) {
+                  void removeArticle(card.id);
+                  return;
+                }
+                void requestArticleSelection(card.id);
+              }}
             />
           ) : <LoadingState title="표시할 뉴스가 없어요" />}
         </main>

@@ -97,12 +97,33 @@ export const secondArticle: ArticleApiModel = {
   availability: { feed: "published", original: "available" },
 };
 
+export const longArticle: ArticleApiModel = {
+  id: "article-long-body",
+  title: "모의 기사: 청소년 과학 교실의 참가 신청이 시작됐습니다",
+  source: {
+    id: "source-demo-news",
+    name: "데모 뉴스",
+    originalUrl: "https://example.com/articles/science-class",
+    publishedAt: "2026-09-13T08:00:00+09:00",
+  },
+  topicIds: ["science"],
+  summary: {
+    status: "available",
+    text: "이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.",
+    aiGenerated: true,
+    reviewedAt: "2026-09-13T08:20:00+09:00",
+  },
+  image: null,
+  availability: { feed: "published", original: "available" },
+};
+
 export const homeFixture: HomeApiModel = {
   viewer: mockViewer,
   feed: {
     items: [
       { article: firstArticle, isFromPreviousFeedDate: false },
       { article: secondArticle, isFromPreviousFeedDate: false },
+      { article: longArticle, isFromPreviousFeedDate: false },
     ],
     currentIndex: 0,
     nextCursor: "demo-next-cursor",

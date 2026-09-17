@@ -40,15 +40,15 @@ export function TodayListSidebar({
   const preparingCount = items.filter((item) => item.quizStatusLabel === "문항 준비 중").length;
 
   return (
-    <aside aria-label="오늘 목록" className="hidden h-full w-[336px] shrink-0 flex-col border-l border-nl-border bg-nl-bg md:flex">
-      <div className="flex flex-col gap-1 border-b border-nl-border px-6 pt-6 pb-4">
+    <aside aria-label="오늘 목록" className="hidden h-full min-h-0 w-[336px] shrink-0 flex-col overflow-hidden border-l border-nl-border bg-nl-bg md:flex">
+      <div className="flex shrink-0 flex-col gap-1 border-b border-nl-border px-6 pt-6 pb-4">
         <h2 className="text-[20px] leading-[1.5] font-bold text-nl-text">오늘 목록 {isLoggedIn ? ` ${items.length}` : ""}</h2>
         <p className="text-nl-caption text-nl-muted">{isLoggedIn ? `${list?.dateLabel} · 선택한 순서대로` : "로그인하면 담은 기사가 여기에 쌓여요"}</p>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
         {isLoggedIn ? (
           items.length ? (
-            <div className="flex h-full flex-col">
+            <div className="flex flex-col">
               {items.map((item, index) => {
                 const isPreparing = item.quizStatusLabel === "문항 준비 중";
                 return (
@@ -86,7 +86,7 @@ export function TodayListSidebar({
           </div>
         )}
       </div>
-      <div className="flex flex-col gap-3 border-t border-nl-border bg-nl-bg p-6 shadow-[0_-6px_16px_rgb(27_29_34_/_0.08)]">
+      <div className="flex shrink-0 flex-col gap-3 border-t border-nl-border bg-nl-bg p-6 shadow-[0_-6px_16px_rgb(27_29_34_/_0.08)]">
         {isLoggedIn ? (
           <>
             <p className="text-nl-micro text-nl-muted">{items.length ? `출제 가능 ${readyCount}개${preparingCount ? ` · 준비 중 ${preparingCount}개` : ""}` : "담은 기사 0개 · 1개 이상 담으면 퀴즈를 시작할 수 있어요"}</p>

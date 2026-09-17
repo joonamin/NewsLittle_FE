@@ -9,6 +9,14 @@ test("member home uses the PEN feed card and today-list sidebar interaction", as
   await expect(page.getByRole("img", { name: "나무가 우거진 공원 산책로" })).toBeVisible();
   await expect(page.getByRole("button", { name: "오늘 목록에 담김" })).toBeVisible();
 
+  await page.getByRole("button", { name: "오늘 목록에 담김" }).click();
+  await expect(page.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).not.toContainText(firstArticle.title);
+
+  await page.getByRole("button", { name: "오늘 목록에 담기" }).click();
+  await expect(page.getByRole("button", { name: "오늘 목록에 담김" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(firstArticle.title);
+
   await page.getByRole("button", { name: "다음 기사" }).click();
   await expect(page.getByRole("heading", { name: secondArticle.title })).toBeVisible();
   await expect(page.getByRole("img", { name: "나무가 우거진 공원 산책로" })).toHaveCount(0);
