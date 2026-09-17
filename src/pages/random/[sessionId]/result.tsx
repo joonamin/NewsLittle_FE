@@ -1,14 +1,17 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
+import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Button } from "@/components/ui/button";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
-import { screenApi } from "@/features/contracts/screen-api";
-import type { QuizRecapItemViewModel, QuizResultViewModel } from "@/features/contracts/view-models";
+import { quizResultQueryOptions } from "@/features/contracts/query-keys";
+import type { QuizRecapItemViewModel } from "@/features/contracts/view-models";
+import { useHomeFlow } from "@/features/home/home-flow";
 
 type RandomQuizResultPageProps = {
   sessionId: string;
@@ -28,74 +31,58 @@ export default function RandomQuizResultPage({
   sessionId,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  const [result, setResult] = useState<QuizResultViewModel | null>(null);
-  const [error, setError] = useState(false);
+
+  return (
+    <AsyncBoundary
+      pending={
+        <Page>
+          <LoadingState title="결과를 불러오고 있어요" />
+        </Page>
+      }
+      rejected={({ reset }) => (
+        <Page>
+          <ErrorState
+            title="결과를 불러오지 못했어요"
+            description="잠시 후 다시 시도해 주세요."
+            onRetry={reset}
+            onGoHome={() => void router.push("/")}
+          />
+        </Page>
+      )}
+    >
+      <RandomQuizResultContent sessionId={sessionId} />
+    </AsyncBoundary>
+  );
+}
+
+function RandomQuizResultContent({ sessionId }: { sessionId: string }) {
+  const router = useRouter();
+  const { data: result } = useSuspenseQuery(quizResultQueryOptions("random", sessionId));
+  const { home, requestArticleSelection } = useHomeFlow();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
-  const [savedArticles, setSavedArticles] = useState<Record<string, boolean>>({});
-  const [savingArticles, setSavingArticles] = useState<Record<string, boolean>>({});
-
-  const loadResult = async () => {
-    setError(false);
-    try {
-      const data = await screenApi.result("random", sessionId);
-      setResult(data);
-    } catch {
-      setError(true);
-    }
-  };
-
-  useEffect(() => {
-    let cancelled = false;
-    void screenApi.result("random", sessionId).then(
-      (value) => {
-        if (!cancelled) setResult(value);
-      },
-      () => {
-        if (!cancelled) setError(true);
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionId]);
+  const [savingArticleId, setSavingArticleId] = useState<string | null>(null);
+  const [savedArticleIds, setSavedArticleIds] = useState<Record<string, true>>({});
 
   const toggleExpand = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
   };
 
+  const isArticleSaved = (articleId: string) =>
+    Boolean(savedArticleIds[articleId] || home?.todayList?.items.some((item) => item.articleId === articleId));
+
   const handleSaveArticle = async (articleId: string) => {
-    if (savedArticles[articleId] || savingArticles[articleId]) return;
-    setSavingArticles((prev) => ({ ...prev, [articleId]: true }));
+    if (savingArticleId === articleId || isArticleSaved(articleId)) return;
+    setSavingArticleId(articleId);
     try {
-      await screenApi.addToTodayList({ articleId });
-      setSavedArticles((prev) => ({ ...prev, [articleId]: true }));
+      const result = await requestArticleSelection(articleId);
+      if (result === "added" || result === "already-selected") {
+        setSavedArticleIds((current) => ({ ...current, [articleId]: true }));
+      }
     } finally {
-      setSavingArticles((prev) => ({ ...prev, [articleId]: false }));
+      setSavingArticleId(null);
     }
   };
 
-  if (error) {
-    return (
-      <Page>
-        <ErrorState
-          title="결과를 불러오지 못했어요"
-          description="잠시 후 다시 시도해 주세요."
-          onRetry={() => void loadResult()}
-          onGoHome={() => void router.push("/")}
-        />
-      </Page>
-    );
-  }
-
-  if (!result) {
-    return (
-      <Page>
-        <LoadingState title="결과를 불러오고 있어요" />
-      </Page>
-    );
-  }
-
-  // 예외 처리: 서비스 사유 종료 (유효 0개)
   if (result.isServiceEnded) {
     return (
       <Page>
@@ -132,7 +119,6 @@ export default function RandomQuizResultPage({
         다섯 문제로 만난 오늘의 뉴스
       </h1>
 
-      {/* 결과 요약 카드 */}
       <section
         className="flex w-full flex-col gap-5 rounded-nl-card border border-nl-border bg-nl-bg p-6 md:p-8"
         aria-label="결과 요약"
@@ -142,7 +128,6 @@ export default function RandomQuizResultPage({
           {summary.excludedByService > 0 ? ` · 서비스 제외 ${summary.excludedByService}문제` : ""}
         </p>
 
-        {/* 4분류 통계 카드 */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="flex flex-col gap-1 rounded-nl-card bg-nl-subtle p-4 text-center">
             <p className="text-[28px] font-bold text-nl-accent">{summary.correct}</p>
@@ -179,7 +164,6 @@ export default function RandomQuizResultPage({
         ) : null}
       </section>
 
-      {/* 문항별 복기 카드 */}
       <section
         className="flex w-full flex-col gap-4 rounded-nl-card border border-nl-border bg-nl-bg p-6 md:p-8"
         aria-label="문항별 복기"
@@ -192,8 +176,8 @@ export default function RandomQuizResultPage({
               key={idx}
               item={item}
               isExpanded={expandedIndex === idx}
-              isSaved={item.evidence ? Boolean(savedArticles[item.evidence.id]) : false}
-              isSaving={item.evidence ? Boolean(savingArticles[item.evidence.id]) : false}
+              isSaved={item.evidence ? isArticleSaved(item.evidence.id) : false}
+              isSaving={item.evidence ? savingArticleId === item.evidence.id : false}
               onToggle={() => toggleExpand(idx)}
               onSaveArticle={() => {
                 if (item.evidence) void handleSaveArticle(item.evidence.id);
@@ -203,7 +187,6 @@ export default function RandomQuizResultPage({
         </div>
       </section>
 
-      {/* 다음 행동 영역 */}
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
@@ -277,7 +260,6 @@ function RecapRow({
             <p className="text-nl-caption text-nl-muted leading-[1.5]">{item.explanation}</p>
           ) : null}
 
-          {/* 근거 기사 요약 카드 — 만료·중단된 근거는 AC-36에 따라 카드 없이 제목·링크만 남긴다 */}
           {item.evidence && item.evidence.isRestricted ? (
             <EvidenceAttribution
               articleTitle={item.evidence.title}

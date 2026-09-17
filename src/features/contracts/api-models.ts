@@ -88,6 +88,11 @@ export type ArticleApiModel = {
   };
 };
 
+export type FeedItemApiModel = {
+  article: ArticleApiModel;
+  isFromPreviousFeedDate: boolean;
+};
+
 export type TodayListItemApiModel = {
   article: Pick<ArticleApiModel, "id" | "title" | "source">;
   selectedAt: ApiTimestamp;
@@ -109,13 +114,13 @@ export type PreviousListApiModel = {
 export type HomeApiModel = {
   viewer: ViewerApiModel;
   feed: {
-    items: ArticleApiModel[];
+    items: FeedItemApiModel[];
     currentIndex: number;
     nextCursor: string | null;
     canLoadPreviousDates: boolean;
   };
   todayList: TodayListApiModel | null;
-  pendingPreviousList: PreviousListApiModel | null;
+  pendingPreviousLists: PreviousListApiModel[];
 };
 
 export type QuizPreviewCandidateApiModel = {
@@ -210,6 +215,10 @@ export type SettingsApiModel = {
 
 export type AddToTodayListRequest = {
   articleId: string;
+};
+
+export type AuthenticationApiModel = {
+  viewer: ViewerApiModel;
 };
 
 export type CreateQuizSessionRequest = {

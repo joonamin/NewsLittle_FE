@@ -19,6 +19,13 @@
   --color-nl-overlay: rgb(27 29 34 / 0.4);
   --color-nl-glass-fill: rgb(255 255 255 / 0.76);
   --color-nl-glass-border: rgb(255 255 255 / 0.8);
+  --color-nl-backdrop-tint: rgb(36 31 71 / 0.35);
+  --color-nl-backdrop-card-stroke: rgb(255 255 255 / 0.35);
+  --color-nl-backdrop-panel-fill: rgb(255 255 255 / 0.76);
+  --color-nl-backdrop-panel-stroke: rgb(255 255 255 / 0.8);
+  --color-nl-ai-summary-start: rgb(239 237 252 / 0.9);
+  --color-nl-ai-summary-end: rgb(227 239 250 / 0.9);
+  --color-nl-ai-summary-text: #34386c;
 
   --font-sans: var(--font-noto-sans-kr), "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
 
@@ -41,6 +48,9 @@
 
   --shadow-nl-menu: 0 4px 12px rgb(27 29 34 / 0.2);
   --shadow-nl-glass: 0 6px 16px rgb(27 29 34 / 0.08);
+  --shadow-nl-backdrop-card: 0 18px 40px rgb(27 29 34 / 0.25);
+  --shadow-nl-backdrop-panel: 0 14px 36px rgb(27 29 34 / 0.2);
+  --shadow-nl-save-button: 0 8px 20px rgb(80 85 177 / 0.25);
 }
 
 @layer components {

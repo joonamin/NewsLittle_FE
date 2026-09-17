@@ -1,17 +1,27 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState, type ReactNode } from "react";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { z } from "zod";
 
 import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
+import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Button } from "@/components/ui/button";
 import { ExplanationBlock } from "@/components/ui/explanation-block";
 import { ProgressBar, ProgressLabel } from "@/components/ui/progress";
 import { QuizOptionChoice, QuizOptionOX } from "@/components/ui/quiz-option";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
+import { quizSessionQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
 import type { QuizPlayViewModel } from "@/features/contracts/view-models";
+import { useHomeFlow } from "@/features/home/home-flow";
+import { submitValidated, useValidatedForm } from "@/lib/form";
 
 type RandomQuizPlayPageProps = { sessionId: string };
+
+const writtenAnswerSchema = z.object({
+  answer: z.string().trim().min(1),
+});
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   let timer = 0;
@@ -34,78 +44,89 @@ export const getServerSideProps = (async ({ params }) => {
 
 export default function RandomQuizPlayPage({ sessionId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  const [session, setSession] = useState<QuizPlayViewModel | null>(null);
-  const [selectedAnswer, setSelectedAnswer] = useState("");
-  const [writtenAnswer, setWrittenAnswer] = useState("");
-  const [isJudging, setIsJudging] = useState(false);
-  const [error, setError] = useState(false);
 
-  const loadSession = async () => {
-    setError(false);
-    try {
-      setSession(await screenApi.session("random", sessionId));
-    } catch {
-      setError(true);
-    }
+  return (
+    <AsyncBoundary
+      pending={
+        <Page>
+          <LoadingState title="문제를 준비하고 있어요" />
+        </Page>
+      }
+      rejected={({ reset }) => (
+        <Page>
+          <ErrorState
+            title="문제를 불러오지 못했어요"
+            description="잠시 후 다시 시도해 주세요."
+            onRetry={reset}
+            onGoHome={() => void router.push("/")}
+          />
+        </Page>
+      )}
+    >
+      <RandomQuizPlayContent sessionId={sessionId} />
+    </AsyncBoundary>
+  );
+}
+
+function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const sessionOptions = quizSessionQueryOptions("random", sessionId);
+  const { data: session } = useSuspenseQuery(sessionOptions);
+  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const writtenForm = useValidatedForm(writtenAnswerSchema, { defaultValues: { answer: "" } });
+  const writtenAnswer = writtenForm.watch("answer");
+
+  const updateSession = (next: QuizPlayViewModel) => {
+    queryClient.setQueryData(sessionOptions.queryKey, next);
   };
 
-  useEffect(() => {
-    let cancelled = false;
-    void screenApi.session("random", sessionId).then(
-      (value) => { if (!cancelled) setSession(value); },
-      () => { if (!cancelled) setError(true); },
-    );
-    return () => { cancelled = true; };
-  }, [sessionId]);
+  const submitMutation = useMutation({
+    mutationFn: async (answer: string) => {
+      const timeoutMs = session.format === "written" ? 10_000 : 1_000;
+      return withTimeout(screenApi.submitAnswer("random", sessionId, { answer }), timeoutMs);
+    },
+    onSuccess: updateSession,
+  });
+  const giveUpMutation = useMutation({
+    mutationFn: () => screenApi.giveUpQuestion("random", sessionId),
+    onSuccess: updateSession,
+  });
+  const nextQuestionMutation = useMutation({
+    mutationFn: () => screenApi.nextQuestion("random", sessionId),
+    onSuccess: (next) => {
+      updateSession(next);
+      setSelectedAnswer("");
+      writtenForm.reset({ answer: "" });
+    },
+  });
+
+  const isJudging = submitMutation.isPending || giveUpMutation.isPending || nextQuestionMutation.isPending;
+  const submitError = submitMutation.isError || giveUpMutation.isError;
 
   useEffect(() => {
     const confirmExit = (event: BeforeUnloadEvent) => {
-      if (!session?.resolution) event.preventDefault();
+      if (!session.resolution) event.preventDefault();
     };
     window.addEventListener("beforeunload", confirmExit);
     return () => window.removeEventListener("beforeunload", confirmExit);
-  }, [session?.resolution]);
+  }, [session.resolution]);
 
-  const submit = async () => {
-    const answer = session?.format === "written" ? writtenAnswer.trim() : selectedAnswer;
-    if (!answer || isJudging) return;
-    setIsJudging(true);
-    setError(false);
-    try {
-      const timeoutMs = session?.format === "written" ? 10_000 : 1_000;
-      setSession(await withTimeout(screenApi.submitAnswer("random", sessionId, { answer }), timeoutMs));
-    } catch {
-      setError(true);
-    } finally {
-      setIsJudging(false);
-    }
-  };
-
-  const giveUp = async () => {
-    if (isJudging) return;
-    setIsJudging(true);
-    try {
-      setSession(await screenApi.giveUpQuestion("random", sessionId));
-    } catch {
-      setError(true);
-    } finally {
-      setIsJudging(false);
-    }
-  };
-
-  const nextQuestion = async () => {
-    if (!session) return;
+  const goNext = async () => {
     if (session.progress.current >= session.progress.total) {
       await router.push(`/random/${sessionId}/result`);
       return;
     }
-    setSession(await screenApi.nextQuestion("random", sessionId));
-    setSelectedAnswer("");
-    setWrittenAnswer("");
+    nextQuestionMutation.mutate();
   };
 
-  if (error && !session) return <Page><ErrorState title="문제를 불러오지 못했어요" description="잠시 후 다시 시도해 주세요." onRetry={() => void loadSession()} onGoHome={() => void router.push("/")} /></Page>;
-  if (!session?.question) return <Page><LoadingState title="문제를 준비하고 있어요" /></Page>;
+  if (!session.question) {
+    return (
+      <Page>
+        <LoadingState title="문제를 준비하고 있어요" />
+      </Page>
+    );
+  }
 
   const { question, resolution } = session;
   const answer = session.format === "written" ? writtenAnswer.trim() : selectedAnswer;
@@ -119,7 +140,7 @@ export default function RandomQuizPlayPage({ sessionId }: InferGetServerSideProp
       </div>
 
       {resolution ? (
-        <Resolution session={session} onNext={() => void nextQuestion()} />
+        <Resolution session={session} onNext={() => void goNext()} />
       ) : (
         <section className="space-y-6 rounded-nl-card border border-nl-border bg-nl-bg p-6 md:p-8">
           <p className="text-nl-caption text-nl-muted">{question.context}</p>
@@ -134,9 +155,18 @@ export default function RandomQuizPlayPage({ sessionId }: InferGetServerSideProp
               ))}
             </div>
           ) : (
-            <div className="space-y-3">
+            <form
+              className="space-y-3"
+              onSubmit={submitValidated(writtenForm, ({ answer: nextAnswer }) => submitMutation.mutateAsync(nextAnswer))}
+            >
               <label htmlFor="written-answer" className="text-nl-caption font-bold">내 답변</label>
-              <textarea id="written-answer" value={writtenAnswer} disabled={isJudging} onChange={(event) => setWrittenAnswer(event.target.value)} placeholder="답변을 입력해 주세요." className="min-h-32 w-full rounded-nl-card border border-nl-border bg-nl-bg p-4 text-nl-body" />
+              <textarea
+                id="written-answer"
+                disabled={isJudging}
+                placeholder="답변을 입력해 주세요."
+                className="min-h-32 w-full rounded-nl-card border border-nl-border bg-nl-bg p-4 text-nl-body"
+                {...writtenForm.register("answer")}
+              />
               {!writtenAnswer.trim() ? <p className="text-nl-caption text-nl-muted">빈 입력은 시도·오답으로 집계하지 않아요.</p> : null}
               {question.hint ? (
                 <div className="space-y-3">
@@ -149,14 +179,23 @@ export default function RandomQuizPlayPage({ sessionId }: InferGetServerSideProp
                   ) : null}
                 </div>
               ) : null}
-            </div>
+              {submitError ? <p role="alert" className="text-nl-caption text-nl-negative">판정을 완료하지 못했어요. 오답으로 기록하지 않았습니다. 재시도하거나 포기해 주세요.</p> : null}
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button type="submit" disabled={!answer || isJudging}>{isJudging ? "판정 중…" : question.hint ? "다시 제출" : "제출하기"}</Button>
+                <Button type="button" variant="secondary" disabled={isJudging} onClick={() => giveUpMutation.mutate()}>포기</Button>
+              </div>
+            </form>
           )}
 
-          {error ? <p role="alert" className="text-nl-caption text-nl-negative">판정을 완료하지 못했어요. 오답으로 기록하지 않았습니다. 재시도하거나 포기해 주세요.</p> : null}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button disabled={!answer || isJudging} onClick={() => void submit()}>{isJudging ? "판정 중…" : question.hint ? "다시 제출" : "제출하기"}</Button>
-            <Button variant="secondary" disabled={isJudging} onClick={() => void giveUp()}>포기</Button>
-          </div>
+          {session.format === "choice" ? (
+            <>
+              {submitError ? <p role="alert" className="text-nl-caption text-nl-negative">판정을 완료하지 못했어요. 오답으로 기록하지 않았습니다. 재시도하거나 포기해 주세요.</p> : null}
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button disabled={!answer || isJudging} onClick={() => submitMutation.mutate(selectedAnswer)}>{isJudging ? "판정 중…" : question.hint ? "다시 제출" : "제출하기"}</Button>
+                <Button variant="secondary" disabled={isJudging} onClick={() => giveUpMutation.mutate()}>포기</Button>
+              </div>
+            </>
+          ) : null}
         </section>
       )}
     </Page>
@@ -167,19 +206,24 @@ function Resolution({ session, onNext }: { session: QuizPlayViewModel; onNext: (
   const resolution = session.resolution!;
   const evidence = resolution.evidence;
   const positive = resolution.outcome === "correct";
-  const [isSaved, setIsSaved] = useState(false);
+  const { home, requestArticleSelection } = useHomeFlow();
   const [isSaving, setIsSaving] = useState(false);
+  const [savedLocally, setSavedLocally] = useState(false);
+  const isSaved =
+    savedLocally ||
+    Boolean(evidence && home?.todayList?.items.some((item) => item.articleId === evidence.id));
 
   const saveArticle = async () => {
     if (!evidence || isSaved || isSaving) return;
     setIsSaving(true);
     try {
-      await screenApi.addToTodayList({ articleId: evidence.id });
-      setIsSaved(true);
+      const result = await requestArticleSelection(evidence.id);
+      if (result === "added" || result === "already-selected") setSavedLocally(true);
     } finally {
       setIsSaving(false);
     }
   };
+
   return (
     <>
       <section className="space-y-5 rounded-nl-card border border-nl-border bg-nl-bg p-6 md:p-8">

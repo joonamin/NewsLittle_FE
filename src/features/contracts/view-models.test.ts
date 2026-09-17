@@ -12,6 +12,7 @@ describe("screen view-model mappers", () => {
     expect(viewModel.feed.cards[0]).toMatchObject({
       sourceName: "데모 뉴스",
       showsAiSummary: true,
+      isRestricted: false,
     });
     expect(viewModel.feed.cards[0]).not.toHaveProperty("topicIds");
   });

@@ -22,10 +22,15 @@
     "test": "npm run test:unit && npm run test:storybook && npm run test:e2e && npm run test:e2e:mocks"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "@tanstack/react-query": "^5.103.1",
     "lucide-react": "^1.46.0",
     "next": "16.3.5",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "react-error-boundary": "^6.1.5",
+    "react-hook-form": "^7.88.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@playwright/test": "1.61.0",

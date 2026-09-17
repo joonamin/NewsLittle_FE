@@ -1,12 +1,14 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useRouter } from "next/router";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
+import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import type { QuizFormat } from "@/features/contracts/api-models";
+import { quizPreviewQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
-import type { QuizStartViewModel } from "@/features/contracts/view-models";
 import { cn } from "@/lib/cn";
 
 const formatDescription: Record<QuizFormat, string> = {
@@ -16,78 +18,40 @@ const formatDescription: Record<QuizFormat, string> = {
 
 export default function RandomQuizStartPage() {
   const router = useRouter();
-  const [preview, setPreview] = useState<QuizStartViewModel | null>(null);
-  const [selectedFormat, setSelectedFormat] = useState<QuizFormat | null>(null);
-  const [loadError, setLoadError] = useState(false);
-  const [startError, setStartError] = useState(false);
-  const [isStarting, setIsStarting] = useState(false);
 
-  const applyPreview = (value: QuizStartViewModel) => {
-    setPreview(value);
-    setSelectedFormat(value.defaultFormatId);
-  };
+  return (
+    <AsyncBoundary
+      pending={
+        <PageContainer>
+          <LoadingState title="랜덤 퀴즈를 준비하고 있어요" description="출제 가능한 문제를 확인 중이에요." />
+        </PageContainer>
+      }
+      rejected={({ reset }) => (
+        <PageContainer>
+          <ErrorState
+            title="퀴즈 정보를 불러오지 못했어요"
+            description="잠시 후 다시 시도해 주세요. 문제가 계속되면 홈에서 다른 뉴스를 둘러볼 수 있어요."
+            onRetry={reset}
+            onGoHome={() => void router.push("/")}
+          />
+        </PageContainer>
+      )}
+    >
+      <RandomQuizStartContent />
+    </AsyncBoundary>
+  );
+}
 
-  const retryPreview = async () => {
-    setLoadError(false);
-    setPreview(null);
-
-    try {
-      const value = await screenApi.randomPreview();
-      applyPreview(value);
-    } catch {
-      setLoadError(true);
-    }
-  };
-
-  useEffect(() => {
-    let cancelled = false;
-    void screenApi.randomPreview().then(
-      (value) => {
-        if (!cancelled) applyPreview(value);
-      },
-      () => {
-        if (!cancelled) setLoadError(true);
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const startQuiz = async () => {
-    if (!selectedFormat || isStarting) return;
-
-    setStartError(false);
-    setIsStarting(true);
-    try {
-      const session = await screenApi.createSession("random", { format: selectedFormat });
-      await router.push(`/random/${session.id}`);
-    } catch {
-      setStartError(true);
-      setIsStarting(false);
-    }
-  };
-
-  if (loadError) {
-    return (
-      <PageContainer>
-        <ErrorState
-          title="퀴즈 정보를 불러오지 못했어요"
-          description="잠시 후 다시 시도해 주세요. 문제가 계속되면 홈에서 다른 뉴스를 둘러볼 수 있어요."
-          onRetry={() => void retryPreview()}
-          onGoHome={() => void router.push("/")}
-        />
-      </PageContainer>
-    );
-  }
-
-  if (!preview) {
-    return (
-      <PageContainer>
-        <LoadingState title="랜덤 퀴즈를 준비하고 있어요" description="출제 가능한 문제를 확인 중이에요." />
-      </PageContainer>
-    );
-  }
+function RandomQuizStartContent() {
+  const router = useRouter();
+  const { data: preview } = useSuspenseQuery(quizPreviewQueryOptions("random"));
+  const [selectedFormat, setSelectedFormat] = useState<QuizFormat>(preview.defaultFormatId);
+  const startQuiz = useMutation({
+    mutationFn: (format: QuizFormat) => screenApi.createSession("random", { format }),
+    onSuccess: (session) => {
+      void router.push(`/random/${session.id}`);
+    },
+  });
 
   const selectedOption = preview.formats.find((format) => format.id === selectedFormat);
   const unavailableFormats = preview.formats.filter((format) => !format.enabled && format.reason);
@@ -154,13 +118,20 @@ export default function RandomQuizStartPage() {
           모르는 문제는 포기하고 해설을 볼 수 있어요. 제한 시간은 없어요.
         </p>
 
-        {startError ? <p className="text-nl-caption text-nl-negative" role="alert">퀴즈를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.</p> : null}
+        {startQuiz.isError ? <p className="text-nl-caption text-nl-negative" role="alert">퀴즈를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.</p> : null}
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button disabled={!canStart || isStarting} onClick={() => void startQuiz()} className="sm:min-w-40">
-            {isStarting ? "시작하는 중…" : `${preview.plannedQuestionCount}문제 시작하기`}
+          <Button
+            disabled={!canStart || startQuiz.isPending}
+            onClick={() => {
+              if (!selectedFormat) return;
+              startQuiz.mutate(selectedFormat);
+            }}
+            className="sm:min-w-40"
+          >
+            {startQuiz.isPending ? "시작하는 중…" : `${preview.plannedQuestionCount}문제 시작하기`}
           </Button>
-          <Button variant="secondary" disabled={isStarting} onClick={() => router.back()} className="sm:min-w-24">취소</Button>
+          <Button variant="secondary" disabled={startQuiz.isPending} onClick={() => router.back()} className="sm:min-w-24">취소</Button>
         </div>
       </section>
     </PageContainer>
