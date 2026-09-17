@@ -138,6 +138,7 @@ export const randomPreviewFixture: QuizPreviewApiModel = {
   domain: "random",
   plannedQuestionCount: 5,
   remainingCandidateCount: 12,
+  candidates: [],
 };
 
 export const shortformSessionFixture: QuizSessionApiModel = {
@@ -173,15 +174,82 @@ export const randomSessionFixture: QuizSessionApiModel = {
     articleId: secondArticle.id,
     articleTitle: secondArticle.title,
     prompt: "모의 기사에서 참가 신청을 받는 대상은 누구인가요?",
+    context: "기사의 핵심 정보를 확인하는 선택형 문항입니다.",
+    choices: [
+      { id: "teenager", label: "청소년" },
+      { id: "adult", label: "성인" },
+    ],
+  },
+};
+
+export const randomWrittenSessionFixture: QuizSessionApiModel = {
+  ...randomSessionFixture,
+  id: "random-written-demo-session",
+  format: "written",
+  question: {
+    ...randomSessionFixture.question!,
+    kind: "semantic",
+    choices: null,
+    prompt: "청소년 과학 교실은 누구를 대상으로 하나요?",
+    context: "핵심 내용을 자신의 말로 답하는 주관식 문항입니다.",
+    hint: { level: 0, text: null },
+  },
+};
+
+export const randomWrittenHintSessionFixture: QuizSessionApiModel = {
+  ...randomWrittenSessionFixture,
+  question: {
+    ...randomWrittenSessionFixture.question!,
+    hint: { level: 1, text: "기사 제목에서 참가 대상을 찾아보세요." },
+    judgementFeedback: { similarityScore: 42, missingDirection: "참가 대상의 연령대를 구체적으로 적어보세요." },
+  },
+};
+
+export const randomWrittenSecondHintSessionFixture: QuizSessionApiModel = {
+  ...randomWrittenSessionFixture,
+  question: {
+    ...randomWrittenSessionFixture.question!,
+    hint: { level: 2, text: "핵심 표현은 ‘청소년’으로 시작해요." },
+    judgementFeedback: { similarityScore: 68, missingDirection: "기사에서 사용한 정확한 대상 표현이 필요해요." },
   },
 };
 
 const resolution = {
   outcome: "correct" as const,
+  userAnswer: "주말",
   correctAnswer: "주말",
   explanation: "모의 기사에서 주말 프로그램 확대를 안내했습니다.",
   semanticFeedback: null,
   evidence: firstArticle,
+};
+
+export const randomResolvedSessionFixture: QuizSessionApiModel = {
+  ...randomSessionFixture,
+  progress: { current: 1, total: 5, processed: 1 },
+  resolution: {
+    outcome: "correct",
+    userAnswer: "청소년",
+    correctAnswer: "청소년",
+    explanation: "기사에서는 청소년을 대상으로 과학 교실 참가 신청을 받는다고 설명합니다.",
+    semanticFeedback: null,
+    evidence: secondArticle,
+  },
+};
+
+export const randomWrittenResolvedSessionFixture: QuizSessionApiModel = {
+  ...randomResolvedSessionFixture,
+  id: randomWrittenSessionFixture.id,
+  format: "written",
+  question: randomWrittenSessionFixture.question,
+};
+
+export const randomGivenUpSessionFixture: QuizSessionApiModel = {
+  ...randomResolvedSessionFixture,
+  resolution: {
+    ...randomResolvedSessionFixture.resolution!,
+    outcome: "given-up",
+    userAnswer: null,
+  },
 };
 
 export const shortformResultFixture: QuizResultApiModel = {
