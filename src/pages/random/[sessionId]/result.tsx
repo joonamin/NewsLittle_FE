@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { type ReactNode, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
+import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
+import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
 import { Button } from "@/components/ui/button";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { screenApi } from "@/features/contracts/screen-api";
@@ -275,46 +277,41 @@ function RecapRow({
             <p className="text-nl-caption text-nl-muted leading-[1.5]">{item.explanation}</p>
           ) : null}
 
-          {/* 근거 기사 요약 카드 */}
-          {item.evidence ? (
+          {/* 근거 기사 요약 카드 — 만료·중단된 근거는 AC-36에 따라 카드 없이 제목·링크만 남긴다 */}
+          {item.evidence && item.evidence.isRestricted ? (
+            <EvidenceAttribution
+              articleTitle={item.evidence.title}
+              sourceName={item.evidence.sourceName}
+              publishedLabel={item.evidence.publishedLabel}
+              originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
+              summaryUnavailable
+            />
+          ) : null}
+          {item.evidence && !item.evidence.isRestricted ? (
             <article className="space-y-3 rounded-nl-card border border-nl-border bg-nl-accent-wash p-5">
               <p className="text-nl-micro font-bold text-nl-accent">이 문제의 뉴스</p>
               <h3 className="text-[18px] font-bold text-nl-text">{item.evidence.title}</h3>
 
-              {/* 만료/중단되지 않은 경우에만 요약 텍스트 노출 */}
-              {!item.evidence.isRestricted && item.evidence.summaryText ? (
+              {item.evidence.summaryText ? (
                 <p className="text-nl-caption text-nl-muted">{item.evidence.summaryText}</p>
               ) : null}
 
-              <p className="text-nl-micro text-nl-muted">
-                {item.evidence.sourceName} · {item.evidence.publishedLabel}
-                {item.evidence.showsAiSummary ? " · AI 요약" : ""}
-                {item.evidence.isRestricted ? " · 제공사 요청으로 요약이 중단됨" : ""}
-              </p>
+              <ArticleSourceMeta
+                sourceName={item.evidence.sourceName}
+                publishedLabel={item.evidence.publishedLabel}
+                originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
+                showsAiSummary={item.evidence.showsAiSummary}
+              />
 
               <div className="flex flex-wrap items-center gap-4 pt-1">
-                {/* 만료/중단되지 않은 경우에만 담기 버튼 노출 */}
-                {!item.evidence.isRestricted ? (
-                  <Button
-                    variant={isSaved ? "default" : "secondary"}
-                    size="s"
-                    disabled={isSaved || isSaving}
-                    onClick={onSaveArticle}
-                  >
-                    {isSaved ? "오늘 목록에 담김" : isSaving ? "담는 중…" : "오늘 목록에 담기"}
-                  </Button>
-                ) : null}
-
-                {item.evidence.originalIsAvailable ? (
-                  <a
-                    href={item.evidence.originalUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-nl-caption font-bold text-nl-accent hover:underline"
-                  >
-                    원문 보기 ↗
-                  </a>
-                ) : null}
+                <Button
+                  variant={isSaved ? "default" : "secondary"}
+                  size="s"
+                  disabled={isSaved || isSaving}
+                  onClick={onSaveArticle}
+                >
+                  {isSaved ? "오늘 목록에 담김" : isSaving ? "담는 중…" : "오늘 목록에 담기"}
+                </Button>
               </div>
             </article>
           ) : null}
