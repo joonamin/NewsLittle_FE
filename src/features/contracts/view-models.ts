@@ -11,7 +11,10 @@ import type {
   HomeApiModel,
   NavigationApiModel,
   NavigationItemId,
+  QuizDomain,
+  QuizFormat,
   QuizPreviewApiModel,
+  QuizResolutionApiModel,
   QuizResultApiModel,
   QuizSessionApiModel,
   SettingsApiModel,
@@ -57,7 +60,8 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
 });
 
 function formatDate(value: string) {
-  return dateFormatter.format(new Date(value));
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
 }
 
 function mapArticleCard(article: ArticleApiModel) {
@@ -78,6 +82,7 @@ function mapArticleCard(article: ArticleApiModel) {
           }
         : null,
     originalIsAvailable: article.availability.original === "available",
+    isRestricted: article.summary.status !== "available",
   };
 }
 
@@ -198,15 +203,15 @@ export type QuizPlayViewModel = {
   } | null;
 };
 
-export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel {
-  const outcomeLabel = {
-    correct: "정답",
-    incorrect: "오답",
-    "given-up": "포기",
-    pending: "판정 중",
-    "service-excluded": "문항 서비스 제외",
-  } as const;
+const outcomeLabel: Record<QuizResolutionApiModel["outcome"], string> = {
+  correct: "정답",
+  incorrect: "오답",
+  "given-up": "포기",
+  pending: "판정 미완료",
+  "service-excluded": "서비스 제외",
+};
 
+export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel {
   return {
     isFinished: api.status !== "in-progress",
     format: api.format,
@@ -237,10 +242,26 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
   };
 }
 
+export type QuizRecapItemViewModel = {
+  index: number;
+  prompt: string;
+  outcome: QuizResolutionApiModel["outcome"];
+  outcomeLabel: string;
+  userAnswer: string | null;
+  correctAnswer: string | null;
+  explanation: string | null;
+  evidence: ReturnType<typeof mapArticleCard> | null;
+};
+
 export type QuizResultViewModel = {
+  sessionId: string;
+  domain: QuizDomain;
+  format: QuizFormat;
+  status: "completed" | "ended-by-service";
   isServiceEnded: boolean;
   summary: QuizResultApiModel["summary"];
   canStartNextRound: boolean;
+  recapItems: QuizRecapItemViewModel[];
   explanations: Array<{
     outcome: string;
     answer: string | null;
@@ -250,13 +271,27 @@ export type QuizResultViewModel = {
 
 export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewModel {
   return {
+    sessionId: api.sessionId,
+    domain: api.domain,
+    format: api.format,
+    status: api.status,
     isServiceEnded: api.status === "ended-by-service",
     summary: api.summary,
     canStartNextRound: api.remainingCandidateCount > 0,
+    recapItems: api.explanations.map((resolution, idx) => ({
+      index: idx + 1,
+      prompt: resolution.prompt ?? resolution.evidence?.title ?? `문항 ${idx + 1}`,
+      outcome: resolution.outcome,
+      outcomeLabel: outcomeLabel[resolution.outcome] ?? resolution.outcome,
+      userAnswer: resolution.userAnswer,
+      correctAnswer: resolution.correctAnswer,
+      explanation: resolution.explanation,
+      evidence: resolution.evidence ? mapArticleCard(resolution.evidence) : null,
+    })),
     explanations: api.explanations.map((resolution) => ({
       outcome: resolution.outcome,
       answer: resolution.correctAnswer,
-      evidenceTitle: resolution.evidence.title,
+      evidenceTitle: resolution.evidence?.title ?? "",
     })),
   };
 }

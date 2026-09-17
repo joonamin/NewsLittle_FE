@@ -8,17 +8,20 @@ export const randomQuizTopics = [
   ["culture", "시립미술관 야간 관람일이 늘어납니다", "금요일", "시립미술관이 금요일 야간 관람 운영을 확대합니다."],
 ] as const;
 
-const articles: ArticleApiModel[] = randomQuizTopics.map(([topic, title, , summary], index) => ({
-  id: `random-article-${index + 1}`,
-  title,
-  source: { id: "source-demo", name: "데모 뉴스", originalUrl: `https://example.com/random/${index + 1}`, publishedAt: `2026-09-${13 - index}T09:00:00+09:00` },
-  topicIds: [topic],
-  summary: { status: "available", text: summary, aiGenerated: true, reviewedAt: `2026-09-${13 - index}T10:00:00+09:00` },
-  image: null,
-  availability: { feed: "published", original: "available" },
-}));
+export const articles: ArticleApiModel[] = randomQuizTopics.map(([topic, title, , summary], index) => {
+  const day = String(13 - index).padStart(2, "0");
+  return {
+    id: `random-article-${index + 1}`,
+    title,
+    source: { id: "source-demo", name: "데모 뉴스", originalUrl: `https://example.com/random/${index + 1}`, publishedAt: `2026-09-${day}T09:00:00+09:00` },
+    topicIds: [topic],
+    summary: { status: "available", text: summary, aiGenerated: true, reviewedAt: `2026-09-${day}T10:00:00+09:00` },
+    image: null,
+    availability: { feed: "published", original: "available" },
+  };
+});
 
-const choicePrompts = [
+export const choicePrompts = [
   ["과학 교실의 참가 대상은 누구인가요?", ["청소년", "성인"]],
   ["나무가 수분을 내보내 주변 열을 낮추는 작용은 무엇인가요?", ["증산", "응결"]],
   ["전통시장에 확대되는 결제 방식은 무엇인가요?", ["모바일 결제", "수표 결제"]],

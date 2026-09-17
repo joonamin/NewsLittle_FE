@@ -147,6 +147,7 @@ export type QuizQuestionApiModel = {
 };
 
 export type QuizResolutionApiModel = {
+  prompt?: string;
   outcome: "correct" | "incorrect" | "given-up" | "pending" | "service-excluded";
   userAnswer: string | null;
   correctAnswer: string | null;

@@ -4,7 +4,7 @@ const routes = [
   { path: "/", heading: "뉴스 탐색" },
   { path: "/random", heading: "퀴즈로 새로운 뉴스를 만나보세요" },
   { path: "/random/random-session", heading: "랜덤 퀴즈" },
-  { path: "/random/random-session/result", heading: "랜덤 퀴즈 결과" },
+  { path: "/random/random-session/result", heading: "다섯 문제로 만난 오늘의 뉴스" },
   { path: "/quiz", heading: "숏폼 퀴즈 시작" },
   { path: "/quiz/quiz-session", heading: "숏폼 퀴즈 풀이" },
   { path: "/quiz/quiz-session/result", heading: "숏폼 퀴즈 결과" },

@@ -96,3 +96,26 @@ test("random choice quiz renders an incorrect resolution and can save its articl
   await page.getByRole("button", { name: "오늘 목록에 담기" }).click();
   await expect(page.getByRole("button", { name: "오늘 목록에 담김" })).toBeDisabled();
 });
+
+test("random quiz result page renders summary, toggles recap items, and saves articles", async ({ page }) => {
+  await page.goto("/random/random-demo-session/result");
+
+  await expect(page.getByRole("heading", { name: "다섯 문제로 만난 오늘의 뉴스" })).toBeVisible();
+  const summarySection = page.getByLabel("결과 요약");
+  await expect(summarySection.getByText(/최초 계획 5문제/)).toBeVisible();
+  await expect(summarySection.getByText("정답")).toBeVisible();
+  await expect(summarySection.getByText("선택형 오답")).toBeVisible();
+  await expect(summarySection.getByText("서비스 제외", { exact: true })).toBeVisible();
+
+  const recapSection = page.getByLabel("문항별 복기");
+  await expect(recapSection.getByRole("heading", { name: "문항별 복기" })).toBeVisible();
+  await expect(recapSection.getByText(/01/)).toBeVisible();
+  await expect(recapSection.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
+
+  await recapSection.getByRole("button", { name: "오늘 목록에 담기" }).click();
+  await expect(recapSection.getByRole("button", { name: "오늘 목록에 담김" })).toBeDisabled();
+
+  await page.getByRole("button", { name: "새 회차 시작" }).click();
+  await expect(page).toHaveURL("/random?format=choice");
+});
+
