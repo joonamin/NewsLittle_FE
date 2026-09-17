@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/router";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
@@ -22,14 +22,7 @@ export default function QuizStartPage() {
 
   return (
     <AsyncBoundary
-      pending={
-        <PageContainer>
-          <LoadingState
-            title="숏폼 퀴즈를 준비하고 있어요"
-            description="오늘 목록의 출제 가능 여부를 확인 중이에요."
-          />
-        </PageContainer>
-      }
+      pending={<QuizStartPending />}
       rejected={({ reset }) => (
         <PageContainer>
           <ErrorState
@@ -43,6 +36,47 @@ export default function QuizStartPage() {
     >
       <QuizStartContent />
     </AsyncBoundary>
+  );
+}
+
+function QuizStartPending() {
+  const router = useRouter();
+  const [isDelayed, setIsDelayed] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDelayed(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isDelayed) {
+    return (
+      <PageContainer>
+        <div className="space-y-6 rounded-nl-card border border-nl-border bg-nl-bg p-8">
+          <StateNotice
+            title="출제 준비 중"
+            description="2초 내에 기사 분석을 완료하지 못했어요. 오늘 목록의 퀴즈를 아직 준비 중이니 잠시 후 다시 확인해 주세요."
+            tone="accent"
+          />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <Button disabled>시작 불가 (준비 중)</Button>
+            <Button variant="secondary" onClick={() => void router.push("/")}>
+              홈으로
+            </Button>
+          </div>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  return (
+    <PageContainer>
+      <LoadingState
+        title="숏폼 퀴즈를 준비하고 있어요"
+        description="오늘 목록의 출제 가능 여부를 확인 중이에요."
+      />
+    </PageContainer>
   );
 }
 
@@ -79,6 +113,17 @@ function QuizStartContent() {
           <Badge tone="accent">숏폼 퀴즈 · 회원</Badge>
           <p className="text-[20px] leading-[1.5] font-bold">이번 회 {preview.plannedQuestionCount}문제</p>
         </div>
+
+        {/* 주관식 판정 서비스 장애 알림: 형식 선택 카드보다 먼저 보이도록 배치 (NFR-05, AC-32) */}
+        {unavailableFormats.map((format) => (
+          <div
+            key={format.id}
+            className="rounded-nl-button bg-nl-accent-subtle p-4 text-nl-caption text-nl-accent"
+            role="alert"
+          >
+            {format.label}은 지금 이용할 수 없어요. {format.reason}
+          </div>
+        ))}
 
         <fieldset className="space-y-4">
           <legend className="text-[20px] leading-[1.5] font-bold">어떤 방식으로 답할까요?</legend>
@@ -144,11 +189,6 @@ function QuizStartContent() {
           기사당 1문제 · 남은 대상 {preview.remainingCandidateCount}개 · 최대 10문제씩 출제
         </p>
 
-        {unavailableFormats.map((format) => (
-          <p key={format.id} className="text-nl-caption text-nl-negative" role="alert">
-            {format.label}은 지금 이용할 수 없어요. {format.reason}
-          </p>
-        ))}
         {startQuiz.isError ? (
           <p className="text-nl-caption text-nl-negative" role="alert">
             퀴즈를 시작하지 못했어요. 잠시 후 다시 시도해 주세요.
