@@ -43,24 +43,4 @@ describe("mock home store", () => {
     expect(store.home().pendingPreviousLists).toEqual([]);
     expect(store.archive().groups.find((group) => group.date === "2026-09-11")?.entries).toHaveLength(1);
   });
-
-  it("builds the shortform preview from the member's current today list", () => {
-    const store = createMockHomeStore();
-
-    store.addToTodayList(secondArticle.id);
-    store.removeFromTodayList(firstArticle.id);
-
-    expect(store.shortformPreview()).toMatchObject({
-      domain: "shortform",
-      plannedQuestionCount: 1,
-      remainingCandidateCount: 0,
-      candidates: [
-        {
-          articleId: secondArticle.id,
-          status: "included",
-          exclusionReason: null,
-        },
-      ],
-    });
-  });
 });

@@ -3,7 +3,6 @@ import type {
   HomeApiModel,
   NavigationApiModel,
   PreviousListApiModel,
-  QuizPreviewApiModel,
   TodayListApiModel,
   ViewerApiModel,
 } from "@/features/contracts/api-models";
@@ -109,37 +108,6 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     return result;
   }
 
-  function shortformPreview(): QuizPreviewApiModel {
-    const member = activeMember();
-    if (!member) throw new Error("AUTHENTICATION_REQUIRED");
-
-    const candidates = member.todayList.items.map((item) => ({
-      articleId: item.article.id,
-      title: item.article.title,
-      status: item.quizStatus === "ready" ? ("included" as const) : ("excluded" as const),
-      exclusionReason:
-        item.quizStatus === "ready"
-          ? null
-          : item.quizStatus === "preparing"
-            ? ("preparing" as const)
-            : item.quizStatus,
-    }));
-    const includedCandidates = candidates.filter((candidate) => candidate.status === "included");
-    const unavailableReason = includedCandidates.length > 0 ? null : "출제 가능한 기사가 없어요.";
-
-    return {
-      domain: "shortform",
-      defaultFormat: "choice",
-      formatAvailability: {
-        choice: { enabled: includedCandidates.length > 0, reason: unavailableReason },
-        written: { enabled: includedCandidates.length > 0, reason: unavailableReason },
-      },
-      plannedQuestionCount: Math.min(includedCandidates.length, 10),
-      remainingCandidateCount: Math.max(includedCandidates.length - 10, 0),
-      candidates,
-    };
-  }
-
   function addToTodayList(articleId: string): TodayListApiModel {
     const member = activeMember();
     if (!member) throw new Error("AUTHENTICATION_REQUIRED");
@@ -216,7 +184,6 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     },
     navigation,
     removeFromTodayList,
-    shortformPreview,
     setActiveAccountId: (accountId: ActiveAccountId) => {
       activeAccountId = accountId;
     },
