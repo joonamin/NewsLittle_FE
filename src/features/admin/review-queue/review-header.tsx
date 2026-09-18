@@ -11,7 +11,7 @@ type ReviewHeaderProps = {
   usageBasisStatus: UsageBasisStatus;
 };
 
-const usageBasisBadgeText: Record<UsageBasisStatus, string> = {
+const usageBasisLabels: Record<UsageBasisStatus, string> = {
   CONFIRMED: "이용 승인됨",
   CONDITIONAL: "조건부 사용 가능",
   PENDING: "검토 대기",
