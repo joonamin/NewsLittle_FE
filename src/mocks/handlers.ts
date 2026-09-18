@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw";
+import { delay, http, HttpResponse } from "msw";
 
 import {
   randomPreviewFixture,
@@ -7,21 +7,30 @@ import {
 } from "./fixtures";
 import { mockHomeStore } from "./home-store";
 import {
+  abandonRandomQuizSession,
   createRandomQuizSession,
   getRandomQuizResult,
   getRandomQuizSession,
   giveUpRandomQuizQuestion,
   nextRandomQuizQuestion,
+  previousRandomQuizQuestion,
   submitRandomQuizAnswer,
 } from "./random-quiz-store";
 import {
+  abandonShortformQuizSession,
   createShortformQuizSession,
+  excludeShortformQuizQuestion,
   getShortformQuizPreview,
   getShortformQuizSession,
+  giveUpShortformQuizQuestion,
   isShortformPreviewScenario,
+  nextShortformQuizQuestion,
+  previousShortformQuizQuestion,
+  submitShortformQuizAnswer,
 } from "./shortform-quiz-store";
 
 const api = "/api/v1";
+const timedOutShortformSessions = new Set<string>();
 
 function successResponse<T>(data: T, init?: ResponseInit) {
   return HttpResponse.json({ data, meta: { requestId: "mock-request-id" } }, init);
@@ -55,9 +64,12 @@ export const handlers = [
     );
   }),
   http.get(`${api}/quiz/random/preview`, () => successResponse(randomPreviewFixture)),
-  http.get(`${api}/quiz/shortform/sessions/:sessionId`, ({ params }) =>
-    successResponse(getShortformQuizSession(String(params.sessionId))),
-  ),
+  http.get(`${api}/quiz/shortform/sessions/:sessionId`, ({ params }) => {
+    const sessionId = String(params.sessionId);
+    return sessionId.includes("expired-session")
+      ? failureResponse(new Error("AUTHENTICATION_REQUIRED"))
+      : successResponse(getShortformQuizSession(sessionId));
+  }),
   http.get(`${api}/quiz/random/sessions/:sessionId`, ({ params }) => {
     const sessionId = String(params.sessionId);
     return successResponse(getRandomQuizSession(sessionId));
@@ -74,6 +86,31 @@ export const handlers = [
     const payload = await request.json() as { answer?: string };
     return successResponse(submitRandomQuizAnswer(String(params.sessionId), payload.answer ?? ""));
   }),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/answers`, async ({ params, request }) => {
+    const sessionId = String(params.sessionId);
+    const payload = await request.json() as { answer?: string };
+    if (sessionId.includes("service-excluded")) {
+      return successResponse(excludeShortformQuizQuestion(sessionId));
+    }
+    if (sessionId.includes("timeout") && !timedOutShortformSessions.has(sessionId)) {
+      timedOutShortformSessions.add(sessionId);
+      await delay(sessionId.includes("written") ? 10_100 : 3_100);
+      return failureResponse(new Error("JUDGEMENT_TIMEOUT"));
+    }
+    return successResponse(submitShortformQuizAnswer(sessionId, payload.answer ?? ""));
+  }),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/give-up`, ({ params }) =>
+    successResponse(giveUpShortformQuizQuestion(String(params.sessionId))),
+  ),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/next`, ({ params }) =>
+    successResponse(nextShortformQuizQuestion(String(params.sessionId))),
+  ),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/previous`, ({ params }) =>
+    successResponse(previousShortformQuizQuestion(String(params.sessionId))),
+  ),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/abandon`, ({ params }) =>
+    successResponse(abandonShortformQuizSession(String(params.sessionId))),
+  ),
   http.post(`${api}/quiz/random/sessions/:sessionId/give-up`, ({ params }) => {
     const sessionId = String(params.sessionId);
     return successResponse(giveUpRandomQuizQuestion(sessionId));
@@ -82,6 +119,12 @@ export const handlers = [
     const sessionId = String(params.sessionId);
     return successResponse(nextRandomQuizQuestion(sessionId));
   }),
+  http.post(`${api}/quiz/random/sessions/:sessionId/previous`, ({ params }) =>
+    successResponse(previousRandomQuizQuestion(String(params.sessionId))),
+  ),
+  http.post(`${api}/quiz/random/sessions/:sessionId/abandon`, ({ params }) =>
+    successResponse(abandonRandomQuizSession(String(params.sessionId))),
+  ),
   http.get(`${api}/quiz/shortform/sessions/:sessionId/result`, () =>
     successResponse(shortformResultFixture),
   ),

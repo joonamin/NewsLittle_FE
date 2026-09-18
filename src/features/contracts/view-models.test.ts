@@ -1,8 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { adminNavigationFixture, homeFixture, shortformPreviewFixture, shortformResultFixture } from "@/mocks/fixtures";
+import {
+  adminNavigationFixture,
+  homeFixture,
+  shortformPreviewFixture,
+  shortformResultFixture,
+  shortformSessionFixture,
+} from "@/mocks/fixtures";
 
-import { toGlobalNavigationViewModel, toHomeViewModel, toQuizResultViewModel, toQuizStartViewModel } from "./view-models";
+import {
+  toGlobalNavigationViewModel,
+  toHomeViewModel,
+  toQuizPlayViewModel,
+  toQuizResultViewModel,
+  toQuizStartViewModel,
+} from "./view-models";
 
 describe("screen view-model mappers", () => {
   it("keeps API-only article fields out of the home view model", () => {
@@ -52,5 +64,22 @@ describe("screen view-model mappers", () => {
       outcomeLabel: "정답",
     });
     expect(viewModel.recapItems[0].evidence?.title).toBe(shortformResultFixture.explanations[0].evidence.title);
+  });
+
+  it("preserves a service-ended play session as a distinct screen state", () => {
+    const viewModel = toQuizPlayViewModel({
+      ...shortformSessionFixture,
+      status: "ended-by-service",
+      progress: { current: 0, total: 0, processed: 0 },
+      question: null,
+      resolution: null,
+    });
+
+    expect(viewModel).toMatchObject({
+      isFinished: true,
+      isServiceEnded: true,
+      status: "ended-by-service",
+      question: null,
+    });
   });
 });
