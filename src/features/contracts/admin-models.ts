@@ -6,7 +6,13 @@
 export type AnswerFormat = "OX" | "MULTIPLE_CHOICE" | "SUBJECTIVE";
 export type QuestionKind = "FACT" | "SEMANTIC" | null;
 export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
-export type UsageBasisStatus = "CONFIRMED" | "CONDITIONAL" | "PENDING" | "RESTRICTED";
+export type UsageBasisStatus =
+  | "CONFIRMED"
+  | "CONDITIONAL"
+  | "PENDING"
+  | "RESTRICTED"
+  | "SUSPENDED"
+  | "PERMITTED";
 
 export type AdminQuizItem = {
   id: number;

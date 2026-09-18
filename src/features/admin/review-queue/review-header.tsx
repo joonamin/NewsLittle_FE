@@ -11,11 +11,13 @@ type ReviewHeaderProps = {
   usageBasisStatus: UsageBasisStatus;
 };
 
-const usageBasisLabels: Record<UsageBasisStatus, string> = {
+const usageBasisBadgeText: Record<UsageBasisStatus, string> = {
   CONFIRMED: "이용 승인됨",
   CONDITIONAL: "조건부 사용 가능",
   PENDING: "검토 대기",
   RESTRICTED: "사용 제한됨",
+  SUSPENDED: "이용 중단됨",
+  PERMITTED: "이용 허용됨",
 };
 
 export function ReviewHeader({
