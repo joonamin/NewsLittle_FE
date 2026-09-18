@@ -327,6 +327,61 @@ export const archiveFixture: ArchiveApiModel = {
           article: firstArticle,
           displayStatus: "available",
         },
+        {
+          id: "archive-science-class",
+          selectedAt: "2026-09-12T17:30:00+09:00",
+          article: secondArticle,
+          displayStatus: "access-failed",
+        },
+        {
+          id: "archive-urban-trees",
+          selectedAt: "2026-09-12T17:00:00+09:00",
+          article: {
+            id: "article-urban-trees",
+            title: "모의 기사: 도심의 열을 낮추는 나무, 그늘 이상의 역할",
+            source: {
+              id: "source-demo-news",
+              name: "데모 뉴스",
+              originalUrl: "https://example.com/articles/urban-trees",
+              publishedAt: "2026-08-13T09:00:00+09:00",
+            },
+          },
+          displayStatus: "derivative-expired",
+        },
+        {
+          id: "archive-metadata-terms-ended",
+          selectedAt: "2026-09-12T16:30:00+09:00",
+          article: null,
+          displayStatus: "discontinued",
+          discontinuedReason: "메타데이터 이용 조건이 종료되어 제목과 원문 링크를 표시할 수 없습니다.",
+        },
+        {
+          id: "archive-provider-requested",
+          selectedAt: "2026-09-12T16:00:00+09:00",
+          article: null,
+          displayStatus: "discontinued",
+          discontinuedReason: "제공처 요청으로 이용이 중단되어 제목과 원문 링크를 표시할 수 없습니다.",
+        },
+      ],
+    },
+    {
+      date: "2026-08-10",
+      entries: [
+        {
+          id: "archive-previous-month",
+          selectedAt: "2026-08-10T12:00:00+09:00",
+          article: {
+            id: "article-previous-month",
+            title: "모의 기사: 기준금리가 내려가면 우리 생활은 어떻게 달라질까",
+            source: {
+              id: "source-demo-news",
+              name: "데모 뉴스",
+              originalUrl: "https://example.com/articles/interest-rate",
+              publishedAt: "2026-08-10T09:00:00+09:00",
+            },
+          },
+          displayStatus: "available",
+        },
       ],
     },
   ],

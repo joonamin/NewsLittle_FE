@@ -2,8 +2,8 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/router";
 
-import { GlobalNav } from "@/components/ui/global-nav";
 import { Button } from "@/components/ui/button";
+import { GlobalNav } from "@/components/ui/global-nav";
 import { Modal } from "@/components/ui/modal";
 import { useHomeFlow } from "@/features/home/home-flow";
 

@@ -193,11 +193,27 @@ export type QuizResultApiModel = {
   remainingCandidateCount: number;
 };
 
+/**
+ * SCR-07 상태 분기: 원문 접근 실패·파생물 만료는 제목/원문 링크를 유지하되 표시를
+ * 구분하고, 이용 중단(메타데이터 이용 조건 종료 포함)은 article을 null로 내려
+ * 제목·매체·게시일 자체를 노출하지 않는다.
+ */
+export type ArchiveEntryDisplayStatus =
+  | "available"
+  | "access-failed"
+  | "derivative-expired"
+  | "discontinued";
+
 export type ArchiveEntryApiModel = {
   id: string;
   selectedAt: ApiTimestamp;
   article: Pick<ArticleApiModel, "id" | "title" | "source"> | null;
-  displayStatus: "available" | "restricted";
+  displayStatus: ArchiveEntryDisplayStatus;
+  /**
+   * displayStatus가 "discontinued"일 때의 구체적 사유(예: 메타데이터 이용 조건 종료,
+   * 제공사 요청 등). 생략하면 화면에서 일반 안내 문구로 대체한다.
+   */
+  discontinuedReason?: string | null;
 };
 
 export type ArchiveApiModel = {
