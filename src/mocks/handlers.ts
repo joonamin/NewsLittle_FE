@@ -21,6 +21,7 @@ import {
   createShortformQuizSession,
   excludeShortformQuizQuestion,
   getShortformQuizPreview,
+  getShortformQuizResult,
   getShortformQuizSession,
   giveUpShortformQuizQuestion,
   isShortformPreviewScenario,
@@ -125,8 +126,8 @@ export const handlers = [
   http.post(`${api}/quiz/random/sessions/:sessionId/abandon`, ({ params }) =>
     successResponse(abandonRandomQuizSession(String(params.sessionId))),
   ),
-  http.get(`${api}/quiz/shortform/sessions/:sessionId/result`, () =>
-    successResponse(shortformResultFixture),
+  http.get(`${api}/quiz/shortform/sessions/:sessionId/result`, ({ params }) =>
+    successResponse(getShortformQuizResult(String(params.sessionId))),
   ),
   http.get(`${api}/quiz/random/sessions/:sessionId/result`, ({ params }) =>
     successResponse(getRandomQuizResult(String(params.sessionId))),
