@@ -1,5 +1,7 @@
 import { delay, http, HttpResponse } from "msw";
 
+import type { TopicCode } from "@/features/contracts/api-models";
+
 import {
   randomPreviewFixture,
   settingsFixture,
@@ -40,19 +42,35 @@ function successResponse<T>(data: T, init?: ResponseInit) {
 function failureResponse(error: unknown) {
   const code = error instanceof Error ? error.message : "UNKNOWN_ERROR";
   const status =
-    code === "AUTHENTICATION_REQUIRED" ? 401 : code === "ARTICLE_NOT_FOUND" || code === "NOT_FOUND" ? 404 : 500;
+    code === "AUTHENTICATION_REQUIRED" || code === "INVALID_CREDENTIALS"
+      ? 401
+      : code === "ARTICLE_NOT_FOUND" || code === "NOT_FOUND"
+        ? 404
+        : 500;
   return HttpResponse.json({ error: { code } }, { status });
 }
 
 export const handlers = [
   http.get(`${api}/navigation`, () => successResponse(mockHomeStore.navigation())),
   http.get(`${api}/home`, () => successResponse(mockHomeStore.home())),
-  http.post(`${api}/auth/google`, () =>
-    successResponse({ viewer: mockHomeStore.login() }),
-  ),
-  http.post(`${api}/auth/logout`, () =>
-    successResponse({ viewer: mockHomeStore.logout() }),
-  ),
+  http.post(`${api}/auth/google`, async ({ request }) => {
+    const payload = (await request.json().catch(() => null)) as {
+      credential?: string;
+      code?: string;
+      topicIds?: TopicCode[];
+      browserTopicIds?: TopicCode[];
+    } | null;
+    if (!payload?.credential && !payload?.code) {
+      return failureResponse(new Error("INVALID_CREDENTIALS"));
+    }
+    // browserTopicIds 필드가 존재하기만 하면(빈 배열이어도) topicIds는 병합 없이 완전히 무시된다.
+    const topicIds = payload && "browserTopicIds" in payload ? payload.browserTopicIds : payload?.topicIds;
+    return successResponse(mockHomeStore.login(topicIds));
+  }),
+  http.post(`${api}/auth/logout`, () => {
+    mockHomeStore.logout();
+    return new HttpResponse(null, { status: 204 });
+  }),
   http.get(`${api}/quiz/shortform/preview`, ({ request }) => {
     const url = new URL(request.url);
     const scenario = url.searchParams.get("scenario");

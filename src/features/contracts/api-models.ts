@@ -20,6 +20,8 @@ export type ApiResponse<T> = {
 };
 
 export type ViewerRole = "guest" | "member";
+export type AccountRole = "member" | "admin";
+export type TopicCode = "ECONOMY" | "SOCIETY" | "AI_IT" | "SCIENCE" | "WORLD" | "POLITICS";
 export type QuizDomain = "shortform" | "random";
 export type QuizFormat = "choice" | "written";
 export type QuestionKind = "fact" | "semantic";
@@ -39,6 +41,7 @@ export type AccountMenuItemApiModel =
 /**
  * The server returns only the items the current session is allowed to see.
  * In particular, a client must never infer administrator access from a role flag.
+ * account.status는 "guest" | "member"이며 /auth/me의 "authenticated" | "guest"와는 다른 값이다.
  */
 export type NavigationApiModel = {
   primaryItems: NavigationMenuItemApiModel[];
@@ -233,8 +236,26 @@ export type AddToTodayListRequest = {
   articleId: string;
 };
 
+export type SignInWithGoogleRequest = {
+  /** Google Identity Services(One Tap/버튼)에서 발급받은 ID Token(JWT) */
+  credential: string;
+  /**
+   * 비회원 상태에서 브라우저에 저장돼 있던 관심 주제. 계정에 설정된 적이 없을 때만 반영된다.
+   * 백엔드는 "browserTopicIds" 필드도 동일한 용도로 받지만 존재하기만 하면(빈 배열이어도)
+   * topicIds를 병합 없이 완전히 무시하므로, 프론트는 이 필드 하나만 사용한다.
+   */
+  topicIds?: TopicCode[];
+};
+
 export type AuthenticationApiModel = {
-  viewer: ViewerApiModel;
+  email: string;
+  displayName: string;
+  /** 이번 로그인으로 신규 가입됐는지 여부 */
+  isNewUser: boolean;
+  /** 프론트가 보낸 topicIds 순서가 아니라 항상 알파벳순으로 내려온다. */
+  interests: TopicCode[];
+  interestsSetAt: ApiTimestamp | null;
+  role: AccountRole;
 };
 
 export type CreateQuizSessionRequest = {

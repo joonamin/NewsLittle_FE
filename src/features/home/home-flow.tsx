@@ -10,6 +10,8 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { ApiError } from "@/lib/api-client";
+import { GoogleSignInCancelledError, resolveGoogleCredential } from "@/lib/google-identity";
 import {
   homeQueryOptions,
   navigationQueryOptions,
@@ -22,10 +24,31 @@ import {
   type HomeViewModel,
 } from "@/features/contracts/view-models";
 
+/** AC-01 오류 코드 표(구글 로그인)를 화면 문구로 변환한다. */
+function describeSignInError(error: unknown): string {
+  if (error instanceof ApiError) {
+    switch (error.code) {
+      case "INVALID_CREDENTIALS":
+        return "인증에 실패했습니다. 다시 시도해 주세요.";
+      case "RATE_LIMITED":
+        return "요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.";
+      case "DEPENDENCY_UNAVAILABLE":
+        return "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.";
+      case "PERMISSION_DENIED":
+        return "로그인 요청을 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.";
+      default:
+        break;
+    }
+  }
+  return "로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+}
+
 type PendingAction = { type: "select-article"; articleId: string } | null;
 
 export type HomeFlowState = {
   loginOpen: boolean;
+  loginPending: boolean;
+  loginError: string | null;
   pendingAction: PendingAction;
 };
 
@@ -33,10 +56,15 @@ type HomeFlowAction =
   | { type: "set-pending-selection"; articleId: string }
   | { type: "clear-pending-action" }
   | { type: "open-login" }
-  | { type: "close-login" };
+  | { type: "close-login" }
+  | { type: "login-pending" }
+  | { type: "login-idle" }
+  | { type: "login-error"; message: string };
 
 export const initialHomeFlowState: HomeFlowState = {
   loginOpen: false,
+  loginPending: false,
+  loginError: null,
   pendingAction: null,
 };
 
@@ -51,9 +79,15 @@ export function homeFlowReducer(state: HomeFlowState, action: HomeFlowAction): H
     case "clear-pending-action":
       return { ...state, pendingAction: null };
     case "open-login":
-      return { ...state, loginOpen: true };
+      return { ...state, loginOpen: true, loginPending: false, loginError: null };
     case "close-login":
-      return { ...state, loginOpen: false };
+      return { ...state, loginOpen: false, loginPending: false, loginError: null };
+    case "login-pending":
+      return { ...state, loginPending: true, loginError: null };
+    case "login-idle":
+      return { ...state, loginPending: false };
+    case "login-error":
+      return { ...state, loginPending: false, loginError: action.message };
   }
 }
 
@@ -168,7 +202,27 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
   );
 
   const completeLogin = useCallback(async (): Promise<ArticleSelectionResult> => {
-    await signIn.mutateAsync();
+    dispatch({ type: "login-pending" });
+
+    let credential: string;
+    try {
+      credential = await resolveGoogleCredential();
+    } catch (error) {
+      dispatch(
+        error instanceof GoogleSignInCancelledError
+          ? { type: "login-idle" }
+          : { type: "login-error", message: describeSignInError(error) },
+      );
+      return "login-required";
+    }
+
+    try {
+      await signIn.mutateAsync({ credential });
+    } catch (error) {
+      dispatch({ type: "login-error", message: describeSignInError(error) });
+      return "login-required";
+    }
+
     dispatch({ type: "close-login" });
     const nextHome = await queryClient.ensureQueryData(homeQueryOptions);
     if (nextHome.needsPreviousListDecision) return "previous-list-required";

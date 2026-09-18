@@ -18,6 +18,7 @@ import type {
   QuizResultApiModel,
   QuizSessionApiModel,
   SettingsApiModel,
+  SignInWithGoogleRequest,
   TodayListApiModel,
   SubmitQuizAnswerRequest,
   UpdateInterestTopicsRequest,
@@ -36,9 +37,9 @@ export const screenApi = {
   navigation: () =>
     apiRequest<NavigationApiModel>("/api/v1/navigation").then(toGlobalNavigationViewModel),
   home: () => apiRequest<HomeApiModel>("/api/v1/home").then(toHomeViewModel),
-  signInWithGoogle: () =>
-    apiRequest<AuthenticationApiModel>("/api/v1/auth/google", { method: "POST" }),
-  signOut: () => apiRequest<AuthenticationApiModel>("/api/v1/auth/logout", { method: "POST" }),
+  signInWithGoogle: (payload: SignInWithGoogleRequest) =>
+    apiRequest<AuthenticationApiModel>("/api/v1/auth/google", jsonRequest("POST", payload)),
+  signOut: () => apiRequest<void>("/api/v1/auth/logout", { method: "POST" }),
   shortformPreview: () =>
     apiRequest<QuizPreviewApiModel>("/api/v1/quiz/shortform/preview").then(
       toQuizStartViewModel,
