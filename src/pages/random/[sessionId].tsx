@@ -277,7 +277,6 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
         <h2 className="text-nl-title font-bold">{session.question?.prompt}</h2>
         <p className="text-nl-caption">내 답 {resolution.userAnswer ?? "포기"} · 정답 {resolution.answer}</p>
         {resolution.explanation ? <p className="text-nl-body text-nl-muted">{resolution.explanation}</p> : null}
-        <button type="button" className="text-nl-micro text-nl-negative">판정 오류 신고</button>
         {evidence ? (
           <article className="space-y-3 rounded-nl-card border border-nl-border bg-nl-accent-wash p-6">
             <p className="text-nl-micro font-bold text-nl-accent">이 문제의 뉴스</p>
@@ -296,6 +295,7 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
             </div>
           </article>
         ) : null}
+        <button type="button" className="text-nl-micro text-nl-negative underline-offset-4 hover:underline">판정 오류 신고</button>
       </section>
     </>
   );

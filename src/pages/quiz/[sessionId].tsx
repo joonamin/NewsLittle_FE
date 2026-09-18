@@ -520,9 +520,6 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
           body={resolution.explanation}
         />
       ) : null}
-      <button type="button" className="text-nl-micro text-nl-negative underline-offset-4 hover:underline">
-        판정 오류 신고
-      </button>
       {evidence ? (
         <>
           {!evidence.originalIsAvailable ? (
@@ -541,6 +538,9 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
           />
         </>
       ) : null}
+      <button type="button" className="text-nl-micro text-nl-negative underline-offset-4 hover:underline">
+        판정 오류 신고
+      </button>
     </div>
   );
 }
