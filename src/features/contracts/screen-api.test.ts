@@ -43,4 +43,33 @@ describe("screen API", () => {
       expect.objectContaining({ method: "DELETE", credentials: "include" }),
     );
   });
+
+  it("sends an abandon request with keepalive during page exit", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          data: {
+            id: "shortform-session",
+            domain: "shortform",
+            format: "choice",
+            status: "abandoned",
+            progress: { current: 1, total: 3, processed: 0 },
+            question: null,
+            resolution: null,
+          },
+          meta: { requestId: "request-123" },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const session = await screenApi.abandonSession("shortform", "shortform-session", true);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/v1/quiz/shortform/sessions/shortform-session/abandon",
+      expect.objectContaining({ method: "POST", keepalive: true, credentials: "include" }),
+    );
+    expect(session.status).toBe("abandoned");
+  });
 });

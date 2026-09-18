@@ -1,8 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { adminNavigationFixture, homeFixture, shortformPreviewFixture, shortformResultFixture } from "@/mocks/fixtures";
+import {
+  adminNavigationFixture,
+  homeFixture,
+  shortformPreviewFixture,
+  shortformResultFixture,
+  shortformSessionFixture,
+} from "@/mocks/fixtures";
 
-import { toGlobalNavigationViewModel, toHomeViewModel, toQuizResultViewModel, toQuizStartViewModel } from "./view-models";
+import {
+  toGlobalNavigationViewModel,
+  toHomeViewModel,
+  toQuizPlayViewModel,
+  toQuizResultViewModel,
+  toQuizStartViewModel,
+} from "./view-models";
 
 describe("screen view-model mappers", () => {
   it("keeps API-only article fields out of the home view model", () => {
@@ -45,6 +57,7 @@ describe("screen view-model mappers", () => {
     expect(viewModel.sessionId).toBe(shortformResultFixture.sessionId);
     expect(viewModel.format).toBe("choice");
     expect(viewModel.isServiceEnded).toBe(false);
+    expect(viewModel.canStartNextRound).toBe(false);
     expect(viewModel.recapItems).toHaveLength(1);
     expect(viewModel.recapItems[0]).toMatchObject({
       index: 1,
@@ -52,5 +65,31 @@ describe("screen view-model mappers", () => {
       outcomeLabel: "정답",
     });
     expect(viewModel.recapItems[0].evidence?.title).toBe(shortformResultFixture.explanations[0].evidence.title);
+  });
+
+  it("enables next round in quiz result view model when remaining candidates exist", () => {
+    const viewModel = toQuizResultViewModel({
+      ...shortformResultFixture,
+      remainingCandidateCount: 2,
+    });
+
+    expect(viewModel.canStartNextRound).toBe(true);
+  });
+
+  it("preserves a service-ended play session as a distinct screen state", () => {
+    const viewModel = toQuizPlayViewModel({
+      ...shortformSessionFixture,
+      status: "ended-by-service",
+      progress: { current: 0, total: 0, processed: 0 },
+      question: null,
+      resolution: null,
+    });
+
+    expect(viewModel).toMatchObject({
+      isFinished: true,
+      isServiceEnded: true,
+      status: "ended-by-service",
+      question: null,
+    });
   });
 });
