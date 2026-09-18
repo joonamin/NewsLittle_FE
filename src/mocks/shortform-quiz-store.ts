@@ -4,6 +4,7 @@ import type {
   QuizPreviewApiModel,
   QuizPreviewCandidateApiModel,
   QuizResolutionApiModel,
+  QuizResultApiModel,
   QuizSessionApiModel,
 } from "@/features/contracts/api-models";
 
@@ -418,4 +419,115 @@ export function isShortformPreviewScenario(value: string | null): value is Short
   return ["normal", "empty", "partial", "twelve", "written-unavailable", "next-round"].includes(
     value ?? "",
   );
+}
+
+export function getShortformQuizResult(sessionId: string): QuizResultApiModel {
+  const state = stateFor(sessionId);
+  const isEndedByService =
+    state.status === "ended-by-service" || sessionId.includes("service-ended");
+
+  if (isEndedByService) {
+    return {
+      sessionId,
+      domain: "shortform",
+      format: state.snapshot.format,
+      status: "ended-by-service",
+      summary: {
+        planned: state.snapshot.candidateIds.length,
+        processed: 0,
+        correct: 0,
+        choiceIncorrect: 0,
+        givenUp: 0,
+        excludedByService: state.snapshot.candidateIds.length,
+        writtenCorrect: { firstAttempt: 0, retryWithoutHint: 0, retryWithHint: 0 },
+      },
+      explanations: [],
+      remainingCandidateCount: 0,
+    };
+  }
+
+  const planned = Math.max(state.snapshot.candidateIds.length, 1);
+  const explanations: QuizResolutionApiModel[] = state.snapshot.candidateIds.map((_, idx) => {
+    const existing = state.history[idx];
+    if (existing) return existing;
+    const content = contentAt(idx);
+    const isFirst = idx === 0;
+    const isSecond = idx === 1;
+    const outcome: QuizResolutionApiModel["outcome"] = isFirst
+      ? "correct"
+      : isSecond
+        ? state.snapshot.format === "choice"
+          ? "incorrect"
+          : "given-up"
+        : "correct";
+
+    const resolution: QuizResolutionApiModel = {
+      prompt: state.snapshot.format === "choice" ? content.choicePrompt : content.writtenPrompt,
+      outcome,
+      userAnswer:
+        outcome === "correct"
+          ? state.snapshot.format === "choice"
+            ? content.choiceLabels[0]
+            : content.answer
+          : outcome === "incorrect"
+            ? content.choiceLabels[1]
+            : null,
+      correctAnswer:
+        state.snapshot.format === "choice" ? content.choiceLabels[0] : content.answer,
+      explanation: content.explanation,
+      semanticFeedback: null,
+      evidence: articleFor({ snapshot: state.snapshot, index: idx } as SessionState),
+    };
+    if (sessionId.includes("original-unavailable")) {
+      resolution.evidence.availability.original = "unavailable";
+    }
+    return resolution;
+  });
+
+  const correct = explanations.filter((item) => item.outcome === "correct").length;
+  const choiceIncorrect = explanations.filter((item) => item.outcome === "incorrect").length;
+  const givenUp = explanations.filter((item) => item.outcome === "given-up").length;
+  const excludedByService = explanations.filter(
+    (item) => item.outcome === "service-excluded",
+  ).length;
+  const processed = planned - excludedByService;
+
+  let firstAttempt = 0;
+  let retryWithoutHint = 0;
+  let retryWithHint = 0;
+
+  if (state.snapshot.format === "written") {
+    explanations.forEach((exp, idx) => {
+      if (exp.outcome !== "correct") return;
+      const attempt = state.attempts[idx] ?? 0;
+      if (attempt === 0) firstAttempt += 1;
+      else if (attempt === 1) retryWithoutHint += 1;
+      else retryWithHint += 1;
+    });
+  }
+
+  const remainingCandidateCount =
+    sessionId.includes("twelve") || sessionId.includes("next-round") ? 2 : 0;
+
+  return {
+    sessionId,
+    domain: "shortform",
+    format: state.snapshot.format,
+    status: "completed",
+    summary: {
+      planned,
+      processed,
+      correct,
+      choiceIncorrect,
+      givenUp,
+      excludedByService,
+      writtenCorrect: {
+        firstAttempt,
+        retryWithoutHint,
+        retryWithHint,
+      },
+    },
+    explanations,
+    remainingCandidateCount,
+  };
 }

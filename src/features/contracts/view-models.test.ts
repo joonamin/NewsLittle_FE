@@ -57,6 +57,7 @@ describe("screen view-model mappers", () => {
     expect(viewModel.sessionId).toBe(shortformResultFixture.sessionId);
     expect(viewModel.format).toBe("choice");
     expect(viewModel.isServiceEnded).toBe(false);
+    expect(viewModel.canStartNextRound).toBe(false);
     expect(viewModel.recapItems).toHaveLength(1);
     expect(viewModel.recapItems[0]).toMatchObject({
       index: 1,
@@ -64,6 +65,15 @@ describe("screen view-model mappers", () => {
       outcomeLabel: "정답",
     });
     expect(viewModel.recapItems[0].evidence?.title).toBe(shortformResultFixture.explanations[0].evidence.title);
+  });
+
+  it("enables next round in quiz result view model when remaining candidates exist", () => {
+    const viewModel = toQuizResultViewModel({
+      ...shortformResultFixture,
+      remainingCandidateCount: 2,
+    });
+
+    expect(viewModel.canStartNextRound).toBe(true);
   });
 
   it("preserves a service-ended play session as a distinct screen state", () => {
