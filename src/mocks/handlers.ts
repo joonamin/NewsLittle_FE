@@ -38,7 +38,8 @@ function successResponse<T>(data: T, init?: ResponseInit) {
 
 function failureResponse(error: unknown) {
   const code = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-  const status = code === "AUTHENTICATION_REQUIRED" ? 401 : code === "ARTICLE_NOT_FOUND" ? 404 : 500;
+  const status =
+    code === "AUTHENTICATION_REQUIRED" ? 401 : code === "ARTICLE_NOT_FOUND" || code === "NOT_FOUND" ? 404 : 500;
   return HttpResponse.json({ error: { code } }, { status });
 }
 
@@ -131,6 +132,15 @@ export const handlers = [
     successResponse(getRandomQuizResult(String(params.sessionId))),
   ),
   http.get(`${api}/archive`, () => successResponse(mockHomeStore.archive())),
+  /** SCR-07 개별 삭제(FR-10·FR-15). 없거나 남의 것이면 404, 성공은 204. */
+  http.delete(`${api}/archive/:entryId`, ({ params }) => {
+    try {
+      mockHomeStore.deleteArchiveEntry(String(params.entryId));
+      return new HttpResponse(null, { status: 204 });
+    } catch (error) {
+      return failureResponse(error);
+    }
+  }),
   http.get(`${api}/settings`, () => successResponse(settingsFixture)),
   http.post(`${api}/today-list`, async ({ request }) => {
     try {

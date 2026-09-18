@@ -33,6 +33,17 @@ describe("screen API", () => {
     });
   });
 
+  it("sends a DELETE for deleteArchiveEntry and tolerates its empty 204 response", async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(screenApi.deleteArchiveEntry("entry-1")).resolves.toBeUndefined();
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/v1/archive/entry-1",
+      expect.objectContaining({ method: "DELETE", credentials: "include" }),
+    );
+  });
+
   it("sends an abandon request with keepalive during page exit", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(

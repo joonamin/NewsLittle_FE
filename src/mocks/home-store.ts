@@ -152,7 +152,7 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
           id: `archive-${list.date}-${item.article.id}`,
           selectedAt: item.selectedAt,
           article: item.article,
-          displayStatus: item.quizStatus === "suspended" ? "restricted" : "available",
+          displayStatus: item.quizStatus === "suspended" ? "discontinued" : "available",
         });
       }
     }
@@ -168,10 +168,27 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     return home();
   }
 
+  /** SCR-07 개별 삭제(FR-10·FR-15). 본인 소유가 아니거나 없는 항목은 NOT_FOUND. */
+  function deleteArchiveEntry(entryId: string): void {
+    const member = activeMember();
+    if (!member) throw new Error("AUTHENTICATION_REQUIRED");
+
+    for (const group of member.archive.groups) {
+      const index = group.entries.findIndex((entry) => entry.id === entryId);
+      if (index === -1) continue;
+      group.entries.splice(index, 1);
+      member.archive.groups = member.archive.groups.filter((g) => g.entries.length > 0);
+      return;
+    }
+
+    throw new Error("NOT_FOUND");
+  }
+
   return {
     addToTodayList,
     archive: () => clone(activeMember()?.archive ?? { groups: [] }),
     archivePreviousLists,
+    deleteArchiveEntry,
     discardPreviousLists,
     home,
     login: () => {

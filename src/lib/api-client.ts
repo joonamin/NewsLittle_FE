@@ -40,6 +40,12 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
     throw new ApiError(response.status, body?.error?.code ?? "UNKNOWN", body?.error?.message);
   }
 
+  // 로그아웃·아카이브 삭제 등 일부 엔드포인트는 본문 없는 204를 돌려준다 —
+  // 그런 응답에 .json()을 호출하면 파싱 오류가 난다.
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return ((await response.json()) as ApiResponse<T>).data;
 }
 

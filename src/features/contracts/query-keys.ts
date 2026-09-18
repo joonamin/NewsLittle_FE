@@ -29,6 +29,11 @@ export const navigationQueryOptions = queryOptions({
   placeholderData: defaultGuestNavigation,
 });
 
+export const archiveQueryOptions = queryOptions({
+  queryKey: queryKeys.archive,
+  queryFn: screenApi.archive,
+});
+
 export function quizPreviewQueryOptions(domain: QuizDomain) {
   return queryOptions({
     queryKey: queryKeys.quiz.preview(domain),

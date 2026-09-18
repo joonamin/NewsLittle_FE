@@ -54,6 +54,9 @@ export const screenApi = {
       toQuizResultViewModel,
     ),
   archive: () => apiRequest<ArchiveApiModel>("/api/v1/archive").then(toArchiveViewModel),
+  /** SCR-07 개별 삭제(FR-10·FR-15). 응답 본문 없음(204). */
+  deleteArchiveEntry: (entryId: string) =>
+    apiRequest<void>(`/api/v1/archive/${entryId}`, { method: "DELETE" }),
   settings: () => apiRequest<SettingsApiModel>("/api/v1/settings").then(toSettingsViewModel),
   addToTodayList: (payload: AddToTodayListRequest) =>
     apiRequest<TodayListApiModel>("/api/v1/today-list", jsonRequest("POST", payload)),

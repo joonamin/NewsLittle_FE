@@ -107,6 +107,7 @@ test("MSW persists today-list mutations and switches the authenticated home stat
   expect(response.member.data.viewer.role).toBe("member");
   expect(response.member.data.todayList.items).toHaveLength(1);
 });
+
 test("random quiz preview selects a format and creates a session", async ({ page }) => {
   await page.goto("/random");
 
@@ -183,5 +184,97 @@ test("random quiz result page renders summary, toggles recap items, and saves ar
 
   await page.getByRole("button", { name: "새 회차 시작" }).click();
   await expect(page).toHaveURL("/random?format=choice");
+});
+
+test("archive shows grouped entries with status badges and supports collapse and delete", async ({ page }) => {
+  await page.goto("/archive");
+
+  await expect(page.getByRole("heading", { name: "아카이브" })).toBeVisible();
+  await expect(
+    page.getByText("제목과 원문 링크만 보관해요. 기사 본문·요약은 저장하지 않으며, 다시 푸는 퀴즈는 제공하지 않아요."),
+  ).toBeVisible();
+
+  const latestGroupHeader = page.getByRole("button", { name: /2026\. 9\. 12\. 선택 · 5개/ });
+  await expect(latestGroupHeader).toHaveAttribute("aria-expanded", "true");
+  await expect(latestGroupHeader.getByText("펼침")).toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(5);
+  await expect(page.getByText("원문 접근 실패 · 보관 기록 유지")).toBeVisible();
+  await expect(page.getByText("요약·퀴즈 연결 없음")).toBeVisible();
+  await expect(page.getByText("이용 중단으로 표시가 제한된 기사")).toHaveCount(2);
+  await expect(
+    page.getByText("메타데이터 이용 조건이 종료되어 제목과 원문 링크를 표시할 수 없습니다."),
+  ).toBeVisible();
+  await expect(
+    page.getByText("제공처 요청으로 이용이 중단되어 제목과 원문 링크를 표시할 수 없습니다."),
+  ).toBeVisible();
+
+  const previousGroupHeader = page.getByRole("button", { name: /2026\. 8\. 10\. 선택 · 1개/ });
+  await expect(previousGroupHeader).toHaveAttribute("aria-expanded", "false");
+  await expect(previousGroupHeader.getByText("접힘")).toBeVisible();
+  await previousGroupHeader.click();
+  await expect(previousGroupHeader).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("listitem")).toHaveCount(6);
+
+  await expect(page.getByRole("listitem").first()).toContainText(
+    "모의 기사: 지역 공공도서관이 주말 프로그램을 확대합니다",
+  );
+  await page.getByRole("listitem").first().getByRole("button", { name: "삭제" }).click();
+  await expect(page.getByText("모의 기사: 지역 공공도서관이 주말 프로그램을 확대합니다")).not.toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(5);
+});
+
+test("archive auto-opens a login prompt when the session becomes unauthenticated, cancel returns to the previous screen, and logging back in restores the archive", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+
+  const nav = page.getByRole("navigation", { name: "주 내비게이션" });
+  await nav.getByRole("link", { name: "아카이브" }).click();
+  await expect(page.getByRole("heading", { name: "아카이브" })).toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(5);
+
+  // 세션이 끊겨 게스트가 되면 아카이브에서 로그인 모달이 자동으로 뜬다(FR-11).
+  await page.getByRole("button", { name: "뉴스리틀 사용자" }).click();
+  await page.getByRole("menuitem", { name: "로그아웃" }).click();
+  const loginDialog = page.getByRole("dialog", { name: "로그인이 필요해요" });
+  await expect(loginDialog).toBeVisible();
+
+  // 로그인 없이 닫으면 이전 화면으로 돌아간다(FR-16).
+  await loginDialog.getByRole("button", { name: "닫기" }).click();
+  await expect(page).toHaveURL("/");
+
+  // 다시 로그인한 뒤 아카이브로 이동한다.
+  await page.getByRole("button", { name: "로그인", exact: true }).click();
+  await page.getByRole("button", { name: "구글로 계속하기" }).click();
+  await nav.getByRole("link", { name: "아카이브" }).click();
+  await expect(page.getByRole("heading", { name: "아카이브" })).toBeVisible();
+
+  // 아카이브에 머무는 동안 다시 게스트가 되어도, 로그인에 성공하면 본인 아카이브가 그대로 표시된다(FR-11).
+  await page.getByRole("button", { name: "뉴스리틀 사용자" }).click();
+  await page.getByRole("menuitem", { name: "로그아웃" }).click();
+  await expect(page.getByRole("dialog", { name: "로그인이 필요해요" })).toBeVisible();
+  await page.getByRole("button", { name: "구글로 계속하기" }).click();
+  await expect(page.getByRole("heading", { name: "아카이브" })).toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(5);
+});
+
+test("archive shows archival guidance once every entry is deleted", async ({ page }) => {
+  await page.goto("/archive");
+
+  await expect(page.getByRole("listitem")).toHaveCount(5);
+
+  for (let remaining = 5; remaining > 0; remaining -= 1) {
+    await page.getByRole("button", { name: "삭제" }).first().click();
+    await expect(page.getByRole("listitem")).toHaveCount(remaining - 1);
+  }
+
+  await page.getByRole("button", { name: /2026\. 8\. 10\. 선택/ }).click();
+  await expect(page.getByRole("listitem")).toHaveCount(1);
+  await page.getByRole("button", { name: "삭제" }).first().click();
+
+  await expect(page.getByText("아직 보관한 기사가 없어요")).toBeVisible();
+  await expect(page.getByText("다음 날 다시 찾아오면 어제 목록이 자동으로 보관돼요.")).toBeVisible();
+  await expect(page.getByRole("listitem")).toHaveCount(0);
 });
 
