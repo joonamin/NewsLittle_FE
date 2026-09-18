@@ -65,7 +65,7 @@ export default function AdminDashboardPage() {
               {/* 삭제 실패 상태 시뮬레이션 토글 버튼 (테스트용) */}
               <Button
                 size="xs"
-                variant="ghost"
+                variant="secondary"
                 onClick={handleToggleDeletionFailure}
                 className="text-xs text-nl-muted hover:text-nl-text border border-dashed border-nl-border"
                 title="삭제 실패 경고 노출 여부를 토글합니다."

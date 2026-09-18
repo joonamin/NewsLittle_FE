@@ -64,12 +64,12 @@ export function quizResultQueryOptions(domain: QuizDomain, sessionId: string) {
 
 export const adminDashboardSummaryQueryOptions = queryOptions({
   queryKey: queryKeys.admin.dashboard,
-  queryFn: adminApi.dashboardSummary,
+  queryFn: () => adminApi.dashboardSummary(),
 });
 
 export const adminReviewQueueQueryOptions = queryOptions({
   queryKey: queryKeys.admin.queue,
-  queryFn: adminApi.reviewQueue,
+  queryFn: () => adminApi.reviewQueue(),
 });
 
 export function adminArticleReviewQueryOptions(articleId: number) {
