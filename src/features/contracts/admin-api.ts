@@ -1,11 +1,16 @@
 import { apiRequest, jsonRequest } from "@/lib/api-client";
 import type {
   AdminArticleReviewItem,
+  AdminDashboardSummary,
   ReviewDecisionRequest,
   ReviewQueueSummary,
 } from "./admin-models";
 
 export const adminApi = {
+  /** ADM-01 운영 대시보드 핵심 지표 및 최근 활동 내역 */
+  dashboardSummary: () =>
+    apiRequest<AdminDashboardSummary>("/api/v1/operations/dashboard/summary"),
+
   /** ADM-03 검수 대기열 목록 및 기한 요약 */
   reviewQueue: () =>
     apiRequest<ReviewQueueSummary>("/api/v1/operations/reviews/queue"),

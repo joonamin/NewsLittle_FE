@@ -1,11 +1,78 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { adminApi } from "./admin-api";
-import type { AdminArticleReviewItem, ReviewQueueSummary } from "./admin-models";
+import type {
+  AdminArticleReviewItem,
+  AdminDashboardSummary,
+  ReviewQueueSummary,
+} from "./admin-models";
 
 describe("admin API", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("fetches dashboard summary metrics and logs", async () => {
+    const mockDashboard: AdminDashboardSummary = {
+      lastAggregatedAt: "09:42",
+      deletionFailureAlert: {
+        hasFailure: true,
+        count: 2,
+        message: "삭제 실패 2건 · 확인되지 않은 자산은 재게시할 수 없습니다.",
+      },
+      pendingCounts: {
+        reviewPendingCount: 12,
+        usageBasisPendingCount: 3,
+        deletionFailureCount: 2,
+        unprocessedReportCount: 4,
+        correctionPendingCount: 1,
+      },
+      deadlineWarnings: [
+        {
+          id: "warn-1",
+          label: "본문 삭제 임박",
+          assetCode: "N-0913-08",
+          remainingTimeText: "18시간",
+          severity: "critical",
+        },
+      ],
+      supplyStatus: {
+        publishableArticleCount: 12,
+        choiceQuestionCount: 24,
+        subjectiveQuestionCount: 3,
+        subjectiveSuspended: true,
+        noticeText: "5문제 미만인 형식만 보류합니다.",
+      },
+      recentActivities: [
+        {
+          id: "act-1",
+          time: "09:40",
+          assetCode: "N-0914-12",
+          action: "검수 통과",
+          actor: "운영자 A",
+        },
+      ],
+    };
+
+    const fetchMock = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          data: mockDashboard,
+          meta: { requestId: "req-dash" },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await adminApi.dashboardSummary();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/v1/operations/dashboard/summary",
+      expect.objectContaining({ credentials: "include" }),
+    );
+    expect(result.pendingCounts.reviewPendingCount).toBe(12);
+    expect(result.deletionFailureAlert.hasFailure).toBe(true);
   });
 
   it("fetches review queue summary", async () => {

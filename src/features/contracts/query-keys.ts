@@ -19,6 +19,7 @@ export const queryKeys = {
       ["quiz", domain, "result", sessionId] as const,
   },
   admin: {
+    dashboard: ["admin", "dashboard"] as const,
     queue: ["admin", "review", "queue"] as const,
     articleReview: (articleId: number) => ["admin", "review", "article", articleId] as const,
   },
@@ -60,6 +61,11 @@ export function quizResultQueryOptions(domain: QuizDomain, sessionId: string) {
     queryFn: () => screenApi.result(domain, sessionId),
   });
 }
+
+export const adminDashboardSummaryQueryOptions = queryOptions({
+  queryKey: queryKeys.admin.dashboard,
+  queryFn: adminApi.dashboardSummary,
+});
 
 export const adminReviewQueueQueryOptions = queryOptions({
   queryKey: queryKeys.admin.queue,
