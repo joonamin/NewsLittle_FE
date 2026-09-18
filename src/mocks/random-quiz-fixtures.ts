@@ -29,7 +29,10 @@ export const choicePrompts = [
   ["시립미술관 야간 관람을 확대하는 요일은 언제인가요?", ["금요일", "월요일"]],
 ] as const;
 
-type ResolutionInput = { outcome: "correct" | "incorrect" | "given-up"; userAnswer: string | null } | null;
+type ResolutionInput = {
+  outcome: "correct" | "incorrect" | "given-up" | "service-excluded";
+  userAnswer: string | null;
+} | null;
 
 export function randomQuizSession(format: QuizFormat, index = 0, resolutionInput: ResolutionInput = null, hintLevel: 0 | 1 | 2 = 0): QuizSessionApiModel {
   const article = articles[index];

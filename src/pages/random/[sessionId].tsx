@@ -9,6 +9,7 @@ import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Button } from "@/components/ui/button";
 import { ExplanationBlock } from "@/components/ui/explanation-block";
 import { ProgressBar, ProgressLabel } from "@/components/ui/progress";
+import { QuestionNavigation } from "@/components/ui/question-navigation";
 import { QuizOptionChoice, QuizOptionOX } from "@/components/ui/quiz-option";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { quizSessionQueryOptions } from "@/features/contracts/query-keys";
@@ -81,6 +82,11 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
     queryClient.setQueryData(sessionOptions.queryKey, next);
   };
 
+  const resetDraft = () => {
+    setSelectedAnswer("");
+    writtenForm.reset({ answer: "" });
+  };
+
   const submitMutation = useMutation({
     mutationFn: async (answer: string) => {
       const timeoutMs = session.format === "written" ? 10_000 : 1_000;
@@ -96,12 +102,18 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
     mutationFn: () => screenApi.nextQuestion("random", sessionId),
     onSuccess: (next) => {
       updateSession(next);
-      setSelectedAnswer("");
-      writtenForm.reset({ answer: "" });
+      resetDraft();
+    },
+  });
+  const previousQuestionMutation = useMutation({
+    mutationFn: () => screenApi.previousQuestion("random", sessionId),
+    onSuccess: (previous) => {
+      updateSession(previous);
+      resetDraft();
     },
   });
 
-  const isJudging = submitMutation.isPending || giveUpMutation.isPending || nextQuestionMutation.isPending;
+  const isJudging = submitMutation.isPending || giveUpMutation.isPending || nextQuestionMutation.isPending || previousQuestionMutation.isPending;
   const submitError = submitMutation.isError || giveUpMutation.isError;
 
   useEffect(() => {
@@ -118,6 +130,10 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
       return;
     }
     nextQuestionMutation.mutate();
+  };
+
+  const goPrevious = () => {
+    previousQuestionMutation.mutate();
   };
 
   if (!session.question) {
@@ -140,7 +156,7 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
       </div>
 
       {resolution ? (
-        <Resolution session={session} onNext={() => void goNext()} />
+        <Resolution session={session} />
       ) : (
         <section className="space-y-6 rounded-nl-card border border-nl-border bg-nl-bg p-6 md:p-8">
           <p className="text-nl-caption text-nl-muted">{question.context}</p>
@@ -198,11 +214,19 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
           ) : null}
         </section>
       )}
+      <QuestionNavigation
+        current={session.progress.current}
+        total={session.progress.total}
+        canGoNext={Boolean(resolution)}
+        pending={isJudging}
+        onPrevious={goPrevious}
+        onNext={() => void goNext()}
+      />
     </Page>
   );
 }
 
-function Resolution({ session, onNext }: { session: QuizPlayViewModel; onNext: () => void }) {
+function Resolution({ session }: { session: QuizPlayViewModel }) {
   const resolution = session.resolution!;
   const evidence = resolution.evidence;
   const positive = resolution.outcome === "correct";
@@ -251,7 +275,6 @@ function Resolution({ session, onNext }: { session: QuizPlayViewModel; onNext: (
           </article>
         ) : null}
       </section>
-      <Button onClick={onNext}>{session.progress.current >= session.progress.total ? "결과 보기 →" : "다음 문제 →"}</Button>
     </>
   );
 }

@@ -26,7 +26,8 @@ export function createRandomQuizSession(format: QuizFormat) {
 
 export function getRandomQuizSession(sessionId: string) {
   const state = stateFor(sessionId);
-  return randomQuizSession(state.format, state.index);
+  const resolution = state.resolved ? state.history[state.index] : null;
+  return randomQuizSession(state.format, state.index, resolution);
 }
 
 export function submitRandomQuizAnswer(sessionId: string, rawAnswer: string): QuizSessionApiModel {
@@ -63,8 +64,15 @@ export function giveUpRandomQuizQuestion(sessionId: string) {
 export function nextRandomQuizQuestion(sessionId: string) {
   const state = stateFor(sessionId);
   if (state.resolved && state.index < 4) state.index += 1;
-  state.resolved = false;
-  return randomQuizSession(state.format, state.index);
+  state.resolved = Boolean(state.history[state.index]);
+  return getRandomQuizSession(sessionId);
+}
+
+export function previousRandomQuizQuestion(sessionId: string) {
+  const state = stateFor(sessionId);
+  if (state.index > 0) state.index -= 1;
+  state.resolved = Boolean(state.history[state.index]);
+  return getRandomQuizSession(sessionId);
 }
 
 export function getRandomQuizResult(sessionId: string): QuizResultApiModel {

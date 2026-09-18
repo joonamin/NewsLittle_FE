@@ -30,7 +30,7 @@ type SessionState = {
   snapshot: SessionSnapshot;
   index: number;
   attempts: number[];
-  resolution: QuizResolutionApiModel | null;
+  history: Array<QuizResolutionApiModel | null>;
   status: QuizSessionApiModel["status"];
 };
 
@@ -39,7 +39,10 @@ type QuestionContent = {
   choicePrompt: string;
   choiceLabels: readonly [string, string];
   writtenPrompt: string;
-  context: string;
+  choiceContext: string;
+  writtenContext: string;
+  firstHint: string;
+  secondHint: string;
   explanation: string;
 };
 
@@ -61,10 +64,13 @@ const designCandidateTitles = [
 const questionContents: QuestionContent[] = [
   {
     answer: "증산",
-    choicePrompt: "나무는 그늘뿐 아니라 수분을 내보내 주변 온도를 낮춘다.",
+    choicePrompt: "나무는 그늘을 만드는 것 외에도 수분을 내보내 주변 온도를 낮춘다.",
     choiceLabels: ["O", "X"],
     writtenPrompt: "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?",
-    context: "기사 기준 2026.09.14 · 핵심 개념을 확인해 주세요.",
+    choiceContext: "기사 기준 2026.09.14 · 맞으면 O, 틀리면 X를 골라주세요.",
+    writtenContext: "기사 기준 2026.09.14 · 핵심 개념을 짧게 입력해 주세요.",
+    firstHint: "양분을 만드는 과정이 아니라, 잎에서 물이 빠져나가는 과정을 떠올려보세요.",
+    secondHint: "핵심 개념은 '증산'으로 시작해요. 다시 답하거나 포기할 수 있어요.",
     explanation: "식물이 잎을 통해 물을 수증기로 내보내는 현상을 증산이라고 해요.",
   },
   {
@@ -72,7 +78,10 @@ const questionContents: QuestionContent[] = [
     choicePrompt: "기준금리가 내려가면 대출 이자 부담도 달라질 수 있다.",
     choiceLabels: ["O", "X"],
     writtenPrompt: "기준금리 변화가 가계의 어떤 비용에 영향을 줄 수 있나요?",
-    context: "기사 기준 2026.09.14 · 기사에서 설명한 생활 변화를 답해 주세요.",
+    choiceContext: "기사 기준 2026.09.14 · 맞으면 O, 틀리면 X를 골라주세요.",
+    writtenContext: "기사 기준 2026.09.14 · 기사에서 설명한 생활 변화를 답해 주세요.",
+    firstHint: "가계가 금융기관에 돈을 빌릴 때 부담하는 비용을 떠올려보세요.",
+    secondHint: "핵심 표현은 '대출'로 시작해요. 다시 답하거나 포기할 수 있어요.",
     explanation: "기준금리 변화는 예금 금리와 함께 대출 이자 부담에도 영향을 줄 수 있어요.",
   },
   {
@@ -80,7 +89,10 @@ const questionContents: QuestionContent[] = [
     choicePrompt: "공공도서관의 새 프로그램은 일상 속 인공지능 활용을 다룬다.",
     choiceLabels: ["O", "X"],
     writtenPrompt: "공공도서관 새 프로그램이 다루는 핵심 기술은 무엇인가요?",
-    context: "기사 기준 2026.09.14 · 핵심 주제를 짧게 입력해 주세요.",
+    choiceContext: "기사 기준 2026.09.14 · 맞으면 O, 틀리면 X를 골라주세요.",
+    writtenContext: "기사 기준 2026.09.14 · 핵심 주제를 짧게 입력해 주세요.",
+    firstHint: "사람의 학습과 판단을 컴퓨터로 구현하는 기술을 떠올려보세요.",
+    secondHint: "핵심 표현은 '인공'으로 시작해요. 다시 답하거나 포기할 수 있어요.",
     explanation: "새 프로그램은 시민이 일상에서 인공지능을 이해하고 활용하도록 돕는 내용이에요.",
   },
 ];
@@ -145,6 +157,7 @@ function sessionFromState(sessionId: string, state: SessionState): QuizSessionAp
   const article = total > 0 ? articleFor(state) : null;
   const hintLevel = Math.min(state.attempts[state.index] ?? 0, 2) as 0 | 1 | 2;
   const semanticQuestion = state.index % 2 === 1;
+  const resolution = state.history[state.index] ?? null;
 
   return {
     id: sessionId,
@@ -154,7 +167,7 @@ function sessionFromState(sessionId: string, state: SessionState): QuizSessionAp
     progress: {
       current: total > 0 ? state.index + 1 : 0,
       total,
-      processed: state.index + (state.resolution ? 1 : 0),
+      processed: state.history.filter(Boolean).length,
     },
     question: article
       ? {
@@ -164,7 +177,10 @@ function sessionFromState(sessionId: string, state: SessionState): QuizSessionAp
           kind: semanticQuestion ? "semantic" : "fact",
           prompt:
             state.snapshot.format === "choice" ? content.choicePrompt : content.writtenPrompt,
-          context: content.context,
+          context:
+            state.snapshot.format === "choice"
+              ? content.choiceContext
+              : content.writtenContext,
           choices:
             state.snapshot.format === "choice"
               ? content.choiceLabels.map((label, index) => ({
@@ -178,11 +194,11 @@ function sessionFromState(sessionId: string, state: SessionState): QuizSessionAp
               : hintLevel === 1
                 ? {
                     level: 1,
-                    text: "기사에서 설명한 대상과 변화의 방향을 다시 떠올려보세요.",
+                    text: content.firstHint,
                   }
                 : {
                     level: 2,
-                    text: `핵심 표현은 '${content.answer.slice(0, 1)}'으로 시작해요. 다시 답하거나 포기할 수 있어요.`,
+                    text: content.secondHint,
                   },
           judgementFeedback:
             semanticQuestion && hintLevel > 0
@@ -193,7 +209,7 @@ function sessionFromState(sessionId: string, state: SessionState): QuizSessionAp
               : null,
         }
       : null,
-    resolution: state.resolution,
+    resolution,
   };
 }
 
@@ -211,7 +227,7 @@ function stateFor(sessionId: string) {
     },
     index: 0,
     attempts: candidates.map(() => 0),
-    resolution: null,
+    history: candidates.map(() => null),
     status: "in-progress",
   };
   sessions.set(sessionId, created);
@@ -298,7 +314,7 @@ export function createShortformQuizSession(format: QuizFormat) {
     },
     index: 0,
     attempts: selectedCandidates.map(() => 0),
-    resolution: null,
+    history: selectedCandidates.map(() => null),
     status: "in-progress",
   };
   sessions.set(sessionId, state);
@@ -321,7 +337,7 @@ export function submitShortformQuizAnswer(sessionId: string, rawAnswer: string) 
 
   const content = contentAt(state.index);
   if (state.snapshot.format === "choice") {
-    state.resolution = resolutionFor(
+    state.history[state.index] = resolutionFor(
       state,
       answer === "correct" ? "correct" : "incorrect",
       answer === "correct" ? content.choiceLabels[0] : content.choiceLabels[1],
@@ -331,7 +347,7 @@ export function submitShortformQuizAnswer(sessionId: string, rawAnswer: string) 
 
   const normalizedAnswer = answer.replaceAll(" ", "");
   if (normalizedAnswer.includes(content.answer.replaceAll(" ", ""))) {
-    state.resolution = resolutionFor(state, "correct", answer);
+    state.history[state.index] = resolutionFor(state, "correct", answer);
   } else {
     state.attempts[state.index] = Math.min((state.attempts[state.index] ?? 0) + 1, 2);
   }
@@ -340,17 +356,22 @@ export function submitShortformQuizAnswer(sessionId: string, rawAnswer: string) 
 
 export function giveUpShortformQuizQuestion(sessionId: string) {
   const state = stateFor(sessionId);
-  state.resolution = resolutionFor(state, "given-up", null);
+  state.history[state.index] = resolutionFor(state, "given-up", null);
   return structuredClone(sessionFromState(sessionId, state));
 }
 
 export function nextShortformQuizQuestion(sessionId: string) {
   const state = stateFor(sessionId);
   const isLastQuestion = state.index >= state.snapshot.candidateIds.length - 1;
-  if (state.resolution && !isLastQuestion) {
+  if (state.history[state.index] && !isLastQuestion) {
     state.index += 1;
-    state.resolution = null;
   }
+  return structuredClone(sessionFromState(sessionId, state));
+}
+
+export function previousShortformQuizQuestion(sessionId: string) {
+  const state = stateFor(sessionId);
+  if (state.index > 0) state.index -= 1;
   return structuredClone(sessionFromState(sessionId, state));
 }
 

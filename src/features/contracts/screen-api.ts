@@ -89,6 +89,11 @@ export const screenApi = {
       `/api/v1/quiz/${domain}/sessions/${sessionId}/next`,
       jsonRequest("POST", {}),
     ).then(toQuizPlayViewModel),
+  previousQuestion: (domain: QuizDomain, sessionId: string) =>
+    apiRequest<QuizSessionApiModel>(
+      `/api/v1/quiz/${domain}/sessions/${sessionId}/previous`,
+      jsonRequest("POST", {}),
+    ).then(toQuizPlayViewModel),
   updateInterestTopics: (payload: UpdateInterestTopicsRequest) =>
     apiRequest<SettingsApiModel>("/api/v1/settings/topics", jsonRequest("PUT", payload)).then(
       toSettingsViewModel,

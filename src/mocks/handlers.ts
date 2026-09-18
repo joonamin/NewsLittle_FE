@@ -12,6 +12,7 @@ import {
   getRandomQuizSession,
   giveUpRandomQuizQuestion,
   nextRandomQuizQuestion,
+  previousRandomQuizQuestion,
   submitRandomQuizAnswer,
 } from "./random-quiz-store";
 import {
@@ -21,6 +22,7 @@ import {
   giveUpShortformQuizQuestion,
   isShortformPreviewScenario,
   nextShortformQuizQuestion,
+  previousShortformQuizQuestion,
   submitShortformQuizAnswer,
 } from "./shortform-quiz-store";
 
@@ -86,6 +88,9 @@ export const handlers = [
   http.post(`${api}/quiz/shortform/sessions/:sessionId/next`, ({ params }) =>
     successResponse(nextShortformQuizQuestion(String(params.sessionId))),
   ),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/previous`, ({ params }) =>
+    successResponse(previousShortformQuizQuestion(String(params.sessionId))),
+  ),
   http.post(`${api}/quiz/random/sessions/:sessionId/give-up`, ({ params }) => {
     const sessionId = String(params.sessionId);
     return successResponse(giveUpRandomQuizQuestion(sessionId));
@@ -94,6 +99,9 @@ export const handlers = [
     const sessionId = String(params.sessionId);
     return successResponse(nextRandomQuizQuestion(sessionId));
   }),
+  http.post(`${api}/quiz/random/sessions/:sessionId/previous`, ({ params }) =>
+    successResponse(previousRandomQuizQuestion(String(params.sessionId))),
+  ),
   http.get(`${api}/quiz/shortform/sessions/:sessionId/result`, () =>
     successResponse(shortformResultFixture),
   ),

@@ -7,6 +7,7 @@ import {
   getShortformSessionSnapshot,
   giveUpShortformQuizQuestion,
   nextShortformQuizQuestion,
+  previousShortformQuizQuestion,
   submitShortformQuizAnswer,
 } from "./shortform-quiz-store";
 
@@ -122,6 +123,12 @@ describe("shortform quiz mock store", () => {
     expect(next.progress.current).toBe(2);
     expect(next.resolution).toBeNull();
     expect(getShortformQuizSession(session.id).question?.articleId).toBe("shortform-article-2");
+
+    const previous = previousShortformQuizQuestion(session.id);
+    expect(previous.progress.current).toBe(1);
+    expect(previous.resolution).toMatchObject({ outcome: "given-up", correctAnswer: "증산" });
+
+    expect(nextShortformQuizQuestion(session.id).progress.current).toBe(2);
   });
 
   it("restores a direct-entry mock session from the session id", () => {
