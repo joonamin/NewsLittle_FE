@@ -16,6 +16,7 @@ import { ExplanationBlock } from "@/components/ui/explanation-block";
 import { ProgressBar, ProgressLabel } from "@/components/ui/progress";
 import { QuestionNavigation } from "@/components/ui/question-navigation";
 import { QuizOptionChoice, QuizOptionOX } from "@/components/ui/quiz-option";
+import { StateNotice } from "@/components/ui/state-notice";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import {
   navigationQueryOptions,
@@ -24,7 +25,13 @@ import {
 import { screenApi } from "@/features/contracts/screen-api";
 import type { QuizPlayViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import {
+  CHOICE_JUDGEMENT_TIMEOUT_MS,
+  WRITTEN_JUDGEMENT_TIMEOUT_MS,
+} from "@/features/quiz/judgement-timeout";
+import { useQuizAbandonGuard } from "@/features/quiz/use-quiz-abandon-guard";
 import { submitValidated, useValidatedForm } from "@/lib/form";
+import { ApiError } from "@/lib/api-client";
 
 type QuizPlayPageProps = {
   sessionId: string;
@@ -114,15 +121,8 @@ export default function QuizPlayPage({
           <LoadingState title="문제를 준비하고 있어요" />
         </Page>
       }
-      rejected={({ reset }) => (
-        <Page>
-          <ErrorState
-            title="문제를 불러오지 못했어요"
-            description="잠시 후 다시 시도해 주세요."
-            onRetry={reset}
-            onGoHome={() => void router.push("/")}
-          />
-        </Page>
+      rejected={({ error, reset }) => (
+        <QuizSessionError error={error} onRetry={reset} />
       )}
     >
       <QuizPlayContent sessionId={sessionId} />
@@ -140,6 +140,12 @@ function QuizPlayContent({ sessionId }: { sessionId: string }) {
     defaultValues: { answer: "" },
   });
   const writtenAnswer = writtenForm.watch("answer");
+  const finishWithoutAbandon = useQuizAbandonGuard({
+    active: session.status === "in-progress",
+    domain: "shortform",
+    router,
+    sessionId,
+  });
 
   const updateSession = (next: QuizPlayViewModel) => {
     queryClient.setQueryData(sessionOptions.queryKey, next);
@@ -154,7 +160,9 @@ function QuizPlayContent({ sessionId }: { sessionId: string }) {
     mutationFn: (answer: string) =>
       withTimeout(
         screenApi.submitAnswer("shortform", sessionId, { answer }),
-        session.format === "written" ? 10_000 : 1_000,
+        session.format === "written"
+          ? WRITTEN_JUDGEMENT_TIMEOUT_MS
+          : CHOICE_JUDGEMENT_TIMEOUT_MS,
       ),
     onSuccess: updateSession,
   });
@@ -182,10 +190,14 @@ function QuizPlayContent({ sessionId }: { sessionId: string }) {
     giveUpMutation.isPending ||
     nextQuestionMutation.isPending ||
     previousQuestionMutation.isPending;
-  const judgementIncomplete = submitMutation.isError || giveUpMutation.isError;
+  const judgementIncomplete = submitMutation.isError;
+  const judgementTimedOut =
+    submitMutation.error instanceof Error &&
+    submitMutation.error.message === "judgement-timeout";
 
   const goNext = async () => {
     if (session.progress.current >= session.progress.total) {
+      finishWithoutAbandon();
       await router.push(`/quiz/${sessionId}/result`);
       return;
     }
@@ -195,6 +207,36 @@ function QuizPlayContent({ sessionId }: { sessionId: string }) {
   const goPrevious = () => {
     previousQuestionMutation.mutate();
   };
+
+  if (session.isServiceEnded) {
+    return (
+      <Page>
+        <h1 className="text-[28px] leading-[1.5] font-bold text-nl-text">숏폼 퀴즈</h1>
+        <StateNotice
+          title="서비스 사유 종료"
+          description="유효 문항이 0개여서 종료했어요. 완료·오답으로 집계하지 않아요."
+          tone="accent"
+          className="max-w-none"
+          actions={<Button onClick={() => void router.push("/")}>홈으로</Button>}
+        />
+      </Page>
+    );
+  }
+
+  if (session.status === "abandoned") {
+    return (
+      <Page>
+        <h1 className="text-[28px] leading-[1.5] font-bold text-nl-text">숏폼 퀴즈</h1>
+        <StateNotice
+          title="중도 종료된 퀴즈예요"
+          description="이 회차는 다시 이어서 풀 수 없어요. 새로운 퀴즈를 시작해 주세요."
+          tone="accent"
+          className="max-w-none"
+          actions={<Button onClick={() => void router.push("/quiz")}>새 퀴즈 시작</Button>}
+        />
+      </Page>
+    );
+  }
 
   if (!session.question) {
     return (
@@ -242,8 +284,10 @@ function QuizPlayContent({ sessionId }: { sessionId: string }) {
             selectedAnswer={selectedAnswer}
             isJudging={isJudging}
             judgementIncomplete={judgementIncomplete}
+            judgementTimedOut={judgementTimedOut}
             onSelect={setSelectedAnswer}
             onSubmit={() => submitMutation.mutate(selectedAnswer)}
+            onRetry={() => submitMutation.mutate(selectedAnswer)}
             onGiveUp={() => giveUpMutation.mutate()}
           />
         ) : (
@@ -290,13 +334,21 @@ function QuizPlayContent({ sessionId }: { sessionId: string }) {
                 ) : null}
               </>
             ) : null}
-            {judgementIncomplete ? <JudgementIncomplete /> : null}
-            <ActionButtons
-              canSubmit={Boolean(answer)}
-              isJudging={isJudging}
-              submitLabel={question.hint ? "다시 제출" : "답변 제출"}
-              onGiveUp={() => giveUpMutation.mutate()}
-            />
+            {judgementIncomplete ? (
+              <JudgementIncomplete
+                timeoutSeconds={10}
+                timedOut={judgementTimedOut}
+                onRetry={() => submitMutation.mutate(answer)}
+                onGiveUp={() => giveUpMutation.mutate()}
+              />
+            ) : (
+              <ActionButtons
+                canSubmit={Boolean(answer)}
+                isJudging={isJudging}
+                submitLabel={question.hint ? "다시 제출" : "답변 제출"}
+                onGiveUp={() => giveUpMutation.mutate()}
+              />
+            )}
           </form>
         )}
       </section>
@@ -322,16 +374,20 @@ function ChoiceAnswer({
   selectedAnswer,
   isJudging,
   judgementIncomplete,
+  judgementTimedOut,
   onSelect,
   onSubmit,
+  onRetry,
   onGiveUp,
 }: {
   session: QuizPlayViewModel;
   selectedAnswer: string;
   isJudging: boolean;
   judgementIncomplete: boolean;
+  judgementTimedOut: boolean;
   onSelect: (answer: string) => void;
   onSubmit: () => void;
+  onRetry: () => void;
   onGiveUp: () => void;
 }) {
   const choices = session.question?.choices ?? [];
@@ -360,15 +416,23 @@ function ChoiceAnswer({
           ),
         )}
       </div>
-      {judgementIncomplete ? <JudgementIncomplete /> : null}
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Button disabled={!selectedAnswer || isJudging} onClick={onSubmit}>
-          {isJudging ? "판정 중…" : "답변 제출"}
-        </Button>
-        <Button variant="secondary" disabled={isJudging} onClick={onGiveUp}>
-          포기
-        </Button>
-      </div>
+      {judgementIncomplete ? (
+        <JudgementIncomplete
+          timeoutSeconds={3}
+          timedOut={judgementTimedOut}
+          onRetry={onRetry}
+          onGiveUp={onGiveUp}
+        />
+      ) : (
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button disabled={!selectedAnswer || isJudging} onClick={onSubmit}>
+            {isJudging ? "판정 중…" : "답변 제출"}
+          </Button>
+          <Button variant="secondary" disabled={isJudging} onClick={onGiveUp}>
+            포기
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -396,11 +460,30 @@ function ActionButtons({
   );
 }
 
-function JudgementIncomplete() {
+function JudgementIncomplete({
+  timeoutSeconds,
+  timedOut,
+  onRetry,
+  onGiveUp,
+}: {
+  timeoutSeconds: 3 | 10;
+  timedOut: boolean;
+  onRetry: () => void;
+  onGiveUp: () => void;
+}) {
   return (
-    <p role="alert" className="text-nl-caption text-nl-negative">
-      판정을 완료하지 못했어요. 오답으로 기록하지 않았습니다. 재시도하거나 포기해 주세요.
-    </p>
+    <StateNotice
+      title={timedOut ? `판정 미완료 · ${timeoutSeconds}초 초과` : "판정 미완료"}
+      description="판정을 완료하지 못했습니다. 오답으로 기록하지 않습니다."
+      tone="accent"
+      className="max-w-none"
+      actions={
+        <>
+          <Button size="s" onClick={onRetry}>재시도</Button>
+          <Button size="s" variant="secondary" onClick={onGiveUp}>포기</Button>
+        </>
+      }
+    />
   );
 }
 
@@ -408,6 +491,17 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
   const resolution = session.resolution!;
   const evidence = resolution.evidence;
   const positive = resolution.outcome === "correct";
+
+  if (resolution.outcome === "service-excluded") {
+    return (
+      <StateNotice
+        title="문항 서비스 제외"
+        description="이용 조건이 변경되어 문항을 제외했어요. 오답과 채점 분모에 포함하지 않아요."
+        tone="accent"
+        className="max-w-none"
+      />
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -430,15 +524,68 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
         판정 오류 신고
       </button>
       {evidence ? (
-        <EvidenceAttribution
-          articleTitle={evidence.title}
-          sourceName={evidence.sourceName}
-          publishedLabel={evidence.publishedLabel}
-          originalUrl={evidence.originalIsAvailable ? evidence.originalUrl : null}
-          asOfLabel="문항 생성 기준 2026.09.14"
-        />
+        <>
+          {!evidence.originalIsAvailable ? (
+            <StateNotice
+              title="원문을 열 수 없어요"
+              description="현재 제공처에서 원문 접근을 지원하지 않아요. 풀이 결과는 그대로 유지됩니다."
+              className="max-w-none"
+            />
+          ) : null}
+          <EvidenceAttribution
+            articleTitle={evidence.title}
+            sourceName={evidence.sourceName}
+            publishedLabel={evidence.publishedLabel}
+            originalUrl={evidence.originalIsAvailable ? evidence.originalUrl : null}
+            asOfLabel="문항 생성 기준 2026.09.14"
+          />
+        </>
       ) : null}
     </div>
+  );
+}
+
+function QuizSessionError({ error, onRetry }: { error: Error; onRetry: () => void }) {
+  const router = useRouter();
+  const { requestLogin } = useHomeFlow();
+  const requestedLoginRef = useRef(false);
+  const sessionExpired = error instanceof ApiError && error.status === 401;
+
+  useEffect(() => {
+    if (sessionExpired && !requestedLoginRef.current) {
+      requestedLoginRef.current = true;
+      requestLogin();
+    }
+  }, [requestLogin, sessionExpired]);
+
+  if (!sessionExpired) {
+    return (
+      <Page>
+        <ErrorState
+          title="문제를 불러오지 못했어요"
+          description="잠시 후 다시 시도해 주세요."
+          onRetry={onRetry}
+          onGoHome={() => void router.push("/")}
+        />
+      </Page>
+    );
+  }
+
+  return (
+    <Page>
+      <StateNotice
+        title="로그인이 만료됐어요"
+        description="풀이를 멈췄습니다. 다시 로그인한 뒤 현재 문항을 다시 불러와 주세요."
+        tone="accent"
+        className="max-w-none"
+        actions={
+          <>
+            <Button onClick={requestLogin}>로그인</Button>
+            <Button variant="secondary" onClick={onRetry}>다시 불러오기</Button>
+          </>
+        }
+      />
+    </Page>
   );
 }
 

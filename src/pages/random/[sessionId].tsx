@@ -1,6 +1,6 @@
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
@@ -11,11 +11,17 @@ import { ExplanationBlock } from "@/components/ui/explanation-block";
 import { ProgressBar, ProgressLabel } from "@/components/ui/progress";
 import { QuestionNavigation } from "@/components/ui/question-navigation";
 import { QuizOptionChoice, QuizOptionOX } from "@/components/ui/quiz-option";
+import { StateNotice } from "@/components/ui/state-notice";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { quizSessionQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
 import type { QuizPlayViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import {
+  CHOICE_JUDGEMENT_TIMEOUT_MS,
+  WRITTEN_JUDGEMENT_TIMEOUT_MS,
+} from "@/features/quiz/judgement-timeout";
+import { useQuizAbandonGuard } from "@/features/quiz/use-quiz-abandon-guard";
 import { submitValidated, useValidatedForm } from "@/lib/form";
 
 type RandomQuizPlayPageProps = { sessionId: string };
@@ -77,6 +83,12 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const writtenForm = useValidatedForm(writtenAnswerSchema, { defaultValues: { answer: "" } });
   const writtenAnswer = writtenForm.watch("answer");
+  const finishWithoutAbandon = useQuizAbandonGuard({
+    active: session.status === "in-progress",
+    domain: "random",
+    router,
+    sessionId,
+  });
 
   const updateSession = (next: QuizPlayViewModel) => {
     queryClient.setQueryData(sessionOptions.queryKey, next);
@@ -89,7 +101,9 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
 
   const submitMutation = useMutation({
     mutationFn: async (answer: string) => {
-      const timeoutMs = session.format === "written" ? 10_000 : 1_000;
+      const timeoutMs = session.format === "written"
+        ? WRITTEN_JUDGEMENT_TIMEOUT_MS
+        : CHOICE_JUDGEMENT_TIMEOUT_MS;
       return withTimeout(screenApi.submitAnswer("random", sessionId, { answer }), timeoutMs);
     },
     onSuccess: updateSession,
@@ -116,16 +130,9 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
   const isJudging = submitMutation.isPending || giveUpMutation.isPending || nextQuestionMutation.isPending || previousQuestionMutation.isPending;
   const submitError = submitMutation.isError || giveUpMutation.isError;
 
-  useEffect(() => {
-    const confirmExit = (event: BeforeUnloadEvent) => {
-      if (!session.resolution) event.preventDefault();
-    };
-    window.addEventListener("beforeunload", confirmExit);
-    return () => window.removeEventListener("beforeunload", confirmExit);
-  }, [session.resolution]);
-
   const goNext = async () => {
     if (session.progress.current >= session.progress.total) {
+      finishWithoutAbandon();
       await router.push(`/random/${sessionId}/result`);
       return;
     }
@@ -135,6 +142,21 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
   const goPrevious = () => {
     previousQuestionMutation.mutate();
   };
+
+  if (session.status === "abandoned") {
+    return (
+      <Page>
+        <h1 className="text-[28px] leading-[1.5] font-bold">랜덤 퀴즈</h1>
+        <StateNotice
+          title="중도 종료된 퀴즈예요"
+          description="이 회차는 다시 이어서 풀 수 없어요. 새로운 퀴즈를 시작해 주세요."
+          tone="accent"
+          className="max-w-none"
+          actions={<Button onClick={() => void router.push("/random")}>새 퀴즈 시작</Button>}
+        />
+      </Page>
+    );
+  }
 
   if (!session.question) {
     return (
