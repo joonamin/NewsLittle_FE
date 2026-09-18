@@ -43,4 +43,17 @@ describe("mock home store", () => {
     expect(store.home().pendingPreviousLists).toEqual([]);
     expect(store.archive().groups.find((group) => group.date === "2026-09-11")?.entries).toHaveLength(1);
   });
+
+  it("deletes an archive entry and drops the group once it is empty, but rejects an unknown id", () => {
+    const store = createMockHomeStore();
+    const entry = store.archive().groups[0]!.entries[0]!;
+
+    expect(() => store.deleteArchiveEntry("no-such-entry")).toThrow("NOT_FOUND");
+
+    store.deleteArchiveEntry(entry.id);
+
+    expect(
+      store.archive().groups.flatMap((group) => group.entries).some((candidate) => candidate.id === entry.id),
+    ).toBe(false);
+  });
 });
