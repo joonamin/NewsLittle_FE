@@ -1,11 +1,25 @@
 import { apiRequest, jsonRequest } from "@/lib/api-client";
 import type {
   AdminArticleReviewItem,
+  AdminDashboardSummary,
   ReviewDecisionRequest,
   ReviewQueueSummary,
 } from "./admin-models";
 
 export const adminApi = {
+  /** ADM-01 운영 대시보드 핵심 지표 및 최근 활동 내역 */
+  dashboardSummary: (refresh = false) =>
+    apiRequest<AdminDashboardSummary>(
+      `/api/v1/operations/dashboard/summary${refresh ? "?refresh=true" : ""}`
+    ),
+
+  /** ADM-01 삭제 실패 모의 토글 (정상 0건 <-> 경고 2건) */
+  toggleDeletionFailure: () =>
+    apiRequest<AdminDashboardSummary>(
+      "/api/v1/operations/dashboard/toggle-deletion-failure",
+      jsonRequest("POST", {})
+    ),
+
   /** ADM-03 검수 대기열 목록 및 기한 요약 */
   reviewQueue: () =>
     apiRequest<ReviewQueueSummary>("/api/v1/operations/reviews/queue"),

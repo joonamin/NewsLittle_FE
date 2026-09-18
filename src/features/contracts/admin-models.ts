@@ -6,7 +6,13 @@
 export type AnswerFormat = "OX" | "MULTIPLE_CHOICE" | "SUBJECTIVE";
 export type QuestionKind = "FACT" | "SEMANTIC" | null;
 export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
-export type UsageBasisStatus = "CONFIRMED" | "CONDITIONAL" | "PENDING" | "RESTRICTED";
+export type UsageBasisStatus =
+  | "CONFIRMED"
+  | "CONDITIONAL"
+  | "PENDING"
+  | "RESTRICTED"
+  | "SUSPENDED"
+  | "PERMITTED";
 
 export type AdminQuizItem = {
   id: number;
@@ -82,3 +88,47 @@ export type ReviewDecisionRequest = {
     imageRightsConfirmed: boolean;
   };
 };
+
+export type DashboardDeadlineWarning = {
+  id: string;
+  label: string; // "본문 삭제 임박", "파생물 만료 임박", "계약 종료 임박"
+  assetCode: string; // "N-0913-08", "Q-0815-02", "LIC-004"
+  remainingTimeText: string; // "18시간", "1일", "2일"
+  severity: "critical" | "warning" | "info";
+};
+
+export type DashboardSupplyStatus = {
+  publishableArticleCount: number;
+  choiceQuestionCount: number;
+  subjectiveQuestionCount: number;
+  subjectiveSuspended: boolean; // 5개 미만인 경우 true
+  noticeText: string; // "5문제 미만인 형식만 보류합니다."
+};
+
+export type DashboardActivityLog = {
+  id: string;
+  time: string; // "09:40"
+  assetCode: string; // "N-0914-12"
+  action: string; // "검수 통과", "게시 확인", "삭제 요청"
+  actor: string; // "운영자 A"
+};
+
+export type AdminDashboardSummary = {
+  lastAggregatedAt: string; // "09:42"
+  deletionFailureAlert: {
+    hasFailure: boolean;
+    count: number;
+    message: string;
+  };
+  pendingCounts: {
+    reviewPendingCount: number; // ADM-03 연결
+    usageBasisPendingCount: number; // ADM-02 연결
+    deletionFailureCount: number; // ADM-05 연결
+    unprocessedReportCount: number; // ADM-06 연결
+    correctionPendingCount: number; // ADM-04 연결
+  };
+  deadlineWarnings: DashboardDeadlineWarning[];
+  supplyStatus: DashboardSupplyStatus;
+  recentActivities: DashboardActivityLog[];
+};
+
