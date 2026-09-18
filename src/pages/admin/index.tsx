@@ -8,6 +8,7 @@ import { DeletionAlertBanner } from "@/features/admin/dashboard/deletion-alert-b
 import { KpiMetricCards } from "@/features/admin/dashboard/kpi-metric-cards";
 import { DeadlineSupplySection } from "@/features/admin/dashboard/deadline-supply-section";
 import { RecentActivityTable } from "@/features/admin/dashboard/recent-activity-table";
+import { adminApi } from "@/features/contracts/admin-api";
 import {
   adminDashboardSummaryQueryOptions,
   queryKeys,
@@ -19,8 +20,22 @@ export default function AdminDashboardPage() {
     adminDashboardSummaryQueryOptions
   );
 
-  const handleRefresh = () => {
-    void queryClient.invalidateQueries({ queryKey: queryKeys.admin.dashboard });
+  const handleRefresh = async () => {
+    try {
+      const updated = await adminApi.dashboardSummary(true);
+      queryClient.setQueryData(queryKeys.admin.dashboard, updated);
+    } catch {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.admin.dashboard });
+    }
+  };
+
+  const handleToggleDeletionFailure = async () => {
+    try {
+      const updated = await adminApi.toggleDeletionFailure();
+      queryClient.setQueryData(queryKeys.admin.dashboard, updated);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -46,6 +61,20 @@ export default function AdminDashboardPage() {
               <span className="text-xs text-nl-muted font-mono">
                 마지막 집계 {summary?.lastAggregatedAt ?? "--:--"} · 조회 전용
               </span>
+
+              {/* 삭제 실패 상태 시뮬레이션 토글 버튼 (테스트용) */}
+              <Button
+                size="xs"
+                variant="ghost"
+                onClick={handleToggleDeletionFailure}
+                className="text-xs text-nl-muted hover:text-nl-text border border-dashed border-nl-border"
+                title="삭제 실패 경고 노출 여부를 토글합니다."
+              >
+                {summary?.deletionFailureAlert.hasFailure
+                  ? "🚨 삭제 실패 모의 (ON)"
+                  : "✅ 삭제 실패 모의 (OFF)"}
+              </Button>
+
               <Button
                 size="xs"
                 variant="secondary"

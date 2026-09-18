@@ -1,5 +1,15 @@
-import type { AdminDashboardSummary } from "@/features/contracts/admin-models";
+import type {
+  AdminDashboardSummary,
+  DashboardActivityLog,
+} from "@/features/contracts/admin-models";
 import { mockAdminReviewStore } from "./admin-review-store";
+
+function getCurrentTimeString(): string {
+  const d = new Date();
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
 
 const defaultDashboardSummary: AdminDashboardSummary = {
   lastAggregatedAt: "09:42",
@@ -64,7 +74,7 @@ export function createAdminDashboardStore(initial = defaultDashboardSummary) {
 
   return {
     getSummary(): AdminDashboardSummary {
-      // 검수 대기열의 실제 잔여 건수와 연동
+      // 검수 대기열의 실제 잔여 건수와 실시간 연동
       const queueSummary = mockAdminReviewStore.getQueueSummary();
       const actualReviewPending = queueSummary.totalCount;
 
@@ -75,6 +85,35 @@ export function createAdminDashboardStore(initial = defaultDashboardSummary) {
           reviewPendingCount: Math.max(actualReviewPending, summary.pendingCounts.reviewPendingCount),
         },
       };
+    },
+
+    /** 새로고침 시 집계 시각 갱신 */
+    refresh() {
+      summary.lastAggregatedAt = getCurrentTimeString();
+      return this.getSummary();
+    },
+
+    /** 검수 대기열이나 다른 화면에서 조치 발생 시 실시간 로그 적재 (최대 10건 유지) */
+    recordActivity(action: string, assetCode: string, actor = "운영자 A") {
+      const time = getCurrentTimeString();
+      const newActivity: DashboardActivityLog = {
+        id: `act-${Date.now()}`,
+        time,
+        assetCode,
+        action,
+        actor,
+      };
+      summary.recentActivities = [newActivity, ...summary.recentActivities].slice(0, 10);
+      summary.lastAggregatedAt = time;
+    },
+
+    /** 삭제 실패 시뮬레이션 토글 (정상 0건 <-> 오류 2건) */
+    toggleDeletionFailure(hasFailure?: boolean) {
+      const next = hasFailure !== undefined ? hasFailure : !summary.deletionFailureAlert.hasFailure;
+      summary.deletionFailureAlert.hasFailure = next;
+      summary.deletionFailureAlert.count = next ? 2 : 0;
+      summary.pendingCounts.deletionFailureCount = next ? 2 : 0;
+      return this.getSummary();
     },
 
     reset() {

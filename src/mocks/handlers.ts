@@ -197,8 +197,15 @@ export const handlers = [
   http.put(`${api}/settings/topics`, () => successResponse(settingsFixture)),
 
   // ADM-01 운영 대시보드
-  http.get(`${api}/operations/dashboard/summary`, () => {
+  http.get(`${api}/operations/dashboard/summary`, ({ request }) => {
+    const url = new URL(request.url);
+    if (url.searchParams.get("refresh") === "true") {
+      mockAdminDashboardStore.refresh();
+    }
     return successResponse(mockAdminDashboardStore.getSummary());
+  }),
+  http.post(`${api}/operations/dashboard/toggle-deletion-failure`, () => {
+    return successResponse(mockAdminDashboardStore.toggleDeletionFailure());
   }),
 
   // ADM-03 검수 대기열
@@ -218,6 +225,16 @@ export const handlers = [
       const articleId = Number(params.articleId);
       const body = (await request.json()) as ReviewDecisionRequest;
       const updated = mockAdminReviewStore.submitDecision(articleId, body);
+
+      // 대시보드 최근 활동 로그에 실시간 반영
+      const actionText =
+        body.decisionType === "APPROVE"
+          ? "검수 통과"
+          : body.decisionType === "REJECT"
+            ? "검수 반려"
+            : "재생성 요청";
+      mockAdminDashboardStore.recordActivity(actionText, updated.articleCode);
+
       return successResponse(updated);
     } catch (error) {
       return failureResponse(error);
