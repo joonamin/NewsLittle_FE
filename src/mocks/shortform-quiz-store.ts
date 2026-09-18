@@ -1,11 +1,11 @@
 import type {
+  ArticleApiModel,
   QuizFormat,
   QuizPreviewApiModel,
   QuizPreviewCandidateApiModel,
+  QuizResolutionApiModel,
   QuizSessionApiModel,
 } from "@/features/contracts/api-models";
-
-import { createShortformSessionFixture } from "./fixtures";
 
 export type ShortformPreviewScenario =
   | "normal"
@@ -26,6 +26,23 @@ type SessionSnapshot = {
   format: QuizFormat;
 };
 
+type SessionState = {
+  snapshot: SessionSnapshot;
+  index: number;
+  attempts: number[];
+  resolution: QuizResolutionApiModel | null;
+  status: QuizSessionApiModel["status"];
+};
+
+type QuestionContent = {
+  answer: string;
+  choicePrompt: string;
+  choiceLabels: readonly [string, string];
+  writtenPrompt: string;
+  context: string;
+  explanation: string;
+};
+
 const designCandidateTitles = [
   "도심의 열을 낮추는 나무, 그늘 이상의 역할",
   "기준금리가 내려가면 우리 생활은 어떻게 달라질까",
@@ -40,6 +57,33 @@ const designCandidateTitles = [
   "도심 하천 수질 조사 결과가 공개됐습니다",
   "공공 체육시설 예약 방식이 달라집니다",
 ] as const;
+
+const questionContents: QuestionContent[] = [
+  {
+    answer: "증산",
+    choicePrompt: "나무는 그늘뿐 아니라 수분을 내보내 주변 온도를 낮춘다.",
+    choiceLabels: ["O", "X"],
+    writtenPrompt: "식물이 잎에서 물을 수증기로 내보내는 현상을 무엇이라고 할까요?",
+    context: "기사 기준 2026.09.14 · 핵심 개념을 확인해 주세요.",
+    explanation: "식물이 잎을 통해 물을 수증기로 내보내는 현상을 증산이라고 해요.",
+  },
+  {
+    answer: "대출 이자",
+    choicePrompt: "기준금리가 내려가면 대출 이자 부담도 달라질 수 있다.",
+    choiceLabels: ["O", "X"],
+    writtenPrompt: "기준금리 변화가 가계의 어떤 비용에 영향을 줄 수 있나요?",
+    context: "기사 기준 2026.09.14 · 기사에서 설명한 생활 변화를 답해 주세요.",
+    explanation: "기준금리 변화는 예금 금리와 함께 대출 이자 부담에도 영향을 줄 수 있어요.",
+  },
+  {
+    answer: "인공지능",
+    choicePrompt: "공공도서관의 새 프로그램은 일상 속 인공지능 활용을 다룬다.",
+    choiceLabels: ["O", "X"],
+    writtenPrompt: "공공도서관 새 프로그램이 다루는 핵심 기술은 무엇인가요?",
+    context: "기사 기준 2026.09.14 · 핵심 주제를 짧게 입력해 주세요.",
+    explanation: "새 프로그램은 시민이 일상에서 인공지능을 이해하고 활용하도록 돕는 내용이에요.",
+  },
+];
 
 const includedCandidates: QuizPreviewCandidateApiModel[] = designCandidateTitles.map(
   (title, index) => ({
@@ -64,8 +108,132 @@ const expiredCandidate: QuizPreviewCandidateApiModel = {
   exclusionReason: "expired",
 };
 
-const sessions = new Map<string, { session: QuizSessionApiModel; snapshot: SessionSnapshot }>();
+const sessions = new Map<string, SessionState>();
 let latestPreview = buildPreview({ scenario: "normal" });
+
+function contentAt(index: number): QuestionContent {
+  return questionContents[index % questionContents.length];
+}
+
+function articleFor(state: SessionState): ArticleApiModel {
+  const articleId = state.snapshot.candidateIds[state.index];
+  const title = state.snapshot.candidateTitles[state.index];
+  return {
+    id: articleId,
+    title,
+    source: {
+      id: "source-demo-news",
+      name: "데모 뉴스",
+      originalUrl: `https://example.com/shortform/${articleId}`,
+      publishedAt: "2026-09-14T09:00:00+09:00",
+    },
+    topicIds: ["shortform"],
+    summary: {
+      status: "available",
+      text: null,
+      aiGenerated: true,
+      reviewedAt: "2026-09-14T10:00:00+09:00",
+    },
+    image: null,
+    availability: { feed: "published", original: "available" },
+  };
+}
+
+function sessionFromState(sessionId: string, state: SessionState): QuizSessionApiModel {
+  const total = state.snapshot.candidateIds.length;
+  const content = contentAt(state.index);
+  const article = total > 0 ? articleFor(state) : null;
+  const hintLevel = Math.min(state.attempts[state.index] ?? 0, 2) as 0 | 1 | 2;
+  const semanticQuestion = state.index % 2 === 1;
+
+  return {
+    id: sessionId,
+    domain: "shortform",
+    format: state.snapshot.format,
+    status: state.status,
+    progress: {
+      current: total > 0 ? state.index + 1 : 0,
+      total,
+      processed: state.index + (state.resolution ? 1 : 0),
+    },
+    question: article
+      ? {
+          id: `shortform-question-${state.snapshot.format}-${state.index + 1}`,
+          articleId: article.id,
+          articleTitle: article.title,
+          kind: semanticQuestion ? "semantic" : "fact",
+          prompt:
+            state.snapshot.format === "choice" ? content.choicePrompt : content.writtenPrompt,
+          context: content.context,
+          choices:
+            state.snapshot.format === "choice"
+              ? content.choiceLabels.map((label, index) => ({
+                  id: index === 0 ? "correct" : "wrong",
+                  label,
+                }))
+              : null,
+          hint:
+            hintLevel === 0
+              ? { level: 0, text: null }
+              : hintLevel === 1
+                ? {
+                    level: 1,
+                    text: "기사에서 설명한 대상과 변화의 방향을 다시 떠올려보세요.",
+                  }
+                : {
+                    level: 2,
+                    text: `핵심 표현은 '${content.answer.slice(0, 1)}'으로 시작해요. 다시 답하거나 포기할 수 있어요.`,
+                  },
+          judgementFeedback:
+            semanticQuestion && hintLevel > 0
+              ? {
+                  similarityScore: hintLevel === 1 ? 35 : 65,
+                  missingDirection: "기사에서 사용한 핵심 표현을 답에 포함해 보세요.",
+                }
+              : null,
+        }
+      : null,
+    resolution: state.resolution,
+  };
+}
+
+function stateFor(sessionId: string) {
+  const existing = sessions.get(sessionId);
+  if (existing) return existing;
+
+  const format: QuizFormat = sessionId.includes("written") ? "written" : "choice";
+  const candidates = includedCandidates.slice(0, 3);
+  const created: SessionState = {
+    snapshot: {
+      candidateIds: candidates.map((candidate) => candidate.articleId),
+      candidateTitles: candidates.map((candidate) => candidate.title),
+      format,
+    },
+    index: 0,
+    attempts: candidates.map(() => 0),
+    resolution: null,
+    status: "in-progress",
+  };
+  sessions.set(sessionId, created);
+  return created;
+}
+
+function resolutionFor(
+  state: SessionState,
+  outcome: QuizResolutionApiModel["outcome"],
+  userAnswer: string | null,
+): QuizResolutionApiModel {
+  const content = contentAt(state.index);
+  return {
+    outcome,
+    userAnswer,
+    correctAnswer:
+      state.snapshot.format === "choice" ? content.choiceLabels[0] : content.answer,
+    explanation: content.explanation,
+    semanticFeedback: null,
+    evidence: articleFor(state),
+  };
+}
 
 function buildPreview({
   scenario = "normal",
@@ -121,35 +289,69 @@ export function createShortformQuizSession(format: QuizFormat) {
   const selectedCandidates = latestPreview.candidates
     .filter((candidate) => candidate.status === "included")
     .slice(0, 10);
-  const session = createShortformSessionFixture(format);
-  session.progress = {
-    current: selectedCandidates.length > 0 ? 1 : 0,
-    total: selectedCandidates.length,
-    processed: 0,
-  };
-  if (session.question && selectedCandidates[0]) {
-    session.question.articleId = selectedCandidates[0].articleId;
-    session.question.articleTitle = selectedCandidates[0].title;
-  }
-
-  sessions.set(session.id, {
-    session: structuredClone(session),
+  const sessionId = `shortform-demo-${format}-session`;
+  const state: SessionState = {
     snapshot: {
       candidateIds: selectedCandidates.map((candidate) => candidate.articleId),
       candidateTitles: selectedCandidates.map((candidate) => candidate.title),
       format,
     },
-  });
-  return structuredClone(session);
+    index: 0,
+    attempts: selectedCandidates.map(() => 0),
+    resolution: null,
+    status: "in-progress",
+  };
+  sessions.set(sessionId, state);
+  return structuredClone(sessionFromState(sessionId, state));
 }
 
 export function getShortformQuizSession(sessionId: string) {
-  return structuredClone(sessions.get(sessionId)?.session ?? createShortformSessionFixture("choice"));
+  return structuredClone(sessionFromState(sessionId, stateFor(sessionId)));
 }
 
 export function getShortformSessionSnapshot(sessionId: string) {
   const snapshot = sessions.get(sessionId)?.snapshot;
   return snapshot ? structuredClone(snapshot) : null;
+}
+
+export function submitShortformQuizAnswer(sessionId: string, rawAnswer: string) {
+  const state = stateFor(sessionId);
+  const answer = rawAnswer.trim();
+  if (!answer) throw new Error("EMPTY_ANSWER");
+
+  const content = contentAt(state.index);
+  if (state.snapshot.format === "choice") {
+    state.resolution = resolutionFor(
+      state,
+      answer === "correct" ? "correct" : "incorrect",
+      answer === "correct" ? content.choiceLabels[0] : content.choiceLabels[1],
+    );
+    return structuredClone(sessionFromState(sessionId, state));
+  }
+
+  const normalizedAnswer = answer.replaceAll(" ", "");
+  if (normalizedAnswer.includes(content.answer.replaceAll(" ", ""))) {
+    state.resolution = resolutionFor(state, "correct", answer);
+  } else {
+    state.attempts[state.index] = Math.min((state.attempts[state.index] ?? 0) + 1, 2);
+  }
+  return structuredClone(sessionFromState(sessionId, state));
+}
+
+export function giveUpShortformQuizQuestion(sessionId: string) {
+  const state = stateFor(sessionId);
+  state.resolution = resolutionFor(state, "given-up", null);
+  return structuredClone(sessionFromState(sessionId, state));
+}
+
+export function nextShortformQuizQuestion(sessionId: string) {
+  const state = stateFor(sessionId);
+  const isLastQuestion = state.index >= state.snapshot.candidateIds.length - 1;
+  if (state.resolution && !isLastQuestion) {
+    state.index += 1;
+    state.resolution = null;
+  }
+  return structuredClone(sessionFromState(sessionId, state));
 }
 
 export function isShortformPreviewScenario(value: string | null): value is ShortformPreviewScenario {

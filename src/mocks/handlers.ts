@@ -18,7 +18,10 @@ import {
   createShortformQuizSession,
   getShortformQuizPreview,
   getShortformQuizSession,
+  giveUpShortformQuizQuestion,
   isShortformPreviewScenario,
+  nextShortformQuizQuestion,
+  submitShortformQuizAnswer,
 } from "./shortform-quiz-store";
 
 const api = "/api/v1";
@@ -73,6 +76,16 @@ export const handlers = [
     const payload = await request.json() as { answer?: string };
     return successResponse(submitRandomQuizAnswer(String(params.sessionId), payload.answer ?? ""));
   }),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/answers`, async ({ params, request }) => {
+    const payload = await request.json() as { answer?: string };
+    return successResponse(submitShortformQuizAnswer(String(params.sessionId), payload.answer ?? ""));
+  }),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/give-up`, ({ params }) =>
+    successResponse(giveUpShortformQuizQuestion(String(params.sessionId))),
+  ),
+  http.post(`${api}/quiz/shortform/sessions/:sessionId/next`, ({ params }) =>
+    successResponse(nextShortformQuizQuestion(String(params.sessionId))),
+  ),
   http.post(`${api}/quiz/random/sessions/:sessionId/give-up`, ({ params }) => {
     const sessionId = String(params.sessionId);
     return successResponse(giveUpRandomQuizQuestion(sessionId));
