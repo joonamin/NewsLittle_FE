@@ -32,6 +32,7 @@ import {
   submitShortformQuizAnswer,
 } from "./shortform-quiz-store";
 import { mockAdminReviewStore } from "./admin-review-store";
+import { mockAdminDashboardStore } from "./admin-dashboard-store";
 import type { ReviewDecisionRequest } from "@/features/contracts/admin-models";
 
 const api = "/api/v1";
@@ -194,6 +195,11 @@ export const handlers = [
     }
   }),
   http.put(`${api}/settings/topics`, () => successResponse(settingsFixture)),
+
+  // ADM-01 운영 대시보드
+  http.get(`${api}/operations/dashboard/summary`, () => {
+    return successResponse(mockAdminDashboardStore.getSummary());
+  }),
 
   // ADM-03 검수 대기열
   http.get(`${api}/operations/reviews/queue`, () => {
