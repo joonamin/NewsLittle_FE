@@ -8,6 +8,7 @@ export * from "./chip";
 export * from "./explanation-block";
 export * from "./field-box";
 export * from "./global-nav";
+export * from "./google-login-button";
 export * from "./modal";
 export * from "./progress";
 export * from "./quiz-option";

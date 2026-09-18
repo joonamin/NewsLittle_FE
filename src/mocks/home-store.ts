@@ -1,9 +1,11 @@
 import type {
   ArchiveApiModel,
+  AuthenticationApiModel,
   HomeApiModel,
   NavigationApiModel,
   PreviousListApiModel,
   TodayListApiModel,
+  TopicCode,
   ViewerApiModel,
 } from "@/features/contracts/api-models";
 
@@ -21,6 +23,9 @@ type ActiveAccountId = AccountId | "guest";
 
 type MemberRecord = {
   viewer: ViewerApiModel;
+  email: string;
+  interests: TopicCode[];
+  interestsSetAt: string | null;
   todayList: TodayListApiModel;
   pendingPreviousLists: PreviousListApiModel[];
   archive: ArchiveApiModel;
@@ -46,6 +51,10 @@ function createMemberRecord(accountId: AccountId): MemberRecord {
       displayName,
       storageScope: "account",
     },
+    email: isPrimaryAccount ? "member-demo@newslittle.example" : "member-alt@newslittle.example",
+    // 백엔드는 interests를 ORDER BY topic(알파벳순)으로 내려주며, 프론트가 보낸 순서를 보존하지 않는다.
+    interests: isPrimaryAccount ? ["AI_IT", "ECONOMY"] : [],
+    interestsSetAt: isPrimaryAccount ? "2026-09-01T00:00:00+09:00" : null,
     todayList: isPrimaryAccount
       ? clone(homeFixture.todayList!)
       : { selectedForDate: "2026-09-13", items: [] },
@@ -191,9 +200,26 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     deleteArchiveEntry,
     discardPreviousLists,
     home,
-    login: () => {
+    /**
+     * FR-12/AC-33: 계정에 관심 주제가 설정된 적이 없을 때만(interestsSetAt이 null일 때만)
+     * 브라우저에 저장돼 있던 topicIds를 계정에 반영하고, 이미 설정된 계정은 그대로 보존한다.
+     */
+    login: (topicIds?: TopicCode[]): AuthenticationApiModel => {
       activeAccountId = "member-demo";
-      return clone(accounts.get(activeAccountId)!.viewer);
+      const member = accounts.get(activeAccountId)!;
+      if (!member.interestsSetAt && topicIds && topicIds.length > 0) {
+        // 백엔드는 저장된 topicIds를 그대로 echo하지 않고 알파벳순으로 정렬해 내려준다.
+        member.interests = [...topicIds].sort();
+        member.interestsSetAt = new Date().toISOString();
+      }
+      return {
+        email: member.email,
+        displayName: member.viewer.displayName ?? "",
+        isNewUser: false,
+        interests: clone(member.interests),
+        interestsSetAt: member.interestsSetAt,
+        role: "member",
+      };
     },
     logout: () => {
       activeAccountId = "guest";

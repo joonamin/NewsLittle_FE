@@ -88,7 +88,11 @@ test("MSW persists today-list mutations and switches the authenticated home stat
     const afterRemove = await fetch("/api/v1/home").then((result) => result.json());
     await fetch("/api/v1/auth/logout", { method: "POST" });
     const guest = await fetch("/api/v1/home").then((result) => result.json());
-    await fetch("/api/v1/auth/google", { method: "POST" });
+    await fetch("/api/v1/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: "mock-google-credential" }),
+    });
     const member = await fetch("/api/v1/home").then((result) => result.json());
 
     return { before, afterAdd, afterRemove, guest, member };
@@ -246,7 +250,7 @@ test("archive auto-opens a login prompt when the session becomes unauthenticated
 
   // 다시 로그인한 뒤 아카이브로 이동한다.
   await page.getByRole("button", { name: "로그인", exact: true }).click();
-  await page.getByRole("button", { name: "구글로 계속하기" }).click();
+  await page.getByRole("button", { name: "Google로 계속하기" }).click();
   await nav.getByRole("link", { name: "아카이브" }).click();
   await expect(page.getByRole("heading", { name: "아카이브" })).toBeVisible();
 
@@ -254,7 +258,7 @@ test("archive auto-opens a login prompt when the session becomes unauthenticated
   await page.getByRole("button", { name: "뉴스리틀 사용자" }).click();
   await page.getByRole("menuitem", { name: "로그아웃" }).click();
   await expect(page.getByRole("dialog", { name: "로그인이 필요해요" })).toBeVisible();
-  await page.getByRole("button", { name: "구글로 계속하기" }).click();
+  await page.getByRole("button", { name: "Google로 계속하기" }).click();
   await expect(page.getByRole("heading", { name: "아카이브" })).toBeVisible();
   await expect(page.getByRole("listitem")).toHaveCount(5);
 });

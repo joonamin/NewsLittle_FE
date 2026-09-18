@@ -2,8 +2,8 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/router";
 
-import { Button } from "@/components/ui/button";
 import { GlobalNav } from "@/components/ui/global-nav";
+import { GoogleLoginButton } from "@/components/ui/google-login-button";
 import { Modal } from "@/components/ui/modal";
 import { useHomeFlow } from "@/features/home/home-flow";
 
@@ -26,7 +26,16 @@ function isQuizPlayRoute(pathname: string) {
 
 export function AppShell({ children }: AppShellProps) {
   const router = useRouter();
-  const { closeLogin, completeLogin, loginOpen, navigation, logout, requestLogin } = useHomeFlow();
+  const {
+    closeLogin,
+    completeLogin,
+    loginOpen,
+    loginPending,
+    loginError,
+    navigation,
+    logout,
+    requestLogin,
+  } = useHomeFlow();
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation>(null);
 
   const completeNavigation = (item: NavigationTarget) => {
@@ -83,10 +92,16 @@ export function AppShell({ children }: AppShellProps) {
         title="로그인이 필요해요"
         footer={
           <div className="space-y-3">
-            <Button variant="primary" className="w-full" onClick={() => void completeLogin()}>구글로 계속하기</Button>
+            <GoogleLoginButton pending={loginPending} onClick={() => void completeLogin()} />
+            {loginError ? (
+              <p role="alert" className="text-nl-caption text-nl-negative">
+                {loginError}
+              </p>
+            ) : null}
             <p className="text-nl-caption text-nl-muted">홈 탐색과 랜덤 퀴즈는 로그인 없이 이용할 수 있어요.</p>
             <p className="text-nl-micro text-nl-muted">
-              첫 구글 로그인이 곧 가입입니다. 계정 인증, 관심 주제 설정 및 보관 기록 제공을 위해 정보를 처리합니다.
+              계속 진행하면 서비스 이용약관 및 개인정보 처리방침에 동의하게 됩니다. 첫 구글 로그인은 곧 가입이며,
+              계정 인증과 관심 주제 설정, 보관 기록 제공을 위해 정보를 처리합니다.
             </p>
           </div>
         }
