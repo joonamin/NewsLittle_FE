@@ -31,6 +31,8 @@ import {
   previousShortformQuizQuestion,
   submitShortformQuizAnswer,
 } from "./shortform-quiz-store";
+import { mockAdminReviewStore } from "./admin-review-store";
+import type { ReviewDecisionRequest } from "@/features/contracts/admin-models";
 
 const api = "/api/v1";
 const timedOutShortformSessions = new Set<string>();
@@ -192,4 +194,27 @@ export const handlers = [
     }
   }),
   http.put(`${api}/settings/topics`, () => successResponse(settingsFixture)),
+
+  // ADM-03 검수 대기열
+  http.get(`${api}/operations/reviews/queue`, () => {
+    return successResponse(mockAdminReviewStore.getQueueSummary());
+  }),
+  http.get(`${api}/operations/reviews/:articleId`, ({ params }) => {
+    const articleId = Number(params.articleId);
+    const item = mockAdminReviewStore.getArticleReview(articleId);
+    if (!item) {
+      return failureResponse(new Error("ARTICLE_NOT_FOUND"));
+    }
+    return successResponse(item);
+  }),
+  http.post(`${api}/operations/reviews/:articleId/decision`, async ({ params, request }) => {
+    try {
+      const articleId = Number(params.articleId);
+      const body = (await request.json()) as ReviewDecisionRequest;
+      const updated = mockAdminReviewStore.submitDecision(articleId, body);
+      return successResponse(updated);
+    } catch (error) {
+      return failureResponse(error);
+    }
+  }),
 ];
