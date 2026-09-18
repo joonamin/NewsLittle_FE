@@ -218,6 +218,17 @@ function stateFor(sessionId: string) {
   if (existing) return existing;
 
   const format: QuizFormat = sessionId.includes("written") ? "written" : "choice";
+  if (sessionId.includes("service-ended")) {
+    const ended: SessionState = {
+      snapshot: { candidateIds: [], candidateTitles: [], format },
+      index: 0,
+      attempts: [],
+      history: [],
+      status: "ended-by-service",
+    };
+    sessions.set(sessionId, ended);
+    return ended;
+  }
   const candidates = includedCandidates.slice(0, 3);
   const created: SessionState = {
     snapshot: {
@@ -249,6 +260,13 @@ function resolutionFor(
     semanticFeedback: null,
     evidence: articleFor(state),
   };
+}
+
+function applyOriginalAvailabilityScenario(sessionId: string, state: SessionState) {
+  const resolution = state.history[state.index];
+  if (sessionId.includes("original-unavailable") && resolution) {
+    resolution.evidence.availability.original = "unavailable";
+  }
 }
 
 function buildPreview({
@@ -342,12 +360,14 @@ export function submitShortformQuizAnswer(sessionId: string, rawAnswer: string) 
       answer === "correct" ? "correct" : "incorrect",
       answer === "correct" ? content.choiceLabels[0] : content.choiceLabels[1],
     );
+    applyOriginalAvailabilityScenario(sessionId, state);
     return structuredClone(sessionFromState(sessionId, state));
   }
 
   const normalizedAnswer = answer.replaceAll(" ", "");
   if (normalizedAnswer.includes(content.answer.replaceAll(" ", ""))) {
     state.history[state.index] = resolutionFor(state, "correct", answer);
+    applyOriginalAvailabilityScenario(sessionId, state);
   } else {
     state.attempts[state.index] = Math.min((state.attempts[state.index] ?? 0) + 1, 2);
   }
@@ -357,6 +377,19 @@ export function submitShortformQuizAnswer(sessionId: string, rawAnswer: string) 
 export function giveUpShortformQuizQuestion(sessionId: string) {
   const state = stateFor(sessionId);
   state.history[state.index] = resolutionFor(state, "given-up", null);
+  return structuredClone(sessionFromState(sessionId, state));
+}
+
+export function excludeShortformQuizQuestion(sessionId: string) {
+  const state = stateFor(sessionId);
+  state.history[state.index] = {
+    outcome: "service-excluded",
+    userAnswer: null,
+    correctAnswer: null,
+    explanation: "이용 조건이 변경되어 문항을 제외했어요. 오답과 채점 분모에 포함하지 않아요.",
+    semanticFeedback: null,
+    evidence: articleFor(state),
+  };
   return structuredClone(sessionFromState(sessionId, state));
 }
 
@@ -372,6 +405,12 @@ export function nextShortformQuizQuestion(sessionId: string) {
 export function previousShortformQuizQuestion(sessionId: string) {
   const state = stateFor(sessionId);
   if (state.index > 0) state.index -= 1;
+  return structuredClone(sessionFromState(sessionId, state));
+}
+
+export function abandonShortformQuizSession(sessionId: string) {
+  const state = stateFor(sessionId);
+  if (state.status === "in-progress") state.status = "abandoned";
   return structuredClone(sessionFromState(sessionId, state));
 }
 

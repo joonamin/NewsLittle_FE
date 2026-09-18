@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  abandonShortformQuizSession,
   createShortformQuizSession,
+  excludeShortformQuizQuestion,
   getShortformQuizPreview,
   getShortformQuizSession,
   getShortformSessionSnapshot,
@@ -140,5 +142,53 @@ describe("shortform quiz mock store", () => {
       format: "written",
       progress: { current: 1, total: 3, processed: 0 },
     });
+  });
+
+  it("marks a changed-rights question as service-excluded without an answer", () => {
+    const sessionId = "shortform-service-excluded-written-session";
+    getShortformQuizSession(sessionId);
+
+    const excluded = excludeShortformQuizQuestion(sessionId);
+
+    expect(excluded.resolution).toMatchObject({
+      outcome: "service-excluded",
+      userAnswer: null,
+      correctAnswer: null,
+    });
+    expect(excluded.progress.processed).toBe(1);
+  });
+
+  it("represents a session with zero valid questions as ended by service", () => {
+    const ended = getShortformQuizSession("shortform-service-ended-written-session");
+
+    expect(ended).toMatchObject({
+      status: "ended-by-service",
+      progress: { current: 0, total: 0, processed: 0 },
+      question: null,
+      resolution: null,
+    });
+  });
+
+  it("keeps the resolution while marking an unavailable original article", () => {
+    const sessionId = "shortform-original-unavailable-choice-session";
+    getShortformQuizSession(sessionId);
+
+    const resolved = submitShortformQuizAnswer(sessionId, "correct");
+
+    expect(resolved.resolution).toMatchObject({
+      outcome: "correct",
+      evidence: { availability: { original: "unavailable" } },
+    });
+  });
+
+  it("marks an in-progress session as abandoned without changing its snapshot", () => {
+    getShortformQuizPreview({ scenario: "normal" });
+    const session = createShortformQuizSession("choice");
+    const snapshot = getShortformSessionSnapshot(session.id);
+
+    const abandoned = abandonShortformQuizSession(session.id);
+
+    expect(abandoned.status).toBe("abandoned");
+    expect(getShortformSessionSnapshot(session.id)).toEqual(snapshot);
   });
 });

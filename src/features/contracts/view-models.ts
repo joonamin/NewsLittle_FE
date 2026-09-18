@@ -229,6 +229,8 @@ export function toQuizStartViewModel(api: QuizPreviewApiModel): QuizStartViewMod
 
 export type QuizPlayViewModel = {
   isFinished: boolean;
+  status: QuizSessionApiModel["status"];
+  isServiceEnded: boolean;
   format: "choice" | "written";
   progress: { current: number; total: number };
   progressLabel: string;
@@ -263,6 +265,8 @@ const outcomeLabel: Record<QuizResolutionApiModel["outcome"], string> = {
 export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel {
   return {
     isFinished: api.status !== "in-progress",
+    status: api.status,
+    isServiceEnded: api.status === "ended-by-service",
     format: api.format,
     progress: { current: api.progress.current, total: api.progress.total },
     progressLabel: `${api.progress.current}/${api.progress.total}`,

@@ -3,7 +3,7 @@ import type { QuizFormat, QuizResolutionApiModel, QuizResultApiModel, QuizSessio
 import { articles, choicePrompts, randomQuizSession, randomQuizTopics } from "./random-quiz-fixtures";
 
 type ResolutionRecord = { outcome: "correct" | "incorrect" | "given-up" | "service-excluded"; userAnswer: string | null };
-type SessionState = { format: QuizFormat; index: number; attempts: number[]; resolved: boolean; history: Array<ResolutionRecord | null> };
+type SessionState = { format: QuizFormat; index: number; attempts: number[]; resolved: boolean; history: Array<ResolutionRecord | null>; status: QuizSessionApiModel["status"] };
 const sessions = new Map<string, SessionState>();
 
 function formatFromId(sessionId: string): QuizFormat {
@@ -13,21 +13,21 @@ function formatFromId(sessionId: string): QuizFormat {
 function stateFor(sessionId: string) {
   const existing = sessions.get(sessionId);
   if (existing) return existing;
-  const created: SessionState = { format: formatFromId(sessionId), index: 0, attempts: [0, 0, 0, 0, 0], resolved: false, history: [null, null, null, null, null] };
+  const created: SessionState = { format: formatFromId(sessionId), index: 0, attempts: [0, 0, 0, 0, 0], resolved: false, history: [null, null, null, null, null], status: "in-progress" };
   sessions.set(sessionId, created);
   return created;
 }
 
 export function createRandomQuizSession(format: QuizFormat) {
   const session = randomQuizSession(format);
-  sessions.set(session.id, { format, index: 0, attempts: [0, 0, 0, 0, 0], resolved: false, history: [null, null, null, null, null] });
+  sessions.set(session.id, { format, index: 0, attempts: [0, 0, 0, 0, 0], resolved: false, history: [null, null, null, null, null], status: "in-progress" });
   return session;
 }
 
 export function getRandomQuizSession(sessionId: string) {
   const state = stateFor(sessionId);
   const resolution = state.resolved ? state.history[state.index] : null;
-  return randomQuizSession(state.format, state.index, resolution);
+  return { ...randomQuizSession(state.format, state.index, resolution), status: state.status };
 }
 
 export function submitRandomQuizAnswer(sessionId: string, rawAnswer: string): QuizSessionApiModel {
@@ -72,6 +72,12 @@ export function previousRandomQuizQuestion(sessionId: string) {
   const state = stateFor(sessionId);
   if (state.index > 0) state.index -= 1;
   state.resolved = Boolean(state.history[state.index]);
+  return getRandomQuizSession(sessionId);
+}
+
+export function abandonRandomQuizSession(sessionId: string) {
+  const state = stateFor(sessionId);
+  if (state.status === "in-progress") state.status = "abandoned";
   return getRandomQuizSession(sessionId);
 }
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  abandonRandomQuizSession,
   createRandomQuizSession,
   nextRandomQuizQuestion,
   previousRandomQuizQuestion,
@@ -30,5 +31,11 @@ describe("random quiz mock store", () => {
     const session = createRandomQuizSession("written");
 
     expect(nextRandomQuizQuestion(session.id).progress.current).toBe(1);
+  });
+
+  it("marks an in-progress session as abandoned", () => {
+    const session = createRandomQuizSession("choice");
+
+    expect(abandonRandomQuizSession(session.id).status).toBe("abandoned");
   });
 });
