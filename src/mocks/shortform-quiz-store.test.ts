@@ -5,6 +5,7 @@ import {
   createShortformQuizSession,
   excludeShortformQuizQuestion,
   getShortformQuizPreview,
+  getShortformQuizResult,
   getShortformQuizSession,
   getShortformSessionSnapshot,
   giveUpShortformQuizQuestion,
@@ -190,5 +191,43 @@ describe("shortform quiz mock store", () => {
 
     expect(abandoned.status).toBe("abandoned");
     expect(getShortformSessionSnapshot(session.id)).toEqual(snapshot);
+  });
+
+  it("computes shortform quiz result with planned, processed, and outcome breakdown", () => {
+    const sessionId = "shortform-demo-session";
+    getShortformQuizSession(sessionId);
+    submitShortformQuizAnswer(sessionId, "correct");
+
+    const result = getShortformQuizResult(sessionId);
+
+    expect(result).toMatchObject({
+      sessionId,
+      domain: "shortform",
+      status: "completed",
+      summary: {
+        planned: 3,
+        processed: 3,
+        correct: 2,
+      },
+      remainingCandidateCount: 0,
+    });
+    expect(result.explanations).toHaveLength(3);
+    expect(result.explanations[0].evidence.title).toBeTruthy();
+  });
+
+  it("indicates remaining candidates when session is from a twelve candidate split", () => {
+    const result = getShortformQuizResult("shortform-twelve-session");
+
+    expect(result.remainingCandidateCount).toBe(2);
+  });
+
+  it("returns service-ended result when session was ended by service", () => {
+    const result = getShortformQuizResult("shortform-service-ended-written-session");
+
+    expect(result).toMatchObject({
+      status: "ended-by-service",
+      summary: { planned: 0, processed: 0, correct: 0 },
+      remainingCandidateCount: 0,
+    });
   });
 });
