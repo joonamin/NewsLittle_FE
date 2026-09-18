@@ -7,6 +7,7 @@
 import type {
   AccountMenuItemApiModel,
   ArchiveApiModel,
+  ArchiveEntryDisplayStatus,
   ArticleApiModel,
   HomeApiModel,
   NavigationApiModel,
@@ -347,20 +348,33 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
 
 export type ArchiveViewModel = {
   groups: Array<{
+    date: string;
     dateLabel: string;
-    items: Array<{ id: string; title: string | null; originalUrl: string | null; isRestricted: boolean }>;
+    items: Array<{
+      id: string;
+      title: string | null;
+      originalUrl: string | null;
+      sourceName: string | null;
+      publishedLabel: string | null;
+      status: ArchiveEntryDisplayStatus;
+      discontinuedReason: string | null;
+    }>;
   }>;
 };
 
 export function toArchiveViewModel(api: ArchiveApiModel): ArchiveViewModel {
   return {
     groups: api.groups.map((group) => ({
+      date: group.date,
       dateLabel: formatDate(group.date),
       items: group.entries.map((entry) => ({
         id: entry.id,
         title: entry.article?.title ?? null,
         originalUrl: entry.article?.source.originalUrl ?? null,
-        isRestricted: entry.displayStatus === "restricted",
+        discontinuedReason: entry.discontinuedReason ?? null,
+        sourceName: entry.article?.source.name ?? null,
+        publishedLabel: entry.article ? formatDate(entry.article.source.publishedAt) : null,
+        status: entry.displayStatus,
       })),
     })),
   };

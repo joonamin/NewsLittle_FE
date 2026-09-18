@@ -20,4 +20,5 @@ export const attributionCopy = {
   archiveDiscontinuedTitle: "이용 중단으로 표시가 제한된 기사",
   archiveDiscontinuedDescription: "이용 조건이 종료되어 제목과 원문 링크를 표시할 수 없습니다.",
   archiveAccessFailedLabel: "원문 접근 실패 · 보관 기록 유지",
+  archiveDerivativeExpiredLabel: "요약·퀴즈 연결 없음",
 } as const;
