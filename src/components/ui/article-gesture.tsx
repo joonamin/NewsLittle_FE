@@ -1,6 +1,6 @@
 // lib: 독립 제스처 영역 · 카드와 세로 탐색 (faiKJ), 숏폼 기사 카드 (z6wA0)
 import { Check, ChevronDown, ChevronUp, Plus } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 
 import type { HomeArticleCardViewModel } from "@/features/contracts/view-models";
@@ -11,24 +11,29 @@ import { Spinner } from "@/components/ui/spinner";
 export type SaveToTodayButtonProps = {
   saved: boolean;
   onClick: () => void;
+  disabled?: boolean;
 };
 
-export function SaveToTodayButton({ saved, onClick }: SaveToTodayButtonProps) {
+export function SaveToTodayButton({ saved, onClick, disabled = false }: SaveToTodayButtonProps) {
   const Icon = saved ? Check : Plus;
 
   return (
     <button
       type="button"
       aria-pressed={saved}
+      aria-busy={disabled}
+      disabled={disabled}
       data-save-today-button="true"
       onClick={(event) => {
         event.stopPropagation();
+        if (disabled) return;
         onClick();
       }}
       className={cn(
-        "box-border flex h-[52px] w-full shrink-0 items-center justify-center gap-2 rounded-nl-button border-2 px-5 text-nl-body font-bold",
+        "box-border flex h-[52px] w-full shrink-0 items-center justify-center gap-2 rounded-nl-button border-2 px-5 text-nl-body font-bold transition-all duration-150",
         "shadow-nl-save-button",
         saved ? "border-nl-accent bg-nl-accent-subtle text-nl-accent" : "border-nl-accent bg-nl-accent text-nl-on-accent",
+        disabled && "cursor-not-allowed opacity-60 shadow-none hover:border-nl-accent active:scale-100",
       )}
     >
       <Icon width={20} height={20} aria-hidden />
@@ -107,9 +112,10 @@ export type ArticleGestureProps = {
   canGoNext: boolean;
   onPrevious: () => void;
   onNext: () => void;
-  onToggleSave: () => void;
+  onToggleSave: () => void | Promise<unknown>;
   onReport?: () => void;
   isLoadingNext?: boolean;
+  debounceMs?: number;
 };
 
 export function ArticleGesture({
@@ -122,6 +128,7 @@ export function ArticleGesture({
   onToggleSave,
   onReport,
   isLoadingNext = false,
+  debounceMs = 600,
 }: ArticleGestureProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -129,6 +136,54 @@ export function ArticleGesture({
   const lastWheelAt = useRef(0);
   const [failedImageArticleId, setFailedImageArticleId] = useState<string | null>(null);
   const usesPhoto = card.image !== null && failedImageArticleId !== card.id;
+
+  const isDebouncingRef = useRef(false);
+  const [isDebouncing, setIsDebouncing] = useState(false);
+  const [prevCardId, setPrevCardId] = useState(card.id);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 카드 전환 시 이전 카드의 디바운스 상태 즉시 초기화
+  if (prevCardId !== card.id) {
+    setPrevCardId(card.id);
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+    isDebouncingRef.current = false;
+    setIsDebouncing(false);
+  }
+
+  // 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleToggleSave = useCallback(async () => {
+    if (isDebouncingRef.current) return;
+    isDebouncingRef.current = true;
+    setIsDebouncing(true);
+
+    const cooldown = new Promise<void>((resolve) => {
+      debounceTimerRef.current = setTimeout(() => {
+        resolve();
+      }, debounceMs);
+    });
+
+    try {
+      await Promise.allSettled([
+        Promise.resolve(onToggleSave()),
+        cooldown,
+      ]);
+    } finally {
+      isDebouncingRef.current = false;
+      setIsDebouncing(false);
+      debounceTimerRef.current = null;
+    }
+  }, [debounceMs, onToggleSave]);
 
   const onPointerDown = (event: PointerEvent<HTMLElement>) => {
     pointerStartY.current = event.clientY;
@@ -189,7 +244,7 @@ export function ArticleGesture({
           }
         }
         event.preventDefault();
-        onToggleSave();
+        void handleToggleSave();
         return;
       }
 
@@ -208,7 +263,7 @@ export function ArticleGesture({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [canGoNext, canGoPrevious, isLoadingNext, onNext, onPrevious, onToggleSave]);
+  }, [canGoNext, canGoPrevious, handleToggleSave, isLoadingNext, onNext, onPrevious]);
 
   // 본문이 넘칠 때는 네이티브 단계에서 전파를 끊어야 위 리스너(기사 전환)까지 올라가지 않는다.
   useEffect(() => {
@@ -242,7 +297,7 @@ export function ArticleGesture({
       ) : null}
       <div className="relative flex h-full min-h-0 w-full flex-1 items-center">
         <article
-          onDoubleClick={onToggleSave}
+          onDoubleClick={() => void handleToggleSave()}
           className={cn(
             "relative z-10 flex h-full min-h-[480px] min-w-0 flex-1 self-stretch overflow-hidden rounded-[24px] border px-10 py-6",
             usesPhoto
@@ -311,7 +366,7 @@ export function ArticleGesture({
             </div>
             <div className="relative z-10 mt-auto flex shrink-0 flex-col gap-4 pt-4">
               <div className="h-px w-full bg-nl-border/55" aria-hidden />
-              <SaveToTodayButton saved={saved} onClick={onToggleSave} />
+              <SaveToTodayButton saved={saved} disabled={isDebouncing} onClick={() => void handleToggleSave()} />
             </div>
           </div>
         </article>

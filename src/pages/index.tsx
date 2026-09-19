@@ -115,12 +115,12 @@ function HomeContent() {
               isLoadingNext={isFetchingNextPage && cardIndex === allCards.length - 1}
               onPrevious={handlePrevious}
               onNext={handleNext}
-              onToggleSave={() => {
+              onToggleSave={async () => {
                 if (isSaved) {
-                  void removeArticle(card.id);
+                  await removeArticle(card.id);
                   return;
                 }
-                void requestArticleSelection(card.id);
+                await requestArticleSelection(card.id);
               }}
               onReport={() => window.alert("신고 기능은 준비 중입니다.")}
             />

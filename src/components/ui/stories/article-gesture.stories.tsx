@@ -135,3 +135,16 @@ export const Navigation: Story = {
     await expect(args.onPrevious).toHaveBeenCalledOnce();
   },
 };
+
+export const RapidClicksDebounced: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const saveButton = canvas.getByRole("button", { name: "오늘 목록에 담기" });
+    await userEvent.click(saveButton);
+    const savedButton = canvas.getByRole("button", { name: "오늘 목록에 담김" });
+    await expect(savedButton).toBeDisabled();
+    await userEvent.click(savedButton);
+    await expect(args.onToggleSave).toHaveBeenCalledOnce();
+  },
+};
+
