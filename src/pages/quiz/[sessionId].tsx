@@ -11,6 +11,7 @@ import { z } from "zod";
 
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
+import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
 import { ExplanationBlock } from "@/components/ui/explanation-block";
 import { ProgressBar, ProgressLabel } from "@/components/ui/progress";
@@ -525,9 +526,11 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
       >
         {positive ? "✓ 정답이에요" : resolution.outcomeLabel}
       </p>
-      <p className="text-nl-caption text-nl-text">
-        내 답 {resolution.userAnswer ?? "포기"} · 정답 {resolution.answer ?? "-"}
-      </p>
+      <AnswerComparison
+        userAnswer={resolution.userAnswer}
+        correctAnswer={resolution.answer}
+        isCorrect={positive}
+      />
       {resolution.explanation ? (
         <ExplanationBlock
           header={positive ? "정답 해설" : "정답과 해설"}

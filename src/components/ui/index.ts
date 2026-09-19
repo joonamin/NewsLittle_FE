@@ -1,4 +1,5 @@
 export * from "./accordion-header";
+export * from "./answer-comparison";
 export * from "./article-gesture";
 export * from "./async-boundary";
 export * from "./badge";
