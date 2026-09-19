@@ -35,7 +35,7 @@ function subscribeNever() {
 
 export function AdminShell({ children, activeMenuId = "review" }: AdminShellProps) {
   const router = useRouter();
-  const { data: nav } = useQuery(navigationQueryOptions);
+  const { data: nav, isPending, isPlaceholderData, isError } = useQuery(navigationQueryOptions);
   const isClient = useSyncExternalStore(subscribeNever, () => true, () => false);
 
   // 1. 존재 비노출 (COM-08, IA 2.2절): 비관리자가 /admin/* 에 접근하면 일반 404 화면과 동일하게 위장
@@ -43,7 +43,17 @@ export function AdminShell({ children, activeMenuId = "review" }: AdminShellProp
   // 개발 및 Mock 환경에서는 편의를 위해 query param ?admin=true 또는 operations 메뉴가 있으면 통과
   const isAdmin = hasOperationsMenu || router.query.admin === "true" || process.env.NODE_ENV === "development";
 
-  if (isClient && !isAdmin) {
+  // placeholder(guest)로 먼저 판정하면 관리자 화면이 404로 깜빡인다. 서버 권한 응답 전에는
+  // 운영 레이아웃과 메뉴를 모두 숨긴다.
+  if (!isClient || isPending || isPlaceholderData) {
+    return (
+      <main className="flex min-h-[70vh] items-center justify-center p-6" aria-busy="true">
+        <p className="text-sm text-nl-muted">접근 권한을 확인하고 있습니다...</p>
+      </main>
+    );
+  }
+
+  if (isError || !isAdmin) {
     return (
       <main className="flex min-h-[70vh] flex-col items-center justify-center p-6 text-center">
         <h1 className="text-3xl font-bold text-nl-text">404</h1>
@@ -54,6 +64,35 @@ export function AdminShell({ children, activeMenuId = "review" }: AdminShellProp
         >
           홈으로 돌아가기
         </Link>
+        {process.env.NODE_ENV === "development" && (
+          <div className="mt-8 p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 max-w-sm">
+            <p className="text-xs font-semibold mb-1">🛠️ 로컬 개발 편의 기능</p>
+            <p className="text-xs text-amber-700 mb-3">
+              현재 비관리자 상태입니다. 아래 버튼을 누르면 로컬 관리자(Admin) 권한 세션을 즉시 발급받아 입장합니다.
+            </p>
+            <button
+              type="button"
+              id="dev-admin-login-button"
+              onClick={async () => {
+                const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+                try {
+                  await fetch(`${apiBase}/api/v1/auth/dev-session`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ role: "admin" }),
+                  });
+                  window.location.reload();
+                } catch (e) {
+                  alert("세션 발급 실패: " + String(e));
+                }
+              }}
+              className="w-full rounded-lg bg-amber-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-amber-700 transition"
+            >
+              관리자 권한 발급받고 입장하기
+            </button>
+          </div>
+        )}
       </main>
     );
   }
