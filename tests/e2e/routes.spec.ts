@@ -11,13 +11,14 @@ const routes = [
   { path: "/archive", heading: "아카이브" },
   { path: "/settings", heading: "설정" },
   { path: "/privacy", heading: "개인정보 처리방침" },
+  { path: "/terms", heading: "서비스 이용약관" },
 ] as const;
 
 for (const route of routes) {
   test(`${route.path} renders its route skeleton`, async ({ page }) => {
     await page.goto(route.path);
 
-    await expect(page.getByRole("heading", { name: route.heading })).toBeVisible();
+    await expect(page.getByRole("heading", { name: route.heading, exact: true })).toBeVisible();
   });
 }
 

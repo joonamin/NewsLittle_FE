@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 import { GlobalNav } from "@/components/ui/global-nav";
 import { GoogleLoginButton } from "@/components/ui/google-login-button";
@@ -100,8 +101,25 @@ export function AppShell({ children }: AppShellProps) {
             ) : null}
             <p className="text-nl-caption text-nl-muted">홈 탐색과 랜덤 퀴즈는 로그인 없이 이용할 수 있어요.</p>
             <p className="text-nl-micro text-nl-muted">
-              계속 진행하면 서비스 이용약관 및 개인정보 처리방침에 동의하게 됩니다. 첫 구글 로그인은 곧 가입이며,
-              계정 인증과 관심 주제 설정, 보관 기록 제공을 위해 정보를 처리합니다.
+              계속 진행하면{" "}
+              <Link
+                href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-nl-text"
+              >
+                서비스 이용약관
+              </Link>
+              {" "}및{" "}
+              <Link
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:text-nl-text"
+              >
+                개인정보 처리방침
+              </Link>
+              에 동의하게 됩니다. 첫 구글 로그인은 곧 가입이며, 계정 인증과 관심 주제 설정, 보관 기록 제공을 위해 정보를 처리합니다.
             </p>
           </div>
         }
