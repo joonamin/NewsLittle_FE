@@ -286,13 +286,13 @@ export function ArticleGesture({
                   </div>
                 </div>
               ) : null}
-              <p className="text-nl-micro text-nl-muted">{card.sourceName} · 원문 게시 {card.publishedLabel}</p>
-              <div className="flex items-center gap-4 text-nl-micro">
+              <p className="text-nl-caption text-nl-muted">{card.sourceName} · 원문 게시 {card.publishedLabel}</p>
+              <div className="flex items-center gap-3 text-nl-body font-bold">
                 {card.originalIsAvailable ? (
-                  <a className="flex-1 text-nl-accent" href={card.originalUrl} target="_blank" rel="noreferrer">
+                  <a className="text-nl-accent" href={card.originalUrl} target="_blank" rel="noreferrer">
                     원문 읽기 ↗
                   </a>
-                ) : <span className="flex-1 text-nl-muted">원문을 제공하지 않아요</span>}
+                ) : <span className="text-nl-muted">원문을 제공하지 않아요</span>}
                 {onReport ? (
                   <button
                     type="button"
