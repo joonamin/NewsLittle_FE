@@ -292,8 +292,9 @@ test("archive shows grouped entries with status badges and supports collapse and
     page.getByText("제목과 원문 링크만 보관해요. 기사 본문·요약은 저장하지 않으며, 다시 푸는 퀴즈는 제공하지 않아요."),
   ).toBeVisible();
 
-  const latestGroupHeader = page.getByRole("button", { name: /2026\. 9\. 12\. 선택 · 5개/ });
+  const latestGroupHeader = page.getByRole("button", { name: /2026\. 9\. 12\. 선택/ });
   await expect(latestGroupHeader).toHaveAttribute("aria-expanded", "true");
+  await expect(latestGroupHeader.getByText("5개")).toBeVisible();
   await expect(latestGroupHeader.getByText("펼침")).toBeVisible();
   await expect(page.getByRole("listitem")).toHaveCount(5);
   await expect(page.getByText("원문 접근 실패 · 보관 기록 유지")).toBeVisible();
@@ -306,8 +307,9 @@ test("archive shows grouped entries with status badges and supports collapse and
     page.getByText("제공처 요청으로 이용이 중단되어 제목과 원문 링크를 표시할 수 없습니다."),
   ).toBeVisible();
 
-  const previousGroupHeader = page.getByRole("button", { name: /2026\. 8\. 10\. 선택 · 1개/ });
+  const previousGroupHeader = page.getByRole("button", { name: /2026\. 8\. 10\. 선택/ });
   await expect(previousGroupHeader).toHaveAttribute("aria-expanded", "false");
+  await expect(previousGroupHeader.getByText("1개")).toBeVisible();
   await expect(previousGroupHeader.getByText("접힘")).toBeVisible();
   await previousGroupHeader.click();
   await expect(previousGroupHeader).toHaveAttribute("aria-expanded", "true");
@@ -477,6 +479,9 @@ test("pressing Enter on home screen toggles article in today list", async ({ pag
   await page.keyboard.press("Enter");
   await expect(page.getByRole("button", { name: "오늘 목록에 담김" })).toBeVisible();
   await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(secondArticle.title);
+
+  // 담기/빼기는 연타 방지 쿨다운이 있어, 다시 Enter를 누르기 전에 풀릴 때까지 기다린다.
+  await page.waitForTimeout(650);
 
   // 다시 Enter 키 입력 시 빼기 동작 수행
   await page.keyboard.press("Enter");
