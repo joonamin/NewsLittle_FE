@@ -142,7 +142,7 @@ function QuizStartContent() {
                   aria-checked={isSelected}
                   disabled={!format.enabled}
                   onClick={() => setSelectedFormat(format.id)}
-                  className="text-left disabled:cursor-not-allowed"
+                  className="group text-left disabled:cursor-not-allowed"
                 >
                   <StateNotice
                     title={`${isSelected ? "◉" : "○"} ${label}`}
@@ -151,6 +151,7 @@ function QuizStartContent() {
                     className={cn(
                       "max-w-none transition-colors",
                       isSelected && "border-nl-accent bg-nl-accent-wash",
+                      !isSelected && format.enabled && "group-hover:border-nl-accent",
                       !format.enabled && "bg-nl-subtle text-nl-disabled-content",
                     )}
                   />

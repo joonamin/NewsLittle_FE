@@ -25,7 +25,10 @@ export function DateGroupHeader({
     <button
       type={type}
       aria-expanded={expanded}
-      className={cn("flex h-12 w-full items-center justify-between", className)}
+      className={cn(
+        "flex h-12 w-full items-center justify-between rounded-nl-button px-2 -mx-2 transition-colors hover:bg-nl-subtle",
+        className,
+      )}
       {...props}
     >
       <span className="text-[18px] leading-[1.5] text-nl-text tracking-nl-tight font-bold">{label}</span>

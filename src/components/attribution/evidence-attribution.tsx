@@ -36,7 +36,7 @@ export function EvidenceAttribution({
     return (
       <footer className={cn("flex flex-col gap-2 border-t border-nl-border pt-4", className)}>
         {originalUrl ? (
-          <a href={originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption text-nl-accent">
+          <a href={originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption text-nl-accent hover:underline">
             {articleTitle}
           </a>
         ) : (
@@ -50,7 +50,7 @@ export function EvidenceAttribution({
     <footer className={cn("flex flex-col gap-2 border-t border-nl-border pt-4", className)}>
       <p className="text-nl-micro text-nl-muted">{attributionCopy.evidenceHeading}</p>
       {originalUrl ? (
-        <a href={originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption text-nl-accent">
+        <a href={originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption text-nl-accent hover:underline">
           {articleTitle}
         </a>
       ) : (

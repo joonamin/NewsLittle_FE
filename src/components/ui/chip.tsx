@@ -18,8 +18,8 @@ export function Chip({ label, selected = false, className, type = "button", ...p
       className={cn(
         "inline-flex h-12 w-[120px] items-center justify-center gap-1.5 rounded-full border transition-colors",
         selected
-          ? "border-nl-border bg-nl-text text-nl-on-accent"
-          : "border-nl-border bg-nl-bg text-nl-text",
+          ? "border-nl-border bg-nl-text text-nl-on-accent hover:bg-nl-text/90"
+          : "border-nl-border bg-nl-bg text-nl-text hover:bg-nl-subtle",
         className,
       )}
       {...props}

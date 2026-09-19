@@ -246,7 +246,7 @@ function RecapRow({
         type="button"
         aria-expanded={isExpanded}
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-4 text-left font-bold"
+        className="flex w-full items-center justify-between gap-4 rounded-nl-button px-2 -mx-2 text-left font-bold transition-colors hover:bg-nl-subtle"
       >
         <span className="text-nl-body text-nl-text">
           {String(item.index).padStart(2, "0")}  {item.prompt}

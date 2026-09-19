@@ -51,7 +51,7 @@ function ArchiveItemRow({ item, onDelete }: { item: ArchiveGroupItem; onDelete?:
     <li className="flex items-center gap-4 border-b border-nl-border py-4 last:border-b-0">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         {showsLink && item.originalUrl ? (
-          <a href={item.originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption font-bold text-nl-text">
+          <a href={item.originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption font-bold text-nl-text hover:underline">
             {title}
           </a>
         ) : (
@@ -83,7 +83,7 @@ function ArchiveItemRow({ item, onDelete }: { item: ArchiveGroupItem; onDelete?:
           </Badge>
         ) : null}
       </div>
-      <button type="button" className="shrink-0 text-nl-micro text-nl-negative">
+      <button type="button" className="shrink-0 text-nl-micro text-nl-negative hover:underline">
         신고
       </button>
       {onDelete ? (

@@ -10,7 +10,7 @@ type OptionStateClasses = {
 function optionStateClasses({ selected }: OptionStateClasses) {
   return selected
     ? "border-nl-accent text-nl-accent ring-1 ring-inset ring-nl-accent"
-    : "border-nl-border text-nl-text";
+    : "border-nl-border text-nl-text hover:border-nl-accent hover:bg-nl-accent-wash";
 }
 
 export type QuizOptionOXProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {

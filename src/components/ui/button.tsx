@@ -12,9 +12,9 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: "border border-transparent bg-nl-accent text-nl-on-accent",
-  secondary: "border border-nl-border bg-nl-bg text-nl-text",
-  default: "border-2 border-nl-accent bg-nl-accent-subtle text-nl-accent",
+  primary: "border border-transparent bg-nl-accent text-nl-on-accent hover:bg-nl-accent/90",
+  secondary: "border border-nl-border bg-nl-bg text-nl-text hover:bg-nl-subtle",
+  default: "border-2 border-nl-accent bg-nl-accent-subtle text-nl-accent hover:bg-nl-accent-wash",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
