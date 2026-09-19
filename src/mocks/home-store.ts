@@ -1,12 +1,14 @@
 import type {
   ArchiveApiModel,
   AuthenticationApiModel,
+  AuthMeApiModel,
   DeletionRequestApiModel,
   DeletionRequestKind,
+  FeedApiModel,
   HomeApiModel,
+  InterestsApiModel,
   NavigationApiModel,
   PreviousListApiModel,
-  SettingsApiModel,
   TodayListApiModel,
   TopicCode,
   ViewerApiModel,
@@ -16,11 +18,10 @@ import {
   adminNavigationFixture,
   archiveFixture,
   guestNavigationFixture,
-  guestViewer,
   homeFixture,
   memberNavigationFixture,
   mockViewer,
-  topicCatalog,
+  nextFeedPageFixture,
 } from "./fixtures";
 import { articles as randomQuizArticles } from "./random-quiz-fixtures";
 
@@ -35,15 +36,9 @@ type MemberRecord = {
   todayList: TodayListApiModel;
   pendingPreviousLists: PreviousListApiModel[];
   archive: ArchiveApiModel;
-  lastDeletionRequest: DeletionRequestApiModel;
+  accountDeletionRequest: DeletionRequestApiModel | null;
+  recordsDeletionRequest: DeletionRequestApiModel | null;
 };
-
-/** 개인정보 보호를 위해 이메일 로컬파트 앞 두 글자만 남기고 나머지는 가린다. */
-function maskEmail(email: string): string {
-  const [local, domain] = email.split("@");
-  if (!local || !domain) return email;
-  return `${local.slice(0, 2)}•••@${domain}`;
-}
 
 export type MockHomeStoreOptions = {
   activeAccountId?: ActiveAccountId;
@@ -83,7 +78,8 @@ function createMemberRecord(accountId: AccountId): MemberRecord {
       : { selectedForDate: "2026-09-13", items: [] },
     pendingPreviousLists: [],
     archive: isPrimaryAccount || isAdminAccount ? clone(archiveFixture) : { groups: [] },
-    lastDeletionRequest: null,
+    accountDeletionRequest: null,
+    recordsDeletionRequest: null,
   };
 }
 
@@ -113,6 +109,9 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
   function feedItem(articleId: string) {
     const homeItem = homeFixture.feed.items.find((item) => item.article.id === articleId);
     if (homeItem) return homeItem;
+
+    const nextPageItem = nextFeedPageFixture.items.find((item) => item.article.id === articleId);
+    if (nextPageItem) return nextPageItem;
 
     const quizArticle = randomQuizArticles.find((article) => article.id === articleId);
     return quizArticle ? { article: quizArticle, isFromPreviousFeedDate: false } : null;
@@ -220,57 +219,97 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     throw new Error("NOT_FOUND");
   }
 
-  /** FR-12 설정 화면(SCR-09)의 관심 주제·계정 영역을 구성한다. */
-  function settings(): SettingsApiModel {
+  /**
+   * GET /api/v1/auth/me. 설정 화면(SCR-09)은 전용 조회 엔드포인트가 없어 이 응답
+   * 하나로 구성된다. 비회원도 200이며 status만 "guest"다.
+   */
+  function authMe(): AuthMeApiModel {
     const member = activeMember();
+    if (!member) {
+      return {
+        status: "guest",
+        email: null,
+        displayName: null,
+        role: "guest",
+        interests: [],
+        interestsSetAt: null,
+        accountDeletionRequest: null,
+        canRequestAccountDeletion: true,
+        recordsDeletionRequest: null,
+        canRequestRecordsDeletion: true,
+      };
+    }
+
     return {
-      viewer: member ? clone(member.viewer) : clone(guestViewer),
-      topics: topicCatalog.map((topic) => ({
-        ...topic,
-        selected: member?.interests.includes(topic.id) ?? false,
-      })),
-      account: member
-        ? {
-            emailMasked: maskEmail(member.email),
-            canRequestDeletion: true,
-            persistenceDescription: "관심 주제와 오늘 목록, 아카이브는 계정에 저장됩니다.",
-            lastDeletionRequest: member.lastDeletionRequest,
-          }
-        : null,
+      status: "authenticated",
+      email: member.email,
+      displayName: member.viewer.displayName,
+      role: member.viewer.role,
+      interests: clone(member.interests),
+      interestsSetAt: member.interestsSetAt,
+      accountDeletionRequest: clone(member.accountDeletionRequest),
+      canRequestAccountDeletion: !isPending(member.accountDeletionRequest),
+      recordsDeletionRequest: clone(member.recordsDeletionRequest),
+      canRequestRecordsDeletion: !isPending(member.recordsDeletionRequest),
     };
   }
 
+  /** 서버와 같은 규칙: 접수·처리 중인 요청이 있으면 같은 종류를 다시 받지 않는다. */
+  function isPending(request: DeletionRequestApiModel | null): boolean {
+    return request?.state === "REQUESTED" || request?.state === "PROCESSING";
+  }
+
   /** FR-12: 회원이 설정 화면에서 관심 주제를 직접 저장한다(가중치일 뿐 주제 제한이 아니다). */
-  function updateInterestTopics(topicIds: TopicCode[]): SettingsApiModel {
+  function updateInterestTopics(topicIds: TopicCode[]): InterestsApiModel {
     const member = activeMember();
     if (!member) throw new Error("AUTHENTICATION_REQUIRED");
     member.interests = [...topicIds].sort();
     member.interestsSetAt = new Date().toISOString();
-    return settings();
+    return { interests: clone(member.interests), interestsSetAt: member.interestsSetAt };
   }
 
   /**
-   * FR-15/AC-26: 기록·계정 삭제 요청을 접수한다. 실제 처리는 운영 백엔드가 비동기로
-   * 수행하므로 이 목은 즉시 완료로 응답하지만, 실패 상태 표시·재시도 안내는 화면이
-   * lastDeletionRequest.outcome을 그대로 렌더링하도록 만들어 둔다.
+   * FR-15/AC-26: 기록 삭제 요청과 탈퇴 요청은 별개 동작이라 서버도 경로를 나눈다.
+   * 실제 처리는 백엔드가 같은 요청 안에서 끝내므로 이 목도 즉시 DONE으로 응답하고,
+   * 탈퇴는 계정이 사라지므로 세션까지 비운다.
    */
-  function requestAccountDeletion(kind: DeletionRequestKind): SettingsApiModel {
+  function requestDeletion(kind: DeletionRequestKind): DeletionRequestApiModel {
     const member = activeMember();
     if (!member) throw new Error("AUTHENTICATION_REQUIRED");
-    member.lastDeletionRequest = {
-      kind,
-      outcome: "completed",
-      requestedAt: new Date().toISOString(),
-    };
-    return settings();
+
+    const now = new Date().toISOString();
+    const request: DeletionRequestApiModel = { state: "DONE", requestedAt: now, completedAt: now };
+
+    if (kind === "account") {
+      member.accountDeletionRequest = request;
+      // 계정 자체가 사라지므로 저장된 기록을 비우고 세션도 끊는다. 다시 로그인하면
+      // 새 계정으로 시작한다.
+      accounts.set(activeAccountId as AccountId, createMemberRecord(activeAccountId as AccountId));
+      accounts.get(activeAccountId as AccountId)!.interests = [];
+      accounts.get(activeAccountId as AccountId)!.interestsSetAt = null;
+      activeAccountId = "guest";
+    } else {
+      member.recordsDeletionRequest = request;
+      member.todayList = { selectedForDate: member.todayList.selectedForDate, items: [] };
+      member.archive = { groups: [] };
+    }
+
+    return clone(request);
   }
 
   return {
     addToTodayList,
     archive: () => clone(activeMember()?.archive ?? { groups: [] }),
+    authMe,
     archivePreviousLists,
     deleteArchiveEntry,
     discardPreviousLists,
+    feed: (cursor?: string | null): FeedApiModel => {
+      if (cursor === "demo-next-cursor") {
+        return clone(nextFeedPageFixture);
+      }
+      return clone(homeFixture.feed);
+    },
     home,
     /**
      * FR-12/AC-33: 계정에 관심 주제가 설정된 적이 없을 때만(interestsSetAt이 null일 때만)
@@ -279,10 +318,15 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     login: (topicIds?: TopicCode[]): AuthenticationApiModel => {
       activeAccountId = "member-demo";
       const member = accounts.get(activeAccountId)!;
-      if (!member.interestsSetAt && topicIds && topicIds.length > 0) {
+      const hadAccountInterests = member.interestsSetAt !== null;
+      let interestsSource: AuthenticationApiModel["interestsSource"] = null;
+      if (!hadAccountInterests && topicIds && topicIds.length > 0) {
         // 백엔드는 저장된 topicIds를 그대로 echo하지 않고 알파벳순으로 정렬해 내려준다.
         member.interests = [...topicIds].sort();
         member.interestsSetAt = new Date().toISOString();
+        interestsSource = "browser";
+      } else if (hadAccountInterests) {
+        interestsSource = "account";
       }
       return {
         email: member.email,
@@ -290,6 +334,7 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
         isNewUser: false,
         interests: clone(member.interests),
         interestsSetAt: member.interestsSetAt,
+        interestsSource,
         role: "member",
       };
     },
@@ -303,11 +348,10 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     },
     navigation,
     removeFromTodayList,
-    requestAccountDeletion,
+    requestDeletion,
     setActiveAccountId: (accountId: ActiveAccountId) => {
       activeAccountId = accountId;
     },
-    settings,
     updateInterestTopics,
   };
 }

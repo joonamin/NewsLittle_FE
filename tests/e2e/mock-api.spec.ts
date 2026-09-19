@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { firstArticle, secondArticle } from "../../src/mocks/fixtures";
+import { firstArticle, nextPageArticle, secondArticle } from "../../src/mocks/fixtures";
 
 test("member home uses the PEN feed card and today-list sidebar interaction", async ({ page }) => {
   await page.goto("/");
@@ -27,6 +27,31 @@ test("member home uses the PEN feed card and today-list sidebar interaction", as
 
   await page.getByRole("button", { name: `${secondArticle.title} 삭제` }).click();
   await expect(page.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
+});
+
+test("fetches next cursor items and appends them to feed when reaching the end", async ({ page }) => {
+  await page.goto("/");
+
+  // 1번째 카드
+  await expect(page.getByRole("heading", { name: firstArticle.title })).toBeVisible();
+  await page.getByRole("button", { name: "다음 기사" }).click();
+
+  // 2번째 카드
+  await expect(page.getByRole("heading", { name: secondArticle.title })).toBeVisible();
+  await page.getByRole("button", { name: "다음 기사" }).click();
+
+  // 3번째 카드 (초기 목록의 마지막)
+  await page.getByRole("button", { name: "다음 기사" }).click();
+
+  // 다음 커서로 불러온 4번째 카드
+  await expect(page.getByRole("heading", { name: nextPageArticle.title })).toBeVisible();
+
+  // 마지막 페이지이므로 다음 기사 버튼이 비활성화됨
+  await expect(page.getByRole("button", { name: "다음 기사" })).toBeDisabled();
+
+  // 이전 기사로 되돌아가기 가능
+  await page.getByRole("button", { name: "이전 기사" }).click();
+  await expect(page.getByRole("button", { name: "다음 기사" })).toBeEnabled();
 });
 
 test("MSW returns the home API contract before a backend exists", async ({ page }) => {
@@ -271,23 +296,20 @@ test("settings screen lets a member update interest topics and request record de
 
   await expect(page.getByRole("heading", { name: "설정" })).toBeVisible();
   await expect(page.getByText("저장 위치 · 계정")).toBeVisible();
-  await expect(page.getByText("Google 계정 · me•••@newslittle.example")).toBeVisible();
+  await expect(page.getByText("Google 계정 · member-demo@newslittle.example")).toBeVisible();
 
   const politicsChip = page.getByRole("button", { name: "정치" });
   await expect(politicsChip).toHaveAttribute("aria-pressed", "false");
   await politicsChip.click();
   await expect(politicsChip).toHaveAttribute("aria-pressed", "true");
 
-  // FR-12: PUT으로 저장한 관심 주제는 계정에 남는다(모의 서버 상태를 직접 조회해 확인).
-  const settingsAfterSave = await page.evaluate(async () => {
-    const response = await fetch("/api/v1/settings");
+  // FR-12: PUT /settings/interests로 저장한 관심 주제는 계정에 남는다
+  // (서버 상태를 /auth/me로 직접 조회해 확인).
+  const meAfterSave = await page.evaluate(async () => {
+    const response = await fetch("/api/v1/auth/me");
     return response.json();
   });
-  expect(
-    settingsAfterSave.data.topics
-      .filter((topic: { selected: boolean }) => topic.selected)
-      .map((topic: { id: string }) => topic.id),
-  ).toContain("POLITICS");
+  expect(meAfterSave.data.interests).toContain("POLITICS");
 
   await page.getByRole("button", { name: "기록 삭제 요청" }).click();
   const recordsDialog = page.getByRole("dialog", { name: "기록 삭제를 요청할까요?" });
@@ -295,13 +317,16 @@ test("settings screen lets a member update interest topics and request record de
   await recordsDialog.getByRole("button", { name: "삭제 요청" }).click();
   await expect(page.getByText("기록 삭제를 완료했어요")).toBeVisible();
 
-  // AC-26: 요청 접수와 완료를 구분해 표시하고, 새 요청이 이전 요청 결과를 대체한다.
+  // AC-26: 기록 삭제와 탈퇴는 별개 요청이라 각각의 결과를 따로 표시한다.
   await page.getByRole("button", { name: "탈퇴 요청" }).click();
   const withdrawDialog = page.getByRole("dialog", { name: "계정 탈퇴를 요청할까요?" });
   await expect(withdrawDialog).toBeVisible();
   await withdrawDialog.getByRole("button", { name: "탈퇴 요청" }).click();
-  await expect(page.getByText("탈퇴 요청을 완료했어요")).toBeVisible();
-  await expect(page.getByText("기록 삭제를 완료했어요")).not.toBeVisible();
+
+  // 탈퇴가 완료되면 서버가 세션까지 지우므로 완료를 알린 뒤 홈으로 옮겨 간다.
+  await expect(page.getByText("탈퇴 처리를 완료했어요")).toBeVisible();
+  await page.waitForURL("/");
+  await expect(page.getByRole("button", { name: "뉴스리틀 사용자" })).toHaveCount(0);
 });
 
 test("settings screen stores a guest's interest topics in the browser and shows the account-preserved notice after login", async ({

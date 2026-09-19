@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import type { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { ArticleGesture } from "@/components/ui/article-gesture";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
@@ -10,7 +12,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { StateNotice } from "@/components/ui/state-notice";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { TodayListSidebar } from "@/components/ui/today-list-sidebar";
-import { homeQueryOptions } from "@/features/contracts/query-keys";
+import { feedInfiniteQueryOptions, homeQueryOptions } from "@/features/contracts/query-keys";
+import { screenApi } from "@/features/contracts/screen-api";
+import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
 import { useHomeFlow } from "@/features/home/home-flow";
 import { useReportFlow } from "@/features/report/report-flow";
 
@@ -44,6 +48,13 @@ function HomeContent() {
   const router = useRouter();
   const { data: home } = useSuspenseQuery(homeQueryOptions);
   const {
+    data: feedData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(feedInfiniteQueryOptions(home.feed));
+
+  const {
     requestLogin,
     requestArticleSelection,
     removeArticle,
@@ -54,13 +65,44 @@ function HomeContent() {
   const { openReport } = useReportFlow();
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const cardIndex = Math.min(currentIndex, Math.max(home.feed.cards.length - 1, 0));
-  const card = home.feed.cards[cardIndex];
+  const allCards = useMemo(
+    () => feedData?.pages.flatMap((page) => page.cards) ?? home.feed.cards,
+    [feedData, home.feed.cards],
+  );
+
+  const cardIndex = Math.min(currentIndex, Math.max(allCards.length - 1, 0));
+  const card = allCards[cardIndex];
   const isSaved = card ? home.todayList?.items.some((item) => item.articleId === card.id) ?? false : false;
   const pendingPreviousArticleCount = home.pendingPreviousLists.reduce(
     (count, list) => count + list.items.length,
     0,
   );
+
+  const canGoPrevious = cardIndex > 0;
+  const canGoNext = cardIndex < allCards.length - 1 || Boolean(hasNextPage);
+
+  const handleNext = useCallback(async () => {
+    if (cardIndex < allCards.length - 1) {
+      setCurrentIndex((index) => index + 1);
+      // UX 최적화: 마지막 카드에 가까워지면 백그라운드에서 다음 커서 데이터 미리 요청
+      if (cardIndex + 1 >= allCards.length - 1 && hasNextPage && !isFetchingNextPage) {
+        void fetchNextPage();
+      }
+      return;
+    }
+
+    if (hasNextPage && !isFetchingNextPage) {
+      const result = await fetchNextPage();
+      const updatedCards = result.data?.pages.flatMap((page) => page.cards) ?? [];
+      if (updatedCards.length > allCards.length) {
+        setCurrentIndex((index) => index + 1);
+      }
+    }
+  }, [allCards.length, cardIndex, fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex((index) => Math.max(index - 1, 0));
+  }, []);
 
   return (
     <>
@@ -70,10 +112,11 @@ function HomeContent() {
             <ArticleGesture
               card={card}
               saved={isSaved}
-              canGoPrevious={cardIndex > 0}
-              canGoNext={cardIndex < home.feed.cards.length - 1}
-              onPrevious={() => setCurrentIndex((index) => Math.max(index - 1, 0))}
-              onNext={() => setCurrentIndex((index) => Math.min(index + 1, home.feed.cards.length - 1))}
+              canGoPrevious={canGoPrevious}
+              canGoNext={canGoNext}
+              isLoadingNext={isFetchingNextPage && cardIndex === allCards.length - 1}
+              onPrevious={handlePrevious}
+              onNext={handleNext}
               onToggleSave={() => {
                 if (isSaved) {
                   void removeArticle(card.id);
@@ -91,6 +134,17 @@ function HomeContent() {
               }
             />
           ) : <LoadingState title="표시할 뉴스가 없어요" />}
+          <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-nl-muted md:hidden">
+            <Link href="/privacy" className="hover:text-nl-text underline underline-offset-2">
+              개인정보 처리방침
+            </Link>
+            <span>·</span>
+            <Link href="/terms" className="hover:text-nl-text underline underline-offset-2">
+              서비스 이용약관
+            </Link>
+            <span>·</span>
+            <span>사이드 프로젝트</span>
+          </div>
         </main>
         <TodayListSidebar
           isLoggedIn={home.viewer.isMember}
@@ -134,3 +188,10 @@ function HomeContent() {
     </>
   );
 }
+
+/** 홈은 뷰어·오늘 목록이 섞인 사용자별 화면이라 요청마다 서버에서 채운다. */
+export const getServerSideProps: GetServerSideProps = async ({ req }) => ({
+  props: await dehydrateScreenQueries(req, (queryClient, init) =>
+    queryClient.prefetchQuery({ ...homeQueryOptions, queryFn: () => screenApi.home(init) }),
+  ),
+});

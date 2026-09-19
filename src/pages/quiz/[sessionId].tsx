@@ -23,6 +23,7 @@ import {
   quizSessionQueryOptions,
 } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
+import { dehydrateScreenQueries, type DehydratedProps } from "@/features/contracts/server-prefetch";
 import type { QuizPlayViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
 import {
@@ -34,7 +35,7 @@ import { useReportFlow } from "@/features/report/report-flow";
 import { submitValidated, useValidatedForm } from "@/lib/form";
 import { ApiError } from "@/lib/api-client";
 
-type QuizPlayPageProps = {
+type QuizPlayPageProps = DehydratedProps & {
   sessionId: string;
 };
 
@@ -56,14 +57,21 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   }
 }
 
-export const getServerSideProps = (async ({ params }) => {
+export const getServerSideProps = (async ({ params, req }) => {
   const sessionId = params?.sessionId;
 
   if (typeof sessionId !== "string") {
     return { notFound: true };
   }
 
-  return { props: { sessionId } };
+  const prefetched = await dehydrateScreenQueries(req, (queryClient, init) =>
+    queryClient.prefetchQuery({
+      ...quizSessionQueryOptions("shortform", sessionId),
+      queryFn: () => screenApi.session("shortform", sessionId, init),
+    }),
+  );
+
+  return { props: { sessionId, ...prefetched } };
 }) satisfies GetServerSideProps<QuizPlayPageProps>;
 
 export default function QuizPlayPage({
@@ -391,7 +399,13 @@ function ChoiceAnswer({
   onRetry: () => void;
   onGiveUp: () => void;
 }) {
-  const choices = session.question?.choices ?? [];
+  const choices =
+    session.question?.choices && session.question.choices.length > 0
+      ? session.question.choices
+      : [
+          { id: "O", label: "O" },
+          { id: "X", label: "X" },
+        ];
 
   return (
     <div className="space-y-4">

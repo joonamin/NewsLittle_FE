@@ -16,6 +16,7 @@ export const articles: ArticleApiModel[] = randomQuizTopics.map(([topic, title, 
     source: { id: "source-demo", name: "데모 뉴스", originalUrl: `https://example.com/random/${index + 1}`, publishedAt: `2026-09-${day}T09:00:00+09:00` },
     topicIds: [topic],
     summary: { status: "available", text: summary, aiGenerated: true, reviewedAt: `2026-09-${day}T10:00:00+09:00` },
+    body: { status: "available", text: `${title}. 배경과 경과, 다음 일정을 단문으로 정리한 모의 본문입니다.` },
     image: null,
     availability: { feed: "published", original: "available" },
   };

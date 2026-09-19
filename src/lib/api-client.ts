@@ -21,8 +21,22 @@ export class ApiError extends Error {
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
 
+// 서버(SSR)에서는 상대 경로로 fetch할 수 없어 절대 URL이 필요하다.
+// 브라우저에 노출하면 안 되는 내부 주소를 쓸 수 있도록 API_BASE_URL을 먼저 본다.
+const serverApiBaseUrl = (
+  process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
+).replace(/\/$/, "");
+
+/**
+ * SSR 프리페치 가능 여부. 서버 fetch는 상대 경로를 파싱하지 못하므로 http(s) 절대 URL일
+ * 때만 true다. 값이 비어 있거나 `/api` 같은 상대 경로면 프리페치를 건너뛰고 클라이언트가
+ * 받아온다.
+ */
+export const canRequestOnServer = /^https?:\/\//.test(serverApiBaseUrl);
+
 export function apiUrl(path: string) {
-  return `${apiBaseUrl}${path}`;
+  const baseUrl = typeof window === "undefined" ? serverApiBaseUrl : apiBaseUrl;
+  return `${baseUrl}${path}`;
 }
 
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {

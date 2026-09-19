@@ -57,38 +57,67 @@ describe("mock home store", () => {
     ).toBe(false);
   });
 
-  it("reports no selected topics and no account for a guest", () => {
+  it("reports a guest with no interests and no account fields", () => {
     const store = createMockHomeStore({ activeAccountId: "guest" });
 
-    const settings = store.settings();
+    const me = store.authMe();
 
-    expect(settings.account).toBeNull();
-    expect(settings.topics.every((topic) => !topic.selected)).toBe(true);
+    expect(me.status).toBe("guest");
+    expect(me.email).toBeNull();
+    expect(me.interests).toEqual([]);
   });
 
-  it("saves a member's interest topics sorted, masks the account email, and rejects a guest", () => {
+  it("saves a member's interest topics sorted and rejects a guest", () => {
     const store = createMockHomeStore();
 
-    const settings = store.updateInterestTopics(["WORLD", "AI_IT"]);
+    const interests = store.updateInterestTopics(["WORLD", "AI_IT"]);
 
-    expect(settings.topics.filter((topic) => topic.selected).map((topic) => topic.id)).toEqual([
-      "AI_IT",
-      "WORLD",
-    ]);
-    expect(settings.account?.emailMasked).toBe("me•••@newslittle.example");
+    expect(interests.interests).toEqual(["AI_IT", "WORLD"]);
+    expect(store.authMe().interests).toEqual(["AI_IT", "WORLD"]);
 
     const guestStore = createMockHomeStore({ activeAccountId: "guest" });
     expect(() => guestStore.updateInterestTopics(["ECONOMY"])).toThrow("AUTHENTICATION_REQUIRED");
   });
 
-  it("records a deletion request's kind and outcome, but rejects a guest", () => {
+  it("keeps the account after a records deletion but ends the session after a withdrawal", () => {
     const store = createMockHomeStore();
 
-    const settings = store.requestAccountDeletion("account");
+    const records = store.requestDeletion("records");
+    expect(records).toMatchObject({ state: "DONE" });
+    expect(store.authMe().status).toBe("authenticated");
+    expect(store.authMe().recordsDeletionRequest).toMatchObject({ state: "DONE" });
+    expect(store.archive().groups).toEqual([]);
 
-    expect(settings.account?.lastDeletionRequest).toMatchObject({ kind: "account", outcome: "completed" });
+    const account = store.requestDeletion("account");
+    expect(account).toMatchObject({ state: "DONE" });
+    // 탈퇴가 끝나면 계정이 사라져 세션도 남지 않는다.
+    expect(store.authMe().status).toBe("guest");
 
     const guestStore = createMockHomeStore({ activeAccountId: "guest" });
-    expect(() => guestStore.requestAccountDeletion("records")).toThrow("AUTHENTICATION_REQUIRED");
+    expect(() => guestStore.requestDeletion("records")).toThrow("AUTHENTICATION_REQUIRED");
+  });
+
+  it("reports where the login adopted interests from (AC-33)", () => {
+    const withAccountInterests = createMockHomeStore({ activeAccountId: "guest" });
+    expect(withAccountInterests.login(["WORLD"]).interestsSource).toBe("account");
+
+    const store = createMockHomeStore({ activeAccountId: "guest" });
+    store.login();
+    store.requestDeletion("account");
+    // 새 계정에는 설정된 관심 주제가 없어 브라우저 설정이 반영된다.
+    expect(store.login(["WORLD"]).interestsSource).toBe("browser");
+  });
+
+  it("serves next feed page fixture when demo-next-cursor is passed and default feed otherwise", () => {
+    const store = createMockHomeStore();
+
+    const initialFeed = store.feed();
+    expect(initialFeed.items).toHaveLength(3);
+    expect(initialFeed.nextCursor).toBe("demo-next-cursor");
+
+    const nextFeed = store.feed("demo-next-cursor");
+    expect(nextFeed.items).toHaveLength(1);
+    expect(nextFeed.items[0]?.article.id).toBe("article-next-page-demo");
+    expect(nextFeed.nextCursor).toBeNull();
   });
 });

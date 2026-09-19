@@ -1,6 +1,7 @@
+import type { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 
@@ -14,8 +15,17 @@ import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import type { DeletionRequestKind, TopicCode } from "@/features/contracts/api-models";
 import { settingsQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
+import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
+import {
+  withDeletionRequest,
+  withUpdatedInterests,
+  type SettingsDeletionViewModel,
+} from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
 import { getGuestTopics, setGuestTopics } from "@/lib/guest-topics";
+
+/** 탈퇴 완료 안내를 보여 준 뒤 홈으로 옮겨 가기까지의 시간. */
+const ACCOUNT_DELETED_REDIRECT_MS = 2_000;
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -44,43 +54,49 @@ export default function SettingsPage() {
 }
 
 function SettingsContent() {
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const { requestLogin, logout } = useHomeFlow();
+  const { interestsSource, requestLogin, logout } = useHomeFlow();
   const { data: settings } = useSuspenseQuery(settingsQueryOptions);
 
   const [guestTopicIds, setGuestTopicIdsState] = useState<TopicCode[]>(() =>
     settings.viewer.isMember ? [] : getGuestTopics(),
   );
   const [confirmKind, setConfirmKind] = useState<DeletionRequestKind | null>(null);
+  const [accountDeleted, setAccountDeleted] = useState(false);
 
-  // AC-33: 비회원일 때 로그인 모달(SCR-08)이 열려 로그인이 완료되면, 브라우저 설정이
-  // 계정에 반영됐는지 이미 있던 계정 설정이 유지됐는지를 이 화면으로 돌아왔을 때 한 번 알려준다.
-  // 렌더 중 이전 값과 비교해 갱신하는 방식(React가 권장하는 "prop이 바뀌면 state를 조정"
-  // 패턴)이라 effect 안에서 setState를 호출하지 않는다.
-  const [wasGuest, setWasGuest] = useState(!settings.viewer.isMember);
-  const [loginAdoptionNotice, setLoginAdoptionNotice] = useState<"browser" | "account" | null>(null);
+  // AC-33: 로그인 직후 관심 주제가 어디서 왔는지(브라우저 설정 반영 / 계정 설정 유지)를
+  // 한 번 안내한다. 값은 로그인 응답이 알려주므로 화면에서 추측하지 않으며, 어디서
+  // 로그인했든 설정 화면에 들어오면 보이고 화면을 떠나면 비워진다.
+  const loginAdoptionNotice = settings.viewer.isMember ? interestsSource : null;
 
-  const isGuestNow = !settings.viewer.isMember;
-  if (isGuestNow !== wasGuest) {
-    setWasGuest(isGuestNow);
-    if (wasGuest && !isGuestNow) {
-      const selectedIds = settings.topics.filter((topic) => topic.selected).map((topic) => topic.id);
-      const adoptedFromBrowser =
-        guestTopicIds.length > 0 &&
-        selectedIds.length === guestTopicIds.length &&
-        guestTopicIds.every((id) => selectedIds.includes(id));
-      setLoginAdoptionNotice(adoptedFromBrowser ? "browser" : selectedIds.length > 0 ? "account" : null);
-    }
-  }
+  // 탈퇴가 완료되면 서버가 세션까지 지운다. 완료 안내를 잠깐 보여 준 뒤 모든 캐시를
+  // 비우고 홈으로 옮겨 비회원 상태로 다시 시작한다.
+  useEffect(() => {
+    if (!accountDeleted) return;
+    const timer = window.setTimeout(() => {
+      void queryClient.invalidateQueries().then(() => router.push("/"));
+    }, ACCOUNT_DELETED_REDIRECT_MS);
+    return () => window.clearTimeout(timer);
+  }, [accountDeleted, queryClient, router]);
 
   const updateTopics = useMutation({
     mutationFn: (topicIds: TopicCode[]) => screenApi.updateInterestTopics({ topicIds }),
-    onSuccess: (data) => queryClient.setQueryData(settingsQueryOptions.queryKey, data),
+    // 서버는 관심 주제만 돌려주므로 화면 모델의 해당 부분만 갱신한다.
+    onSuccess: (data) =>
+      queryClient.setQueryData(settingsQueryOptions.queryKey, (previous) =>
+        previous ? withUpdatedInterests(previous, data.interests) : previous,
+      ),
   });
 
   const requestDeletion = useMutation({
-    mutationFn: (kind: DeletionRequestKind) => screenApi.requestAccountDeletion(kind),
-    onSuccess: (data) => queryClient.setQueryData(settingsQueryOptions.queryKey, data),
+    mutationFn: (kind: DeletionRequestKind) => screenApi.requestDeletion(kind),
+    onSuccess: (data, kind) => {
+      queryClient.setQueryData(settingsQueryOptions.queryKey, (previous) =>
+        previous ? withDeletionRequest(previous, kind, data) : previous,
+      );
+      if (kind === "account" && data.state === "DONE") setAccountDeleted(true);
+    },
   });
 
   const displayedTopics = settings.viewer.isMember
@@ -108,6 +124,19 @@ function SettingsContent() {
     requestDeletion.mutate(kind);
   }
 
+  if (accountDeleted) {
+    return (
+      <Page>
+        <h1 className="text-[32px] leading-[1.375] font-bold tracking-nl-tight text-nl-text">설정</h1>
+        <StateNotice
+          tone="accent"
+          title="탈퇴 처리를 완료했어요"
+          description="계정과 기록을 삭제했어요. 잠시 후 홈으로 이동합니다."
+        />
+      </Page>
+    );
+  }
+
   return (
     <Page>
       <h1 className="text-[32px] leading-[1.375] font-bold tracking-nl-tight text-nl-text">설정</h1>
@@ -130,12 +159,17 @@ function SettingsContent() {
         </div>
 
         <p className="text-nl-micro font-bold text-nl-accent">
-          저장 위치 · {settings.viewer.isMember ? "계정" : "브라우저"}
+          저장 위치 · {settings.storageScope === "account" ? "계정" : "브라우저"}
         </p>
         <p className="text-nl-micro text-nl-muted">{settings.persistenceDescription}</p>
         {!settings.viewer.isMember ? (
           <p className="text-nl-micro text-nl-muted">
             브라우저 데이터를 지우면 선택한 관심 주제를 복구할 수 없어요.
+          </p>
+        ) : null}
+        {updateTopics.isError ? (
+          <p role="status" className="text-nl-caption text-nl-text">
+            관심 주제를 저장하지 못했어요. 다시 선택해 주세요.
           </p>
         ) : null}
         {loginAdoptionNotice ? (
@@ -150,7 +184,7 @@ function SettingsContent() {
       {settings.viewer.isMember ? (
         <section className="flex flex-col gap-5 rounded-nl-card border border-nl-border bg-nl-bg p-8">
           <h2 className="text-[20px] leading-[1.5] font-bold text-nl-text">계정</h2>
-          <p className="text-nl-body text-nl-text">Google 계정 · {settings.emailMasked}</p>
+          <p className="text-nl-body text-nl-text">Google 계정 · {settings.email}</p>
           <div>
             <Button variant="secondary" onClick={() => void logout()}>
               로그아웃
@@ -164,14 +198,14 @@ function SettingsContent() {
           <div className="flex flex-wrap items-center gap-4">
             <Button
               variant="secondary"
-              disabled={requestDeletion.isPending}
+              disabled={requestDeletion.isPending || !settings.recordsDeletion.canRequest}
               onClick={() => setConfirmKind("records")}
             >
               기록 삭제 요청
             </Button>
             <Button
               variant="secondary"
-              disabled={requestDeletion.isPending}
+              disabled={requestDeletion.isPending || !settings.accountDeletion.canRequest}
               onClick={() => setConfirmKind("account")}
             >
               탈퇴 요청
@@ -182,12 +216,21 @@ function SettingsContent() {
               요청을 처리하고 있어요.
             </p>
           ) : null}
-          {settings.lastDeletionRequest ? (
-            <DeletionRequestNotice
-              request={settings.lastDeletionRequest}
-              onRetry={() => requestDeletion.mutate(settings.lastDeletionRequest!.kind)}
+          {requestDeletion.isError ? (
+            <StateNotice
+              title="요청을 접수하지 못했어요"
+              description="일시적인 오류로 요청이 전달되지 않았어요. 다시 시도해 주세요."
             />
           ) : null}
+          {/* AC-26: 기록 삭제와 탈퇴는 별개 요청이라 각각의 접수·완료·실패를 따로 표시한다. */}
+          <DeletionRequestNotice
+            deletion={settings.recordsDeletion}
+            onRetry={() => requestDeletion.mutate("records")}
+          />
+          <DeletionRequestNotice
+            deletion={settings.accountDeletion}
+            onRetry={() => requestDeletion.mutate("account")}
+          />
           <p className="text-nl-micro text-nl-muted">
             삭제·탈퇴는 확인 단계를 거쳐요. 요청 접수와 삭제 완료를 구분해 알려드려요.
           </p>
@@ -205,9 +248,14 @@ function SettingsContent() {
         </section>
       )}
 
-      <Link href="/privacy" className="text-nl-caption text-nl-accent">
-        개인정보 처리 안내 ↗
-      </Link>
+      <div className="flex flex-wrap items-center gap-4">
+        <Link href="/terms" className="text-nl-caption text-nl-accent hover:underline">
+          서비스 이용약관 ↗
+        </Link>
+        <Link href="/privacy" className="text-nl-caption text-nl-accent hover:underline">
+          개인정보 처리 안내 ↗
+        </Link>
+      </div>
 
       <Modal
         open={confirmKind === "records"}
@@ -239,15 +287,18 @@ function SettingsContent() {
 }
 
 function DeletionRequestNotice({
-  request,
+  deletion,
   onRetry,
 }: {
-  request: { kind: DeletionRequestKind; outcome: "completed" | "failed"; requestedAtLabel: string };
+  deletion: SettingsDeletionViewModel;
   onRetry: () => void;
 }) {
+  const request = deletion.request;
+  if (!request) return null;
+
   const actionLabel = request.kind === "account" ? "탈퇴 요청" : "기록 삭제 요청";
 
-  if (request.outcome === "failed") {
+  if (request.state === "FAILED") {
     return (
       <StateNotice
         title="요청을 처리하지 못했어요"
@@ -257,6 +308,16 @@ function DeletionRequestNotice({
             다시 시도
           </Button>
         }
+      />
+    );
+  }
+
+  // 접수(REQUESTED)와 처리 중(PROCESSING)은 완료와 구분해 알린다(AC-26).
+  if (request.state !== "DONE") {
+    return (
+      <StateNotice
+        title={`${actionLabel}을 접수했어요`}
+        description={`${request.requestedAtLabel}에 접수했어요. 처리가 끝나면 알려드릴게요.`}
       />
     );
   }
@@ -273,3 +334,9 @@ function DeletionRequestNotice({
 function Page({ children }: { children: ReactNode }) {
   return <div className="mx-auto flex w-full max-w-[880px] flex-col gap-6 px-5 py-9 md:px-8">{children}</div>;
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => ({
+  props: await dehydrateScreenQueries(req, (queryClient, init) =>
+    queryClient.prefetchQuery({ ...settingsQueryOptions, queryFn: () => screenApi.settings(init) }),
+  ),
+});

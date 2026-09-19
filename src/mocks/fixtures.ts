@@ -1,14 +1,14 @@
 import type {
   ArchiveApiModel,
   ArticleApiModel,
+  AuthMeApiModel,
+  FeedApiModel,
   HomeApiModel,
   NavigationApiModel,
   QuizFormat,
   QuizPreviewApiModel,
   QuizResultApiModel,
   QuizSessionApiModel,
-  SettingsApiModel,
-  TopicCode,
   ViewerApiModel,
 } from "@/features/contracts/api-models";
 
@@ -76,6 +76,10 @@ export const firstArticle: ArticleApiModel = {
     aiGenerated: true,
     reviewedAt: "2026-09-13T09:30:00+09:00",
   },
+  body: {
+    status: "available",
+    text: "공공도서관 12곳이 주말 운영을 시작한다. 어린이 독서 모임이 새로 열린다. 신청은 누리집에서 받는다. 내년 확대를 검토한다.",
+  },
   image: {
     status: "available",
     origin: "article",
@@ -102,6 +106,10 @@ export const secondArticle: ArticleApiModel = {
     aiGenerated: true,
     reviewedAt: "2026-09-13T08:20:00+09:00",
   },
+  body: {
+    status: "available",
+    text: "교육청이 중학생 과학 교실을 연다. 실험과 강연으로 구성된다. 신청은 20일부터 선착순이다. 정원은 학교별 열 명이다.",
+  },
   image: null,
   availability: { feed: "published", original: "available" },
 };
@@ -118,12 +126,49 @@ export const longArticle: ArticleApiModel = {
   topicIds: ["science"],
   summary: {
     status: "available",
-    text: "이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.",
+    text: "본문 펼치기 동작을 확인하기 위한 긴 기사 모의 콘텐츠입니다.",
     aiGenerated: true,
     reviewedAt: "2026-09-13T08:20:00+09:00",
   },
+  body: {
+    status: "available",
+    text: "이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 컨텐츠 입니다. 이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다. 이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.이건 엄청 긴 기사입니다.",
+  },
   image: null,
   availability: { feed: "published", original: "available" },
+};
+
+export const nextPageArticle: ArticleApiModel = {
+  id: "article-next-page-demo",
+  title: "모의 기사: 다음 커서로 불러온 새로운 기사입니다",
+  source: {
+    id: "source-demo-news",
+    name: "데모 뉴스",
+    originalUrl: "https://example.com/articles/next-page",
+    publishedAt: "2026-09-12T10:00:00+09:00",
+  },
+  topicIds: ["economy"],
+  summary: {
+    status: "available",
+    text: "무한 스크롤 및 다음 커서로 새롭게 페치된 모의 기사 요약입니다.",
+    aiGenerated: true,
+    reviewedAt: "2026-09-12T10:30:00+09:00",
+  },
+  body: {
+    status: "available",
+    text: "다음 커서로 불러온 기사의 단문 본문이다. 첫 페이지 기사와 다른 날짜에 게시됐다. 무한 스크롤이 이어 붙인 카드인지 확인하는 데 쓴다. 담기와 원문 링크 동작은 같다.",
+  },
+  image: null,
+  availability: { feed: "published", original: "available" },
+};
+
+export const nextFeedPageFixture: FeedApiModel = {
+  items: [
+    { article: nextPageArticle, isFromPreviousFeedDate: true },
+  ],
+  currentIndex: 0,
+  nextCursor: null,
+  canLoadPreviousDates: false,
 };
 
 export const homeFixture: HomeApiModel = {
@@ -395,25 +440,16 @@ export const archiveFixture: ArchiveApiModel = {
   ],
 };
 
-export const topicCatalog: Array<{ id: TopicCode; label: string }> = [
-  { id: "ECONOMY", label: "경제" },
-  { id: "SOCIETY", label: "사회" },
-  { id: "AI_IT", label: "AI·IT" },
-  { id: "SCIENCE", label: "과학" },
-  { id: "WORLD", label: "국제" },
-  { id: "POLITICS", label: "정치" },
-];
-
-export const settingsFixture: SettingsApiModel = {
-  viewer: mockViewer,
-  topics: topicCatalog.map((topic) => ({
-    ...topic,
-    selected: topic.id === "SOCIETY" || topic.id === "AI_IT",
-  })),
-  account: {
-    emailMasked: "me•••@newslittle.example",
-    canRequestDeletion: true,
-    persistenceDescription: "관심 주제와 오늘 목록, 아카이브는 계정에 저장됩니다.",
-    lastDeletionRequest: null,
-  },
+/** GET /api/v1/auth/me 회원 응답. 설정 화면(SCR-09)이 이 하나로 구성된다. */
+export const authMeFixture: AuthMeApiModel = {
+  status: "authenticated",
+  email: "member-demo@newslittle.example",
+  displayName: mockViewer.displayName,
+  role: "member",
+  interests: ["AI_IT", "SOCIETY"],
+  interestsSetAt: "2026-09-01T00:00:00+09:00",
+  accountDeletionRequest: null,
+  canRequestAccountDeletion: true,
+  recordsDeletionRequest: null,
+  canRequestRecordsDeletion: true,
 };
