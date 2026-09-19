@@ -92,7 +92,7 @@ export const Empty: Story = {
     await expect(canvas.getByText("아직 담은 기사가 없어요")).toBeVisible();
     await expect(canvas.getByRole("button", { name: "숏폼 퀴즈 시작" })).toBeDisabled();
     await waitFor(() => {
-      expect((canvas.getByRole("textbox", { name: "오늘 목록 제목" }) as HTMLInputElement).value).toMatch(/^Untitled_.+/);
+      expect((canvas.getByRole("textbox", { name: "오늘 목록 제목" }) as HTMLInputElement).value).toMatch(/^\d{8}_\d+$/);
     });
     await expect(canvas.getByRole("button", { name: "아카이빙" })).toBeDisabled();
   },
@@ -117,21 +117,21 @@ export const Archiving: Story = {
     const titleInput = canvas.getByRole("textbox", { name: "오늘 목록 제목" });
     const archiveButton = canvas.getByRole("button", { name: "아카이빙" });
     await waitFor(() => {
-      expect((titleInput as HTMLInputElement).value).toMatch(/^Untitled_.+/);
+      expect((titleInput as HTMLInputElement).value).toMatch(/^\d{8}_\d+$/);
     });
     await expect(archiveButton).toBeEnabled();
 
     const defaultTitle = (titleInput as HTMLInputElement).value;
     await userEvent.click(archiveButton);
     await expect(args.onArchive).toHaveBeenCalledWith(defaultTitle);
-    await expect((titleInput as HTMLInputElement).value).toMatch(/^Untitled_.+/);
+    await expect((titleInput as HTMLInputElement).value).toMatch(/^\d{8}_\d+$/);
     await expect(titleInput).not.toHaveValue(defaultTitle);
 
     await userEvent.clear(titleInput);
     await userEvent.type(titleInput, "이번 주 읽을거리");
     await userEvent.click(archiveButton);
     await expect(args.onArchive).toHaveBeenCalledWith("이번 주 읽을거리");
-    await expect((titleInput as HTMLInputElement).value).toMatch(/^Untitled_.+/);
+    await expect((titleInput as HTMLInputElement).value).toMatch(/^\d{8}_\d+$/);
   },
 };
 

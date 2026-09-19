@@ -12,10 +12,20 @@ import { Spinner } from "./spinner";
 
 type TodayList = NonNullable<HomeViewModel["todayList"]>;
 
+function formatDateCompact(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}${month}${day}`;
+}
+
+// 세션 안에서만 증가한다 — 같은 날 기본값으로 여러 번 아카이빙해도 제목이
+// 겹치지 않게 하는 용도라 페이지를 새로고침하면 1부터 다시 시작해도 된다.
+let untitledSequence = 0;
+
 function createUntitledTitle() {
-  const unique =
-    globalThis.crypto?.randomUUID?.().replaceAll("-", "").slice(0, 8) ?? Date.now().toString(36);
-  return `Untitled_${unique}`;
+  untitledSequence += 1;
+  return `${formatDateCompact(new Date())}_${untitledSequence}`;
 }
 
 export type TodayListSidebarProps = {
