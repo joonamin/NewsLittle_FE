@@ -240,11 +240,11 @@ export function ArticleGesture({
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25 [mask-image:radial-gradient(ellipse_72%_78%_at_50%_46%,black_0%,transparent_100%)]"
         />
       ) : null}
-      <div className="relative z-10 flex h-full min-h-0 w-full flex-1 items-center gap-5">
+      <div className="relative flex h-full min-h-0 w-full flex-1 items-center">
         <article
           onDoubleClick={onToggleSave}
           className={cn(
-            "relative flex h-full min-h-[480px] min-w-0 flex-1 self-stretch overflow-hidden rounded-[24px] border px-10 py-6",
+            "relative z-10 flex h-full min-h-[480px] min-w-0 flex-1 self-stretch overflow-hidden rounded-[24px] border px-10 py-6",
             usesPhoto
               ? "border-nl-backdrop-card-stroke bg-nl-bg shadow-nl-backdrop-card"
               : "border-nl-border bg-nl-bg",
@@ -315,7 +315,7 @@ export function ArticleGesture({
             </div>
           </div>
         </article>
-        <div className="flex w-14 shrink-0 flex-col items-center gap-4">
+        <div className="absolute top-1/2 right-4 z-20 flex -translate-y-1/2 flex-col items-center gap-4">
           <button
             type="button"
             aria-label="이전 기사"
