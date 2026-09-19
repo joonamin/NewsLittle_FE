@@ -16,24 +16,36 @@ export type UsageBasisStatus =
 
 export type AdminQuizItem = {
   id: number;
-  article_id: number;
-  answer_format: AnswerFormat;
-  question_kind: QuestionKind;
+  article_id?: number;
+  articleId?: number;
+  answer_format?: AnswerFormat;
+  answerFormat?: AnswerFormat;
+  question_kind?: QuestionKind;
+  questionKind?: QuestionKind;
   prompt: string;
   context: string | null;
   choices: Array<{ id: string; text: string }> | null;
-  correct_answer: string;
-  key_concepts: string[] | null;
-  hint_1: string;
-  hint_2: string;
+  correct_answer?: string;
+  correctAnswer?: string;
+  key_concepts?: string[] | null;
+  keyConcepts?: string[] | null;
+  hint_1?: string;
+  hint1?: string;
+  hint_2?: string;
+  hint2?: string;
   explanation: string;
   status: "ELIGIBLE" | "EXCLUDED";
   version: number;
-  review_status: ReviewStatus;
-  reviewed_at: string | null;
-  reviewed_by: string | null;
-  created_at: string;
-  updated_at: string;
+  review_status?: ReviewStatus;
+  reviewStatus?: ReviewStatus;
+  reviewed_at?: string | null;
+  reviewedAt?: string | null;
+  reviewed_by?: string | null;
+  reviewedBy?: string | null;
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  updatedAt?: string;
 };
 
 export type AdminArticleReviewItem = {
