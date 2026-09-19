@@ -27,8 +27,12 @@ const serverApiBaseUrl = (
   process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
 ).replace(/\/$/, "");
 
-/** SSR 프리페치 가능 여부. 절대 URL이 없으면 서버에서 API를 호출할 수 없다. */
-export const canRequestOnServer = serverApiBaseUrl.length > 0;
+/**
+ * SSR 프리페치 가능 여부. 서버 fetch는 상대 경로를 파싱하지 못하므로 http(s) 절대 URL일
+ * 때만 true다. 값이 비어 있거나 `/api` 같은 상대 경로면 프리페치를 건너뛰고 클라이언트가
+ * 받아온다.
+ */
+export const canRequestOnServer = /^https?:\/\//.test(serverApiBaseUrl);
 
 export function apiUrl(path: string) {
   const baseUrl = typeof window === "undefined" ? serverApiBaseUrl : apiBaseUrl;
