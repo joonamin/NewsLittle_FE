@@ -249,7 +249,20 @@ export function ArticleGesture({
                     원문 읽기 ↗
                   </a>
                 ) : <span className="flex-1 text-nl-muted">원문을 제공하지 않아요</span>}
-                {onReport ? <button type="button" onClick={onReport} className="text-nl-negative">신고</button> : <span className="text-nl-negative">신고</span>}
+                {onReport ? (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onReport();
+                    }}
+                    className="text-nl-negative"
+                  >
+                    신고
+                  </button>
+                ) : (
+                  <span className="text-nl-negative">신고</span>
+                )}
               </div>
             </div>
             <div className="relative z-10 mt-auto flex shrink-0 flex-col gap-4 pt-4">
