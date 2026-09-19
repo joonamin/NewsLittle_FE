@@ -190,4 +190,21 @@ describe("screen view-model mappers", () => {
     expect(withRecords.accountDeletion.request).toBeNull();
     expect(withRecords.topics).toEqual(withTopics.topics);
   });
+
+  it("provides default O and X choices for choice-format quiz when question.choices is null or empty", () => {
+    const viewModel = toQuizPlayViewModel({
+      ...shortformSessionFixture,
+      format: "choice",
+      question: {
+        ...shortformSessionFixture.question!,
+        choices: null,
+      },
+    });
+
+    expect(viewModel.question?.choices).toEqual([
+      { id: "O", label: "O" },
+      { id: "X", label: "X" },
+    ]);
+  });
 });
+

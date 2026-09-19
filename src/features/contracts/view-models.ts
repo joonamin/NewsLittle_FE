@@ -288,7 +288,15 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
           title: api.question.articleTitle,
           prompt: api.question.prompt,
           context: api.question.context,
-          choices: api.question.choices,
+          choices:
+            api.question.choices && api.question.choices.length > 0
+              ? api.question.choices
+              : api.format === "choice"
+                ? [
+                    { id: "O", label: "O" },
+                    { id: "X", label: "X" },
+                  ]
+                : null,
           hint: api.question.hint.text,
           hintLevel: api.question.hint.level,
           semanticFeedback: api.question.judgementFeedback ?? null,
