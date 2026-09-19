@@ -56,4 +56,39 @@ describe("mock home store", () => {
       store.archive().groups.flatMap((group) => group.entries).some((candidate) => candidate.id === entry.id),
     ).toBe(false);
   });
+
+  it("reports no selected topics and no account for a guest", () => {
+    const store = createMockHomeStore({ activeAccountId: "guest" });
+
+    const settings = store.settings();
+
+    expect(settings.account).toBeNull();
+    expect(settings.topics.every((topic) => !topic.selected)).toBe(true);
+  });
+
+  it("saves a member's interest topics sorted, masks the account email, and rejects a guest", () => {
+    const store = createMockHomeStore();
+
+    const settings = store.updateInterestTopics(["WORLD", "AI_IT"]);
+
+    expect(settings.topics.filter((topic) => topic.selected).map((topic) => topic.id)).toEqual([
+      "AI_IT",
+      "WORLD",
+    ]);
+    expect(settings.account?.emailMasked).toBe("me•••@newslittle.example");
+
+    const guestStore = createMockHomeStore({ activeAccountId: "guest" });
+    expect(() => guestStore.updateInterestTopics(["ECONOMY"])).toThrow("AUTHENTICATION_REQUIRED");
+  });
+
+  it("records a deletion request's kind and outcome, but rejects a guest", () => {
+    const store = createMockHomeStore();
+
+    const settings = store.requestAccountDeletion("account");
+
+    expect(settings.account?.lastDeletionRequest).toMatchObject({ kind: "account", outcome: "completed" });
+
+    const guestStore = createMockHomeStore({ activeAccountId: "guest" });
+    expect(() => guestStore.requestAccountDeletion("records")).toThrow("AUTHENTICATION_REQUIRED");
+  });
 });

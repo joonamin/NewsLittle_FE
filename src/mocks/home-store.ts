@@ -1,9 +1,12 @@
 import type {
   ArchiveApiModel,
   AuthenticationApiModel,
+  DeletionRequestApiModel,
+  DeletionRequestKind,
   HomeApiModel,
   NavigationApiModel,
   PreviousListApiModel,
+  SettingsApiModel,
   TodayListApiModel,
   TopicCode,
   ViewerApiModel,
@@ -17,6 +20,7 @@ import {
   homeFixture,
   memberNavigationFixture,
   mockViewer,
+  topicCatalog,
 } from "./fixtures";
 import { articles as randomQuizArticles } from "./random-quiz-fixtures";
 
@@ -31,7 +35,15 @@ type MemberRecord = {
   todayList: TodayListApiModel;
   pendingPreviousLists: PreviousListApiModel[];
   archive: ArchiveApiModel;
+  lastDeletionRequest: DeletionRequestApiModel;
 };
+
+/** 개인정보 보호를 위해 이메일 로컬파트 앞 두 글자만 남기고 나머지는 가린다. */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!local || !domain) return email;
+  return `${local.slice(0, 2)}•••@${domain}`;
+}
 
 export type MockHomeStoreOptions = {
   activeAccountId?: ActiveAccountId;
@@ -71,6 +83,7 @@ function createMemberRecord(accountId: AccountId): MemberRecord {
       : { selectedForDate: "2026-09-13", items: [] },
     pendingPreviousLists: [],
     archive: isPrimaryAccount || isAdminAccount ? clone(archiveFixture) : { groups: [] },
+    lastDeletionRequest: null,
   };
 }
 
@@ -207,6 +220,51 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     throw new Error("NOT_FOUND");
   }
 
+  /** FR-12 설정 화면(SCR-09)의 관심 주제·계정 영역을 구성한다. */
+  function settings(): SettingsApiModel {
+    const member = activeMember();
+    return {
+      viewer: member ? clone(member.viewer) : clone(guestViewer),
+      topics: topicCatalog.map((topic) => ({
+        ...topic,
+        selected: member?.interests.includes(topic.id) ?? false,
+      })),
+      account: member
+        ? {
+            emailMasked: maskEmail(member.email),
+            canRequestDeletion: true,
+            persistenceDescription: "관심 주제와 오늘 목록, 아카이브는 계정에 저장됩니다.",
+            lastDeletionRequest: member.lastDeletionRequest,
+          }
+        : null,
+    };
+  }
+
+  /** FR-12: 회원이 설정 화면에서 관심 주제를 직접 저장한다(가중치일 뿐 주제 제한이 아니다). */
+  function updateInterestTopics(topicIds: TopicCode[]): SettingsApiModel {
+    const member = activeMember();
+    if (!member) throw new Error("AUTHENTICATION_REQUIRED");
+    member.interests = [...topicIds].sort();
+    member.interestsSetAt = new Date().toISOString();
+    return settings();
+  }
+
+  /**
+   * FR-15/AC-26: 기록·계정 삭제 요청을 접수한다. 실제 처리는 운영 백엔드가 비동기로
+   * 수행하므로 이 목은 즉시 완료로 응답하지만, 실패 상태 표시·재시도 안내는 화면이
+   * lastDeletionRequest.outcome을 그대로 렌더링하도록 만들어 둔다.
+   */
+  function requestAccountDeletion(kind: DeletionRequestKind): SettingsApiModel {
+    const member = activeMember();
+    if (!member) throw new Error("AUTHENTICATION_REQUIRED");
+    member.lastDeletionRequest = {
+      kind,
+      outcome: "completed",
+      requestedAt: new Date().toISOString(),
+    };
+    return settings();
+  }
+
   return {
     addToTodayList,
     archive: () => clone(activeMember()?.archive ?? { groups: [] }),
@@ -245,9 +303,12 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     },
     navigation,
     removeFromTodayList,
+    requestAccountDeletion,
     setActiveAccountId: (accountId: ActiveAccountId) => {
       activeAccountId = accountId;
     },
+    settings,
+    updateInterestTopics,
   };
 }
 

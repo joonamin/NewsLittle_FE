@@ -263,6 +263,80 @@ test("archive auto-opens a login prompt when the session becomes unauthenticated
   await expect(page.getByRole("listitem")).toHaveCount(5);
 });
 
+test("settings screen lets a member update interest topics and request record deletion, then account withdrawal", async ({
+  page,
+}) => {
+  await page.goto("/settings");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+
+  await expect(page.getByRole("heading", { name: "설정" })).toBeVisible();
+  await expect(page.getByText("저장 위치 · 계정")).toBeVisible();
+  await expect(page.getByText("Google 계정 · me•••@newslittle.example")).toBeVisible();
+
+  const politicsChip = page.getByRole("button", { name: "정치" });
+  await expect(politicsChip).toHaveAttribute("aria-pressed", "false");
+  await politicsChip.click();
+  await expect(politicsChip).toHaveAttribute("aria-pressed", "true");
+
+  // FR-12: PUT으로 저장한 관심 주제는 계정에 남는다(모의 서버 상태를 직접 조회해 확인).
+  const settingsAfterSave = await page.evaluate(async () => {
+    const response = await fetch("/api/v1/settings");
+    return response.json();
+  });
+  expect(
+    settingsAfterSave.data.topics
+      .filter((topic: { selected: boolean }) => topic.selected)
+      .map((topic: { id: string }) => topic.id),
+  ).toContain("POLITICS");
+
+  await page.getByRole("button", { name: "기록 삭제 요청" }).click();
+  const recordsDialog = page.getByRole("dialog", { name: "기록 삭제를 요청할까요?" });
+  await expect(recordsDialog).toBeVisible();
+  await recordsDialog.getByRole("button", { name: "삭제 요청" }).click();
+  await expect(page.getByText("기록 삭제를 완료했어요")).toBeVisible();
+
+  // AC-26: 요청 접수와 완료를 구분해 표시하고, 새 요청이 이전 요청 결과를 대체한다.
+  await page.getByRole("button", { name: "탈퇴 요청" }).click();
+  const withdrawDialog = page.getByRole("dialog", { name: "계정 탈퇴를 요청할까요?" });
+  await expect(withdrawDialog).toBeVisible();
+  await withdrawDialog.getByRole("button", { name: "탈퇴 요청" }).click();
+  await expect(page.getByText("탈퇴 요청을 완료했어요")).toBeVisible();
+  await expect(page.getByText("기록 삭제를 완료했어요")).not.toBeVisible();
+});
+
+test("settings screen stores a guest's interest topics in the browser and shows the account-preserved notice after login", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+
+  const nav = page.getByRole("navigation", { name: "주 내비게이션" });
+  await page.getByRole("button", { name: "뉴스리틀 사용자" }).click();
+  await page.getByRole("menuitem", { name: "로그아웃" }).click();
+
+  await nav.getByRole("link", { name: "설정" }).click();
+  await expect(page.getByRole("heading", { name: "설정" })).toBeVisible();
+  await expect(page.getByText("저장 위치 · 브라우저")).toBeVisible();
+
+  const worldChip = page.getByRole("button", { name: "국제" });
+  await worldChip.click();
+  await expect(worldChip).toHaveAttribute("aria-pressed", "true");
+
+  // FR-12: 비회원 관심 주제는 계정이 아니라 브라우저(localStorage)에 저장된다.
+  const storedTopics = await page.evaluate(() =>
+    JSON.parse(window.localStorage.getItem("newslittle:guest-topics") ?? "[]"),
+  );
+  expect(storedTopics).toContain("WORLD");
+
+  await page.locator("main").getByRole("button", { name: "Google로 계속하기" }).click();
+  const loginDialog = page.getByRole("dialog", { name: "로그인이 필요해요" });
+  await loginDialog.getByRole("button", { name: "Google로 계속하기" }).click();
+
+  // AC-33: 데모 계정은 이미 관심 주제가 설정돼 있어 브라우저 선택 대신 계정 설정이 유지된다.
+  await expect(page.getByText("저장 위치 · 계정")).toBeVisible();
+  await expect(page.getByText("로그인 후 계정에 저장된 관심 주제를 유지했어요.")).toBeVisible();
+});
+
 test("archive shows archival guidance once every entry is deleted", async ({ page }) => {
   await page.goto("/archive");
 

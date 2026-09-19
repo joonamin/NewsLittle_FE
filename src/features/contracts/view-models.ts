@@ -9,6 +9,8 @@ import type {
   ArchiveApiModel,
   ArchiveEntryDisplayStatus,
   ArticleApiModel,
+  DeletionRequestKind,
+  DeletionRequestOutcome,
   HomeApiModel,
   NavigationApiModel,
   NavigationItemId,
@@ -19,6 +21,7 @@ import type {
   QuizResultApiModel,
   QuizSessionApiModel,
   SettingsApiModel,
+  TopicCode,
 } from "./api-models";
 
 export type GlobalNavigationMenuItem = {
@@ -384,11 +387,19 @@ export function toArchiveViewModel(api: ArchiveApiModel): ArchiveViewModel {
   };
 }
 
+export type SettingsDeletionRequestViewModel = {
+  kind: DeletionRequestKind;
+  outcome: DeletionRequestOutcome;
+  requestedAtLabel: string;
+} | null;
+
 export type SettingsViewModel = {
   viewer: { isMember: boolean; displayName: string | null };
-  topics: Array<{ id: string; label: string; selected: boolean }>;
+  topics: Array<{ id: TopicCode; label: string; selected: boolean }>;
   persistenceDescription: string;
   canRequestDeletion: boolean;
+  emailMasked: string | null;
+  lastDeletionRequest: SettingsDeletionRequestViewModel;
 };
 
 export function toSettingsViewModel(api: SettingsApiModel): SettingsViewModel {
@@ -401,5 +412,13 @@ export function toSettingsViewModel(api: SettingsApiModel): SettingsViewModel {
     persistenceDescription:
       api.account?.persistenceDescription ?? "관심 주제는 이 브라우저에 저장됩니다.",
     canRequestDeletion: api.account?.canRequestDeletion ?? false,
+    emailMasked: api.account?.emailMasked ?? null,
+    lastDeletionRequest: api.account?.lastDeletionRequest
+      ? {
+          kind: api.account.lastDeletionRequest.kind,
+          outcome: api.account.lastDeletionRequest.outcome,
+          requestedAtLabel: formatDate(api.account.lastDeletionRequest.requestedAt),
+        }
+      : null,
   };
 }

@@ -1,10 +1,9 @@
 import { delay, http, HttpResponse } from "msw";
 
-import type { TopicCode } from "@/features/contracts/api-models";
+import type { DeletionRequestKind, TopicCode } from "@/features/contracts/api-models";
 
 import {
   randomPreviewFixture,
-  settingsFixture,
   shortformResultFixture,
 } from "./fixtures";
 import { mockHomeStore } from "./home-store";
@@ -163,7 +162,7 @@ export const handlers = [
       return failureResponse(error);
     }
   }),
-  http.get(`${api}/settings`, () => successResponse(settingsFixture)),
+  http.get(`${api}/settings`, () => successResponse(mockHomeStore.settings())),
   http.post(`${api}/today-list`, async ({ request }) => {
     try {
       const payload = (await request.json()) as { articleId?: string };
@@ -194,7 +193,22 @@ export const handlers = [
       return failureResponse(error);
     }
   }),
-  http.put(`${api}/settings/topics`, () => successResponse(settingsFixture)),
+  http.put(`${api}/settings/topics`, async ({ request }) => {
+    try {
+      const payload = (await request.json().catch(() => null)) as { topicIds?: TopicCode[] } | null;
+      return successResponse(mockHomeStore.updateInterestTopics(payload?.topicIds ?? []));
+    } catch (error) {
+      return failureResponse(error);
+    }
+  }),
+  http.post(`${api}/settings/deletion-requests`, async ({ request }) => {
+    try {
+      const payload = (await request.json().catch(() => null)) as { kind?: DeletionRequestKind } | null;
+      return successResponse(mockHomeStore.requestAccountDeletion(payload?.kind ?? "records"));
+    } catch (error) {
+      return failureResponse(error);
+    }
+  }),
 
   // ADM-01 운영 대시보드
   http.get(`${api}/operations/dashboard/summary`, ({ request }) => {
