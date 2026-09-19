@@ -6,6 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
+import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
 import { StateNotice } from "@/components/ui/state-notice";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
@@ -236,9 +237,11 @@ function RecapRow({
 
       {isExpanded ? (
         <div className="mt-4 space-y-4 pt-2">
-          <p className="text-nl-caption text-nl-text">
-            내 답 {item.userAnswer ?? "포기"} · 정답 {item.correctAnswer ?? "-"}
-          </p>
+          <AnswerComparison
+            userAnswer={item.userAnswer}
+            correctAnswer={item.correctAnswer}
+            outcome={item.outcome}
+          />
           {item.explanation ? (
             <p className="text-nl-caption text-nl-muted leading-[1.5]">{item.explanation}</p>
           ) : null}
