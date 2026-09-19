@@ -129,10 +129,9 @@ function HomeContent() {
                   surface: "HOME_CARD",
                   articleId: card.id,
                   targetLabel: card.title,
-                  // GLB-03 디자인 mockup 기준 4유형 전부 노출. 판정 오류는 홈 카드에
-                  // quiz 컨텍스트가 없어 report-modal.tsx의 judgementBlocked가 항상
-                  // 제출을 막는다(내용 오류로 대신 신고하도록 안내).
-                  availableReasons: ["CONTENT_ERROR", "JUDGMENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
+                  // 홈 카드는 퀴즈 컨텍스트가 없어 판정 오류를 신고할 대상 자체가
+                  // 없다 — 항상 막히는 유형이라 아예 노출하지 않는다.
+                  availableReasons: ["CONTENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
                 })
               }
             />
