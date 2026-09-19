@@ -331,6 +331,7 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
                 surface: "QUIZ",
                 articleId: evidence.id,
                 quizId: session.question!.id,
+                answerRef: resolution.answerRef,
                 targetLabel: session.question!.prompt,
                 availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
                 defaultReason: "JUDGMENT_ERROR",

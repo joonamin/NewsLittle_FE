@@ -103,6 +103,8 @@ export function getRandomQuizResult(sessionId: string): QuizResultApiModel {
         : `${summary} 정답은 ‘${answer}’입니다.`,
       semanticFeedback: null,
       evidence: articles[i],
+      answerRef: outcome === "correct" || outcome === "incorrect" ? `random:${i + 1}` : null,
+      quizId: `random-question-${state.format}-${i + 1}`,
     };
   });
 

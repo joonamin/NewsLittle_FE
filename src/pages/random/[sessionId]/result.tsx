@@ -323,12 +323,12 @@ function RecapRow({
             type="button"
             onClick={() => {
               const evidence = item.evidence;
-              if (!evidence) return;
-              // SCR-12 결과 화면 응답(QuizResultData.explanations)에는 quizId·answerRef가
-              // 없어 surface=QUIZ를 쓸 수 없다 — 근거 기사 id로 HOME_CARD로 보낸다.
+              if (!evidence || !item.quizId) return;
               openReport({
-                surface: "HOME_CARD",
+                surface: "QUIZ",
                 articleId: evidence.id,
+                quizId: item.quizId,
+                answerRef: item.answerRef,
                 targetLabel: item.prompt,
                 availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
                 defaultReason: "JUDGMENT_ERROR",

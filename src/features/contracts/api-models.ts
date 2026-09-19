@@ -172,6 +172,10 @@ export type QuizResolutionApiModel = {
   explanation: string | null;
   semanticFeedback: { score: number; missingDirection: string } | null;
   evidence: ArticleApiModel;
+  /** GLB-03 판정 오류 신고가 그대로 돌려보낼 참조. 판정된 답변이 없으면 null. */
+  answerRef: string | null;
+  /** 신고 요청의 quizId. 결과·복기 화면은 별도 question 객체가 없어 이 필드가 유일한 출처다. */
+  quizId: string | null;
 };
 
 export type QuizSessionApiModel = {

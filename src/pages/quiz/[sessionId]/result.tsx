@@ -208,17 +208,13 @@ function RecapRow({
   onToggle: () => void;
 }) {
   const { openReport } = useReportFlow();
-  /**
-   * 결과·복기 화면(SCR-05)의 응답 계약(QuizResultData.explanations)에는 문항의
-   * quizId도 답변 PK(answerRef)도 내려오지 않는다 — 근거 기사 id만 있다. 그래서
-   * surface는 QUIZ가 아니라 HOME_CARD로 보낸다("판정 오류"는 target.answerRef가
-   * 없어 report-modal.tsx가 제출을 막는다).
-   */
   const openQuestionReport = (defaultReason: "JUDGMENT_ERROR" | "CONTENT_ERROR") => {
-    if (!item.evidence) return;
+    if (!item.evidence || !item.quizId) return;
     openReport({
-      surface: "HOME_CARD",
+      surface: "QUIZ",
       articleId: item.evidence.id,
+      quizId: item.quizId,
+      answerRef: item.answerRef,
       targetLabel: item.prompt,
       availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
       defaultReason,

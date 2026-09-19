@@ -289,6 +289,9 @@ export type QuizPlayViewModel = {
     answer: string | null;
     explanation: string | null;
     evidence: ReturnType<typeof mapArticleCard> | null;
+    /** GLB-03 판정 오류 신고용. 판정된 답변이 없으면 null. */
+    answerRef: string | null;
+    quizId: string | null;
   } | null;
 };
 
@@ -337,6 +340,8 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
           answer: api.resolution.correctAnswer,
           explanation: api.resolution.explanation,
           evidence: mapArticleCard(api.resolution.evidence),
+          answerRef: api.resolution.answerRef,
+          quizId: api.resolution.quizId,
         }
       : null,
   };
@@ -351,6 +356,9 @@ export type QuizRecapItemViewModel = {
   correctAnswer: string | null;
   explanation: string | null;
   evidence: ReturnType<typeof mapArticleCard> | null;
+  /** GLB-03 판정 오류 신고용. 결과 화면은 question 객체가 없어 이 필드가 유일한 quizId 출처다. */
+  answerRef: string | null;
+  quizId: string | null;
 };
 
 export type QuizResultViewModel = {
@@ -387,6 +395,8 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
       correctAnswer: resolution.correctAnswer,
       explanation: resolution.explanation,
       evidence: resolution.evidence ? mapArticleCard(resolution.evidence) : null,
+      answerRef: resolution.answerRef,
+      quizId: resolution.quizId,
     })),
     explanations: api.explanations.map((resolution) => ({
       outcome: resolution.outcome,
