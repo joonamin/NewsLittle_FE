@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CheckCircle2, HelpCircle, Lightbulb, Sparkles, BookOpen } from "lucide-react";
 
-import type { AdminArticleReviewItem, AdminQuizItem } from "@/features/contracts/admin-models";
+import type { AdminArticleReviewItem, AdminQuizItem, AnswerFormat } from "@/features/contracts/admin-models";
 import { cn } from "@/lib/cn";
 
 type SideBySideViewerProps = {
@@ -9,7 +9,7 @@ type SideBySideViewerProps = {
   assetFilter: "all" | "summary" | "quiz";
 };
 
-const formatBadgeText: Record<AdminQuizItem["answer_format"], string> = {
+const formatBadgeText: Record<AnswerFormat, string> = {
   OX: "OX 문항",
   MULTIPLE_CHOICE: "객관식 (4지선다)",
   SUBJECTIVE: "주관식",
@@ -115,87 +115,98 @@ export function SideBySideViewer({ reviewItem, assetFilter }: SideBySideViewerPr
                 <span className="text-[11px] text-nl-muted">OX / 객관식 / 주관식</span>
               </div>
 
-              {reviewItem.quizzes.map((quiz, idx) => (
-                <div
-                  key={quiz.id}
-                  className="rounded-lg border border-nl-border bg-white p-4 shadow-2xs space-y-3"
-                >
-                  {/* 문항 헤더 */}
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-nl-accent">
-                      Q{idx + 1}. {formatBadgeText[quiz.answer_format]}
-                      {quiz.question_kind ? ` (${quiz.question_kind})` : ""}
-                    </span>
-                    <span className="text-nl-muted font-mono text-[11px]">ID #{quiz.id}</span>
-                  </div>
+              {reviewItem.quizzes.map((quiz, idx) => {
+                const correctAnswer = quiz.correct_answer ?? quiz.correctAnswer ?? "";
+                const hint1 = quiz.hint_1 ?? quiz.hint1 ?? "";
+                const hint2 = quiz.hint_2 ?? quiz.hint2 ?? "";
+                const formatKey = quiz.answer_format ?? quiz.answerFormat ?? "OX";
 
-                  {/* 문항 본문 */}
-                  <p className="text-sm font-semibold text-nl-text leading-snug">
-                    {quiz.prompt}
-                  </p>
-
-                  {/* 객관식 보기 (choices) */}
-                  {quiz.choices && quiz.choices.length > 0 && (
-                    <div className="grid grid-cols-1 gap-1.5 pt-1">
-                      {quiz.choices.map((choice) => (
-                        <div
-                          key={choice.id}
-                          className={cn(
-                            "rounded-md border px-3 py-1.5 text-xs flex items-center gap-2",
-                            choice.id === quiz.correct_answer
-                              ? "border-emerald-300 bg-emerald-50 text-emerald-900 font-semibold"
-                              : "border-nl-border bg-nl-subtle/50 text-nl-text"
-                          )}
-                        >
-                          <span className="font-mono uppercase font-bold text-nl-muted">
-                            {choice.id}.
-                          </span>
-                          <span>{choice.text}</span>
-                          {choice.id === quiz.correct_answer && (
-                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 ml-auto" />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 정답 표시 */}
-                  <div className="rounded-md bg-nl-subtle p-2.5 text-xs space-y-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-nl-text">정답:</span>
-                      <strong className="text-emerald-700 font-bold">{quiz.correct_answer}</strong>
-                      {quiz.key_concepts && quiz.key_concepts.length > 0 && (
-                        <div className="ml-2 flex items-center gap-1">
-                          <span className="text-[10px] text-nl-muted">핵심 키워드:</span>
-                          {quiz.key_concepts.map((kc, kIdx) => (
-                            <span
-                              key={kIdx}
-                              className="rounded-sm bg-white px-1.5 py-0.5 text-[10px] font-medium text-purple-700 border border-purple-200"
-                            >
-                              {kc}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                return (
+                  <div
+                    key={quiz.id}
+                    className="rounded-lg border border-nl-border bg-nl-surface p-4 space-y-3"
+                  >
+                    {/* 문항 헤더 */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-xs font-bold text-nl-accent">
+                          Q{idx + 1}.
+                        </span>
+                        <span className="rounded-sm bg-nl-subtle px-1.5 py-0.5 text-[10px] font-semibold text-nl-muted">
+                          {formatBadgeText[formatKey] ?? formatKey}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-nl-muted">ID #{quiz.id}</span>
                     </div>
 
-                    {/* 1차 / 2차 힌트 */}
-                    <div className="text-[11px] text-nl-muted pt-1 border-t border-nl-border/60 space-y-0.5">
-                      <p>
-                        <strong className="text-nl-text">1차 힌트:</strong> {quiz.hint_1}
-                      </p>
-                      <p>
-                        <strong className="text-nl-text">2차 힌트:</strong> {quiz.hint_2}
-                      </p>
-                    </div>
-
-                    {/* 해설 */}
-                    <p className="text-[11px] text-nl-muted pt-1">
-                      <strong className="text-nl-text">해설:</strong> {quiz.explanation}
+                    {/* 문항 지문 */}
+                    <p className="text-sm font-semibold text-nl-text leading-snug">
+                      {quiz.prompt}
                     </p>
+
+                    {/* 객관식 보기 리스트 */}
+                    {quiz.choices && quiz.choices.length > 0 && (
+                      <div className="space-y-1.5 pt-1">
+                        {quiz.choices.map((choice) => (
+                          <div
+                            key={choice.id}
+                            className={cn(
+                              "flex items-center gap-2 rounded-md border px-3 py-2 text-xs transition-colors",
+                              choice.id === correctAnswer
+                                ? "border-emerald-300 bg-emerald-50 text-emerald-900 font-semibold"
+                                : "border-nl-border bg-nl-subtle/50 text-nl-text"
+                            )}
+                          >
+                            <span className="font-mono uppercase font-bold text-nl-muted">
+                              {choice.id}.
+                            </span>
+                            <span>{choice.text}</span>
+                            {choice.id === correctAnswer && (
+                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 ml-auto" />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* 정답 표시 */}
+                    <div className="rounded-md bg-nl-subtle p-2.5 text-xs space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-nl-text">정답:</span>
+                        <strong className="text-emerald-700 font-bold">{correctAnswer}</strong>
+                        {quiz.key_concepts && quiz.key_concepts.length > 0 && (
+                          <div className="ml-2 flex items-center gap-1">
+                            <span className="text-[10px] text-nl-muted">핵심 키워드:</span>
+                            {quiz.key_concepts.map((kc, kIdx) => (
+                              <span
+                                key={kIdx}
+                                className="rounded-sm bg-white px-1.5 py-0.5 text-[10px] font-medium text-purple-700 border border-purple-200"
+                              >
+                                {kc}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 1차 / 2차 힌트 */}
+                      <div className="text-[11px] text-nl-muted pt-1 border-t border-nl-border/60 space-y-0.5">
+                        <p>
+                          <strong className="text-nl-text">1차 힌트:</strong> {hint1}
+                        </p>
+                        <p>
+                          <strong className="text-nl-text">2차 힌트:</strong> {hint2}
+                        </p>
+                      </div>
+
+                      {/* 해설 */}
+                      <p className="text-[11px] text-nl-muted pt-1">
+                        <strong className="text-nl-text">해설:</strong> {quiz.explanation}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
