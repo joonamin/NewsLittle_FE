@@ -1,13 +1,14 @@
-import { queryOptions } from "@tanstack/react-query";
+import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
 import type { QuizDomain } from "./api-models";
 import { screenApi } from "./screen-api";
-import { defaultGuestNavigation } from "./view-models";
+import { defaultGuestNavigation, type FeedViewModel } from "./view-models";
 
 import { adminApi } from "./admin-api";
 
 export const queryKeys = {
   home: ["home"] as const,
+  feed: ["feed"] as const,
   navigation: ["navigation"] as const,
   archive: ["archive"] as const,
   settings: ["settings"] as const,
@@ -27,8 +28,24 @@ export const queryKeys = {
 
 export const homeQueryOptions = queryOptions({
   queryKey: queryKeys.home,
-  queryFn: screenApi.home,
+  queryFn: () => screenApi.home(),
 });
+
+export function feedInfiniteQueryOptions(initialFeed?: FeedViewModel) {
+  return infiniteQueryOptions({
+    queryKey: queryKeys.feed,
+    queryFn: ({ pageParam }: { pageParam: string | null }) =>
+      screenApi.feed({ cursor: pageParam }),
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    initialData: initialFeed
+      ? {
+          pages: [initialFeed],
+          pageParams: [null],
+        }
+      : undefined,
+  });
+}
 
 export const navigationQueryOptions = queryOptions({
   queryKey: queryKeys.navigation,
@@ -38,18 +55,18 @@ export const navigationQueryOptions = queryOptions({
 
 export const archiveQueryOptions = queryOptions({
   queryKey: queryKeys.archive,
-  queryFn: screenApi.archive,
+  queryFn: () => screenApi.archive(),
 });
 
 export const settingsQueryOptions = queryOptions({
   queryKey: queryKeys.settings,
-  queryFn: screenApi.settings,
+  queryFn: () => screenApi.settings(),
 });
 
 export function quizPreviewQueryOptions(domain: QuizDomain) {
   return queryOptions({
     queryKey: queryKeys.quiz.preview(domain),
-    queryFn: domain === "random" ? screenApi.randomPreview : screenApi.shortformPreview,
+    queryFn: () => (domain === "random" ? screenApi.randomPreview() : screenApi.shortformPreview()),
   });
 }
 

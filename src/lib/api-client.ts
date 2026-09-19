@@ -21,8 +21,18 @@ export class ApiError extends Error {
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ?? "";
 
+// 서버(SSR)에서는 상대 경로로 fetch할 수 없어 절대 URL이 필요하다.
+// 브라우저에 노출하면 안 되는 내부 주소를 쓸 수 있도록 API_BASE_URL을 먼저 본다.
+const serverApiBaseUrl = (
+  process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? ""
+).replace(/\/$/, "");
+
+/** SSR 프리페치 가능 여부. 절대 URL이 없으면 서버에서 API를 호출할 수 없다. */
+export const canRequestOnServer = serverApiBaseUrl.length > 0;
+
 export function apiUrl(path: string) {
-  return `${apiBaseUrl}${path}`;
+  const baseUrl = typeof window === "undefined" ? serverApiBaseUrl : apiBaseUrl;
+  return `${baseUrl}${path}`;
 }
 
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {

@@ -107,4 +107,17 @@ describe("mock home store", () => {
     // 새 계정에는 설정된 관심 주제가 없어 브라우저 설정이 반영된다.
     expect(store.login(["WORLD"]).interestsSource).toBe("browser");
   });
+
+  it("serves next feed page fixture when demo-next-cursor is passed and default feed otherwise", () => {
+    const store = createMockHomeStore();
+
+    const initialFeed = store.feed();
+    expect(initialFeed.items).toHaveLength(3);
+    expect(initialFeed.nextCursor).toBe("demo-next-cursor");
+
+    const nextFeed = store.feed("demo-next-cursor");
+    expect(nextFeed.items).toHaveLength(1);
+    expect(nextFeed.items[0]?.article.id).toBe("article-next-page-demo");
+    expect(nextFeed.nextCursor).toBeNull();
+  });
 });

@@ -15,6 +15,7 @@ import { StateNotice } from "@/components/ui/state-notice";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { quizSessionQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
+import { dehydrateScreenQueries, type DehydratedProps } from "@/features/contracts/server-prefetch";
 import type { QuizPlayViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
 import {
@@ -24,7 +25,7 @@ import {
 import { useQuizAbandonGuard } from "@/features/quiz/use-quiz-abandon-guard";
 import { submitValidated, useValidatedForm } from "@/lib/form";
 
-type RandomQuizPlayPageProps = { sessionId: string };
+type RandomQuizPlayPageProps = DehydratedProps & { sessionId: string };
 
 const writtenAnswerSchema = z.object({
   answer: z.string().trim().min(1),
@@ -44,9 +45,20 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
   }
 }
 
-export const getServerSideProps = (async ({ params }) => {
+export const getServerSideProps = (async ({ params, req }) => {
   const sessionId = params?.sessionId;
-  return typeof sessionId === "string" ? { props: { sessionId } } : { notFound: true };
+  if (typeof sessionId !== "string") {
+    return { notFound: true };
+  }
+
+  const prefetched = await dehydrateScreenQueries(req, (queryClient, init) =>
+    queryClient.prefetchQuery({
+      ...quizSessionQueryOptions("random", sessionId),
+      queryFn: () => screenApi.session("random", sessionId, init),
+    }),
+  );
+
+  return { props: { sessionId, ...prefetched } };
 }) satisfies GetServerSideProps<RandomQuizPlayPageProps>;
 
 export default function RandomQuizPlayPage({ sessionId }: InferGetServerSidePropsType<typeof getServerSideProps>) {

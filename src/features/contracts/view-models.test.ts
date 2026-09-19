@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   adminNavigationFixture,
   homeFixture,
+  nextFeedPageFixture,
   authMeFixture,
   shortformPreviewFixture,
   shortformResultFixture,
@@ -10,6 +11,7 @@ import {
 } from "@/mocks/fixtures";
 
 import {
+  toFeedViewModel,
   toGlobalNavigationViewModel,
   toHomeViewModel,
   toQuizPlayViewModel,
@@ -21,16 +23,26 @@ import {
 } from "./view-models";
 
 describe("screen view-model mappers", () => {
-  it("keeps API-only article fields out of the home view model", () => {
+  it("keeps API-only article fields out of the home view model and maps nextCursor", () => {
     const viewModel = toHomeViewModel(homeFixture);
 
     expect(viewModel.viewer.isMember).toBe(true);
+    expect(viewModel.feed.nextCursor).toBe("demo-next-cursor");
     expect(viewModel.feed.cards[0]).toMatchObject({
       sourceName: "데모 뉴스",
       showsAiSummary: true,
       isRestricted: false,
     });
     expect(viewModel.feed.cards[0]).not.toHaveProperty("topicIds");
+  });
+
+  it("maps feed API model to FeedViewModel with cards and nextCursor", () => {
+    const feedViewModel = toFeedViewModel(nextFeedPageFixture);
+
+    expect(feedViewModel.cards).toHaveLength(1);
+    expect(feedViewModel.cards[0]?.title).toBe("모의 기사: 다음 커서로 불러온 새로운 기사입니다");
+    expect(feedViewModel.nextCursor).toBeNull();
+    expect(feedViewModel.canLoadPreviousDates).toBe(false);
   });
 
   it("maps quiz format availability into UI-ready labels", () => {

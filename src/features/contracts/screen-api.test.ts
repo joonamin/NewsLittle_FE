@@ -72,4 +72,31 @@ describe("screen API", () => {
     );
     expect(session.status).toBe("abandoned");
   });
+
+  it("calls /api/v1/feed with query parameters and unwraps the feed view model", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          data: {
+            items: [],
+            currentIndex: 0,
+            nextCursor: "next-abc",
+            canLoadPreviousDates: true,
+          },
+          meta: { requestId: "request-123" },
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const feed = await screenApi.feed({ cursor: "cursor-123", topics: ["ECONOMY", "AI_IT"] });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/v1/feed?cursor=cursor-123&topics=ECONOMY%2CAI_IT",
+      expect.objectContaining({ credentials: "include" }),
+    );
+    expect(feed.nextCursor).toBe("next-abc");
+    expect(feed.canLoadPreviousDates).toBe(true);
+  });
 });

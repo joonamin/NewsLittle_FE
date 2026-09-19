@@ -114,14 +114,16 @@ export type PreviousListApiModel = {
   items: TodayListItemApiModel[];
 };
 
+export type FeedApiModel = {
+  items: FeedItemApiModel[];
+  currentIndex: number;
+  nextCursor: string | null;
+  canLoadPreviousDates: boolean;
+};
+
 export type HomeApiModel = {
   viewer: ViewerApiModel;
-  feed: {
-    items: FeedItemApiModel[];
-    currentIndex: number;
-    nextCursor: string | null;
-    canLoadPreviousDates: boolean;
-  };
+  feed: FeedApiModel;
   todayList: TodayListApiModel | null;
   pendingPreviousLists: PreviousListApiModel[];
 };

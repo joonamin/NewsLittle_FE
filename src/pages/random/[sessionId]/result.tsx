@@ -10,21 +10,30 @@ import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Button } from "@/components/ui/button";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { quizResultQueryOptions } from "@/features/contracts/query-keys";
+import { screenApi } from "@/features/contracts/screen-api";
+import { dehydrateScreenQueries, type DehydratedProps } from "@/features/contracts/server-prefetch";
 import type { QuizRecapItemViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
 
-type RandomQuizResultPageProps = {
+type RandomQuizResultPageProps = DehydratedProps & {
   sessionId: string;
 };
 
-export const getServerSideProps = (async ({ params }) => {
+export const getServerSideProps = (async ({ params, req }) => {
   const sessionId = params?.sessionId;
 
   if (typeof sessionId !== "string") {
     return { notFound: true };
   }
 
-  return { props: { sessionId } };
+  const prefetched = await dehydrateScreenQueries(req, (queryClient, init) =>
+    queryClient.prefetchQuery({
+      ...quizResultQueryOptions("random", sessionId),
+      queryFn: () => screenApi.result("random", sessionId, init),
+    }),
+  );
+
+  return { props: { sessionId, ...prefetched } };
 }) satisfies GetServerSideProps<RandomQuizResultPageProps>;
 
 export default function RandomQuizResultPage({

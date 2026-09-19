@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { firstArticle, secondArticle } from "../../src/mocks/fixtures";
+import { firstArticle, nextPageArticle, secondArticle } from "../../src/mocks/fixtures";
 
 test("member home uses the PEN feed card and today-list sidebar interaction", async ({ page }) => {
   await page.goto("/");
@@ -27,6 +27,31 @@ test("member home uses the PEN feed card and today-list sidebar interaction", as
 
   await page.getByRole("button", { name: `${secondArticle.title} 삭제` }).click();
   await expect(page.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
+});
+
+test("fetches next cursor items and appends them to feed when reaching the end", async ({ page }) => {
+  await page.goto("/");
+
+  // 1번째 카드
+  await expect(page.getByRole("heading", { name: firstArticle.title })).toBeVisible();
+  await page.getByRole("button", { name: "다음 기사" }).click();
+
+  // 2번째 카드
+  await expect(page.getByRole("heading", { name: secondArticle.title })).toBeVisible();
+  await page.getByRole("button", { name: "다음 기사" }).click();
+
+  // 3번째 카드 (초기 목록의 마지막)
+  await page.getByRole("button", { name: "다음 기사" }).click();
+
+  // 다음 커서로 불러온 4번째 카드
+  await expect(page.getByRole("heading", { name: nextPageArticle.title })).toBeVisible();
+
+  // 마지막 페이지이므로 다음 기사 버튼이 비활성화됨
+  await expect(page.getByRole("button", { name: "다음 기사" })).toBeDisabled();
+
+  // 이전 기사로 되돌아가기 가능
+  await page.getByRole("button", { name: "이전 기사" }).click();
+  await expect(page.getByRole("button", { name: "다음 기사" })).toBeEnabled();
 });
 
 test("MSW returns the home API contract before a backend exists", async ({ page }) => {
