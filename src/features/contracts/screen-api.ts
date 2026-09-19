@@ -10,15 +10,18 @@ import type {
   AddToTodayListRequest,
   AuthenticationApiModel,
   ArchiveApiModel,
+  AuthMeApiModel,
   CreateQuizSessionRequest,
+  DeletionConfirmationRequest,
+  DeletionRequestApiModel,
   DeletionRequestKind,
   HomeApiModel,
+  InterestsApiModel,
   NavigationApiModel,
   QuizDomain,
   QuizPreviewApiModel,
   QuizResultApiModel,
   QuizSessionApiModel,
-  SettingsApiModel,
   SignInWithGoogleRequest,
   TodayListApiModel,
   SubmitQuizAnswerRequest,
@@ -59,7 +62,11 @@ export const screenApi = {
   /** SCR-07 개별 삭제(FR-10·FR-15). 응답 본문 없음(204). */
   deleteArchiveEntry: (entryId: string) =>
     apiRequest<void>(`/api/v1/archive/${entryId}`, { method: "DELETE" }),
-  settings: () => apiRequest<SettingsApiModel>("/api/v1/settings").then(toSettingsViewModel),
+  /**
+   * 설정 화면(SCR-09) 조회. 백엔드에 화면 전용 엔드포인트가 없어 세션 주체 조회를
+   * 그대로 쓰고, 주제 라벨·저장 위치 문구는 프론트 카탈로그가 채운다.
+   */
+  settings: () => apiRequest<AuthMeApiModel>("/api/v1/auth/me").then(toSettingsViewModel),
   addToTodayList: (payload: AddToTodayListRequest) =>
     apiRequest<TodayListApiModel>("/api/v1/today-list", jsonRequest("POST", payload)),
   removeFromTodayList: (articleId: string) =>
@@ -105,13 +112,18 @@ export const screenApi = {
       { ...jsonRequest("POST", {}), keepalive },
     ).then(toQuizPlayViewModel),
   updateInterestTopics: (payload: UpdateInterestTopicsRequest) =>
-    apiRequest<SettingsApiModel>("/api/v1/settings/topics", jsonRequest("PUT", payload)).then(
-      toSettingsViewModel,
+    apiRequest<InterestsApiModel>("/api/v1/settings/interests", jsonRequest("PUT", payload)),
+  /**
+   * FR-15/AC-26: 기록 삭제와 탈퇴는 별개 동작이라 경로가 나뉜다. 두 요청 모두
+   * 확인 단계를 서버가 다시 검증하므로 `confirm: true`를 함께 보낸다(NFR-07).
+   * 탈퇴가 DONE이면 서버가 세션 쿠키까지 지우므로 호출 측이 로그아웃 상태로
+   * 전환해야 한다.
+   */
+  requestDeletion: (kind: DeletionRequestKind) =>
+    apiRequest<DeletionRequestApiModel>(
+      kind === "account"
+        ? "/api/v1/settings/deletion-request"
+        : "/api/v1/settings/records-deletion-request",
+      jsonRequest("POST", { confirm: true } satisfies DeletionConfirmationRequest),
     ),
-  /** FR-15/AC-26: 기록 삭제 또는 계정 탈퇴를 요청한다. */
-  requestAccountDeletion: (kind: DeletionRequestKind) =>
-    apiRequest<SettingsApiModel>(
-      "/api/v1/settings/deletion-requests",
-      jsonRequest("POST", { kind }),
-    ).then(toSettingsViewModel),
 };

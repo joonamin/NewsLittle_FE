@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   adminNavigationFixture,
   homeFixture,
-  settingsFixture,
+  authMeFixture,
   shortformPreviewFixture,
   shortformResultFixture,
   shortformSessionFixture,
@@ -16,6 +16,8 @@ import {
   toQuizResultViewModel,
   toQuizStartViewModel,
   toSettingsViewModel,
+  withDeletionRequest,
+  withUpdatedInterests,
 } from "./view-models";
 
 describe("screen view-model mappers", () => {
@@ -95,40 +97,85 @@ describe("screen view-model mappers", () => {
     });
   });
 
-  it("maps a member's settings with masked email and all six interest topics", () => {
-    const viewModel = toSettingsViewModel(settingsFixture);
+  it("maps a member's settings from /auth/me with all six interest topics", () => {
+    const viewModel = toSettingsViewModel(authMeFixture);
 
     expect(viewModel.viewer.isMember).toBe(true);
-    expect(viewModel.emailMasked).toBe("me•••@newslittle.example");
-    expect(viewModel.canRequestDeletion).toBe(true);
+    expect(viewModel.email).toBe("member-demo@newslittle.example");
+    expect(viewModel.storageScope).toBe("account");
+    expect(viewModel.accountDeletion.canRequest).toBe(true);
     expect(viewModel.topics).toHaveLength(6);
     expect(viewModel.topics).toContainEqual({ id: "WORLD", label: "국제", selected: false });
-    expect(viewModel.lastDeletionRequest).toBeNull();
+    expect(viewModel.topics).toContainEqual({ id: "AI_IT", label: "AI·IT", selected: true });
+    expect(viewModel.accountDeletion.request).toBeNull();
+    expect(viewModel.recordsDeletion.request).toBeNull();
   });
 
   it("falls back to a browser persistence description and hides account fields for a guest", () => {
     const viewModel = toSettingsViewModel({
-      ...settingsFixture,
-      viewer: { id: null, role: "guest", displayName: null, storageScope: "browser" },
-      account: null,
+      ...authMeFixture,
+      status: "guest",
+      role: "guest",
+      email: null,
+      displayName: null,
+      interests: [],
+      interestsSetAt: null,
     });
 
     expect(viewModel.viewer.isMember).toBe(false);
-    expect(viewModel.canRequestDeletion).toBe(false);
-    expect(viewModel.emailMasked).toBeNull();
-    expect(viewModel.lastDeletionRequest).toBeNull();
+    expect(viewModel.storageScope).toBe("browser");
+    expect(viewModel.email).toBeNull();
+    expect(viewModel.topics.every((topic) => !topic.selected)).toBe(true);
     expect(viewModel.persistenceDescription).toBe("관심 주제는 이 브라우저에 저장됩니다.");
   });
 
   it("maps a failed deletion request so the screen can show a retry prompt", () => {
     const viewModel = toSettingsViewModel({
-      ...settingsFixture,
-      account: {
-        ...settingsFixture.account!,
-        lastDeletionRequest: { kind: "account", outcome: "failed", requestedAt: "2026-09-13T00:00:00+09:00" },
+      ...authMeFixture,
+      accountDeletionRequest: {
+        state: "FAILED",
+        requestedAt: "2026-09-13T00:00:00+09:00",
+        completedAt: null,
       },
+      canRequestAccountDeletion: true,
     });
 
-    expect(viewModel.lastDeletionRequest).toMatchObject({ kind: "account", outcome: "failed" });
+    expect(viewModel.accountDeletion.request).toMatchObject({ kind: "account", state: "FAILED" });
+    expect(viewModel.accountDeletion.canRequest).toBe(true);
+  });
+
+  it("blocks a re-request while a deletion request is still being processed", () => {
+    const viewModel = toSettingsViewModel({
+      ...authMeFixture,
+      recordsDeletionRequest: {
+        state: "PROCESSING",
+        requestedAt: "2026-09-13T00:00:00+09:00",
+        completedAt: null,
+      },
+      canRequestRecordsDeletion: false,
+    });
+
+    expect(viewModel.recordsDeletion.request).toMatchObject({ kind: "records", state: "PROCESSING" });
+    expect(viewModel.recordsDeletion.canRequest).toBe(false);
+  });
+
+  it("patches only the changed part of the settings model from a partial response", () => {
+    const base = toSettingsViewModel(authMeFixture);
+
+    const withTopics = withUpdatedInterests(base, ["WORLD"]);
+    expect(withTopics.topics.filter((topic) => topic.selected).map((topic) => topic.id)).toEqual([
+      "WORLD",
+    ]);
+    expect(withTopics.email).toBe(base.email);
+
+    const withRecords = withDeletionRequest(withTopics, "records", {
+      state: "DONE",
+      requestedAt: "2026-09-13T00:00:00+09:00",
+      completedAt: "2026-09-13T00:00:05+09:00",
+    });
+    expect(withRecords.recordsDeletion.request).toMatchObject({ kind: "records", state: "DONE" });
+    expect(withRecords.recordsDeletion.canRequest).toBe(true);
+    expect(withRecords.accountDeletion.request).toBeNull();
+    expect(withRecords.topics).toEqual(withTopics.topics);
   });
 });

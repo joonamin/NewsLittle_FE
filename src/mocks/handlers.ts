@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from "msw";
 
-import type { DeletionRequestKind, TopicCode } from "@/features/contracts/api-models";
+import type { TopicCode } from "@/features/contracts/api-models";
 
 import {
   randomPreviewFixture,
@@ -48,7 +48,9 @@ function failureResponse(error: unknown) {
       ? 401
       : code === "ARTICLE_NOT_FOUND" || code === "NOT_FOUND"
         ? 404
-        : 500;
+        : code === "VALIDATION_ERROR"
+          ? 422
+          : 500;
   return HttpResponse.json({ error: { code } }, { status });
 }
 
@@ -69,6 +71,8 @@ export const handlers = [
     const topicIds = payload && "browserTopicIds" in payload ? payload.browserTopicIds : payload?.topicIds;
     return successResponse(mockHomeStore.login(topicIds));
   }),
+  /** 설정 화면(SCR-09)은 전용 조회 엔드포인트 없이 이 응답 하나로 구성된다. */
+  http.get(`${api}/auth/me`, () => successResponse(mockHomeStore.authMe())),
   http.post(`${api}/auth/logout`, () => {
     mockHomeStore.logout();
     return new HttpResponse(null, { status: 204 });
@@ -162,7 +166,6 @@ export const handlers = [
       return failureResponse(error);
     }
   }),
-  http.get(`${api}/settings`, () => successResponse(mockHomeStore.settings())),
   http.post(`${api}/today-list`, async ({ request }) => {
     try {
       const payload = (await request.json()) as { articleId?: string };
@@ -193,7 +196,7 @@ export const handlers = [
       return failureResponse(error);
     }
   }),
-  http.put(`${api}/settings/topics`, async ({ request }) => {
+  http.put(`${api}/settings/interests`, async ({ request }) => {
     try {
       const payload = (await request.json().catch(() => null)) as { topicIds?: TopicCode[] } | null;
       return successResponse(mockHomeStore.updateInterestTopics(payload?.topicIds ?? []));
@@ -201,10 +204,21 @@ export const handlers = [
       return failureResponse(error);
     }
   }),
-  http.post(`${api}/settings/deletion-requests`, async ({ request }) => {
+  /** 파괴적 동작은 서버도 확인 단계를 다시 강제한다(NFR-07). confirm이 없으면 422다. */
+  http.post(`${api}/settings/deletion-request`, async ({ request }) => {
     try {
-      const payload = (await request.json().catch(() => null)) as { kind?: DeletionRequestKind } | null;
-      return successResponse(mockHomeStore.requestAccountDeletion(payload?.kind ?? "records"));
+      const payload = (await request.json().catch(() => null)) as { confirm?: boolean } | null;
+      if (payload?.confirm !== true) return failureResponse(new Error("VALIDATION_ERROR"));
+      return successResponse(mockHomeStore.requestDeletion("account"));
+    } catch (error) {
+      return failureResponse(error);
+    }
+  }),
+  http.post(`${api}/settings/records-deletion-request`, async ({ request }) => {
+    try {
+      const payload = (await request.json().catch(() => null)) as { confirm?: boolean } | null;
+      if (payload?.confirm !== true) return failureResponse(new Error("VALIDATION_ERROR"));
+      return successResponse(mockHomeStore.requestDeletion("records"));
     } catch (error) {
       return failureResponse(error);
     }

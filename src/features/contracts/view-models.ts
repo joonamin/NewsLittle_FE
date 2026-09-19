@@ -9,8 +9,9 @@ import type {
   ArchiveApiModel,
   ArchiveEntryDisplayStatus,
   ArticleApiModel,
+  AuthMeApiModel,
   DeletionRequestKind,
-  DeletionRequestOutcome,
+  DeletionRequestState,
   HomeApiModel,
   NavigationApiModel,
   NavigationItemId,
@@ -20,9 +21,10 @@ import type {
   QuizResolutionApiModel,
   QuizResultApiModel,
   QuizSessionApiModel,
-  SettingsApiModel,
   TopicCode,
 } from "./api-models";
+
+import { PERSISTENCE_DESCRIPTION, TOPIC_CATALOG } from "./topics";
 
 export type GlobalNavigationMenuItem = {
   id: NavigationItemId;
@@ -389,36 +391,109 @@ export function toArchiveViewModel(api: ArchiveApiModel): ArchiveViewModel {
 
 export type SettingsDeletionRequestViewModel = {
   kind: DeletionRequestKind;
-  outcome: DeletionRequestOutcome;
+  state: DeletionRequestState;
   requestedAtLabel: string;
-} | null;
+  completedAtLabel: string | null;
+};
+
+export type SettingsDeletionViewModel = {
+  kind: DeletionRequestKind;
+  /** 진행 중인 요청이 있으면 서버가 false로 내려 재요청을 막는다. */
+  canRequest: boolean;
+  /** 가장 최근 요청. 요청한 적이 없으면 null. */
+  request: SettingsDeletionRequestViewModel | null;
+};
 
 export type SettingsViewModel = {
   viewer: { isMember: boolean; displayName: string | null };
   topics: Array<{ id: TopicCode; label: string; selected: boolean }>;
+  storageScope: "account" | "browser";
   persistenceDescription: string;
-  canRequestDeletion: boolean;
-  emailMasked: string | null;
-  lastDeletionRequest: SettingsDeletionRequestViewModel;
+  /** 회원의 구글 계정 이메일. 백엔드가 수집·저장하는 값은 sub·이메일·표시 이름뿐이다. */
+  email: string | null;
+  recordsDeletion: SettingsDeletionViewModel;
+  accountDeletion: SettingsDeletionViewModel;
 };
 
-export function toSettingsViewModel(api: SettingsApiModel): SettingsViewModel {
+function toDeletionViewModel(
+  kind: DeletionRequestKind,
+  api: AuthMeApiModel,
+): SettingsDeletionViewModel {
+  const request = kind === "account" ? api.accountDeletionRequest : api.recordsDeletionRequest;
+  const canRequest =
+    kind === "account" ? api.canRequestAccountDeletion : api.canRequestRecordsDeletion;
+
   return {
-    viewer: {
-      isMember: api.viewer.role === "member",
-      displayName: api.viewer.displayName,
-    },
-    topics: api.topics,
-    persistenceDescription:
-      api.account?.persistenceDescription ?? "관심 주제는 이 브라우저에 저장됩니다.",
-    canRequestDeletion: api.account?.canRequestDeletion ?? false,
-    emailMasked: api.account?.emailMasked ?? null,
-    lastDeletionRequest: api.account?.lastDeletionRequest
+    kind,
+    canRequest: canRequest ?? true,
+    request: request
       ? {
-          kind: api.account.lastDeletionRequest.kind,
-          outcome: api.account.lastDeletionRequest.outcome,
-          requestedAtLabel: formatDate(api.account.lastDeletionRequest.requestedAt),
+          kind,
+          state: request.state,
+          requestedAtLabel: formatDate(request.requestedAt),
+          completedAtLabel: request.completedAt ? formatDate(request.completedAt) : null,
         }
       : null,
   };
+}
+
+/**
+ * 설정 화면은 `/auth/me` 하나로 구성된다. 주제 라벨과 저장 위치 문구는 서버가
+ * 주지 않으므로 프론트 카탈로그에서 채우고, 선택 여부만 `interests`로 맞춘다.
+ */
+export function toSettingsViewModel(api: AuthMeApiModel): SettingsViewModel {
+  const isMember = api.status === "authenticated";
+  const interests = api.interests ?? [];
+
+  return {
+    viewer: {
+      isMember,
+      displayName: api.displayName ?? null,
+    },
+    topics: TOPIC_CATALOG.map((topic) => ({
+      ...topic,
+      selected: isMember && interests.includes(topic.id),
+    })),
+    storageScope: isMember ? "account" : "browser",
+    persistenceDescription: isMember
+      ? PERSISTENCE_DESCRIPTION.account
+      : PERSISTENCE_DESCRIPTION.browser,
+    email: isMember ? (api.email ?? null) : null,
+    recordsDeletion: toDeletionViewModel("records", api),
+    accountDeletion: toDeletionViewModel("account", api),
+  };
+}
+
+/** PUT /settings/interests 응답에는 주제 목록만 있어 화면 모델을 부분 갱신한다. */
+export function withUpdatedInterests(
+  settings: SettingsViewModel,
+  interests: TopicCode[],
+): SettingsViewModel {
+  return {
+    ...settings,
+    topics: settings.topics.map((topic) => ({ ...topic, selected: interests.includes(topic.id) })),
+  };
+}
+
+/** 삭제·탈퇴 요청 응답에도 그 요청의 상태만 있어 해당 영역만 갱신한다. */
+export function withDeletionRequest(
+  settings: SettingsViewModel,
+  kind: DeletionRequestKind,
+  request: { state: DeletionRequestState; requestedAt: string; completedAt: string | null },
+): SettingsViewModel {
+  const next: SettingsDeletionViewModel = {
+    kind,
+    // 서버와 같은 규칙: 접수·처리 중(REQUESTED·PROCESSING)일 때만 재요청을 막는다.
+    canRequest: request.state !== "REQUESTED" && request.state !== "PROCESSING",
+    request: {
+      kind,
+      state: request.state,
+      requestedAtLabel: formatDate(request.requestedAt),
+      completedAtLabel: request.completedAt ? formatDate(request.completedAt) : null,
+    },
+  };
+
+  return kind === "account"
+    ? { ...settings, accountDeletion: next }
+    : { ...settings, recordsDeletion: next };
 }

@@ -223,29 +223,48 @@ export type ArchiveApiModel = {
   groups: Array<{ date: string; entries: ArchiveEntryApiModel[] }>;
 };
 
+/** "records"는 기록 삭제 요청, "account"는 탈퇴 요청. 서버는 둘을 별도 경로로 받는다. */
 export type DeletionRequestKind = "records" | "account";
-export type DeletionRequestOutcome = "completed" | "failed";
+export type DeletionRequestState = "REQUESTED" | "PROCESSING" | "DONE" | "FAILED";
 
 export type DeletionRequestApiModel = {
-  kind: DeletionRequestKind;
-  outcome: DeletionRequestOutcome;
+  state: DeletionRequestState;
   requestedAt: ApiTimestamp;
-} | null;
-
-export type SettingsApiModel = {
-  viewer: ViewerApiModel;
-  topics: Array<{ id: TopicCode; label: string; selected: boolean }>;
-  account: {
-    emailMasked: string;
-    canRequestDeletion: boolean;
-    persistenceDescription: string;
-    /** 가장 최근 삭제·탈퇴 요청의 처리 결과. 요청이 없거나 처리 중이면 null. */
-    lastDeletionRequest: DeletionRequestApiModel;
-  } | null;
+  completedAt: ApiTimestamp | null;
 };
 
-export type RequestAccountDeletionRequest = {
-  kind: DeletionRequestKind;
+/**
+ * GET /api/v1/auth/me. 설정 화면(SCR-09)은 이 응답 하나로 구성된다 — 서버에는
+ * 화면 전용 조회 엔드포인트가 없고, 주제 목록·라벨과 저장 위치 안내 문구는
+ * 프론트 카탈로그(contracts/topics.ts)가 갖는다.
+ *
+ * 비회원도 200이며 status만 "guest"다. 탈퇴가 DONE이 되면 계정 자체가 사라져
+ * accountDeletionRequest로는 다시 조회되지 않는다 — 완료 표시는 요청에 대한
+ * 응답이 직접 전달한다.
+ */
+export type AuthMeApiModel = {
+  status: "guest" | "authenticated";
+  email: string | null;
+  displayName: string | null;
+  role: ViewerRole;
+  /** 서버는 항상 알파벳순으로 내려준다. 프론트가 보낸 순서는 보존되지 않는다. */
+  interests: TopicCode[];
+  interestsSetAt: ApiTimestamp | null;
+  accountDeletionRequest: DeletionRequestApiModel | null;
+  canRequestAccountDeletion: boolean;
+  recordsDeletionRequest: DeletionRequestApiModel | null;
+  canRequestRecordsDeletion: boolean;
+};
+
+/** PUT /api/v1/settings/interests 응답. 화면 전체가 아니라 관심 주제만 돌아온다. */
+export type InterestsApiModel = {
+  interests: TopicCode[];
+  interestsSetAt: ApiTimestamp | null;
+};
+
+/** 파괴적 동작 확인 단계(NFR-07)를 서버도 한 번 더 강제한다. true가 아니면 422다. */
+export type DeletionConfirmationRequest = {
+  confirm: true;
 };
 
 export type AddToTodayListRequest = {
@@ -271,6 +290,12 @@ export type AuthenticationApiModel = {
   /** 프론트가 보낸 topicIds 순서가 아니라 항상 알파벳순으로 내려온다. */
   interests: TopicCode[];
   interestsSetAt: ApiTimestamp | null;
+  /**
+   * AC-33: 이번 로그인에서 관심 주제가 반영된 경로 — "browser"(브라우저 설정을
+   * 계정에 반영), "account"(기존 계정 설정 유지), null(반영할 대상 없음).
+   * 설정 화면이 로그인 직후 한 번 보여주는 안내 문구의 근거다.
+   */
+  interestsSource: "browser" | "account" | null;
   role: AccountRole;
 };
 
