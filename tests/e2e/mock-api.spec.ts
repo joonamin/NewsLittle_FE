@@ -37,7 +37,7 @@ test("archiving the today list with a title flushes it and shows up in the archi
 
   const titleInput = page.getByRole("textbox", { name: "오늘 목록 제목" });
   const archiveButton = page.getByRole("button", { name: "아카이빙" });
-  await expect(titleInput).toHaveValue(/Untitled_.+/);
+  await expect(titleInput).toHaveValue(/^\d{8}_\d+$/);
   await expect(archiveButton).toBeEnabled();
 
   await titleInput.fill("이번 주 읽을거리");
@@ -45,7 +45,7 @@ test("archiving the today list with a title flushes it and shows up in the archi
   await archiveButton.click();
 
   await expect(page.getByText("아직 담은 기사가 없어요")).toBeVisible();
-  await expect(titleInput).toHaveValue(/Untitled_.+/);
+  await expect(titleInput).toHaveValue(/^\d{8}_\d+$/);
 
   // 목 서버 상태가 브라우저 페이지 컨텍스트에 살아 있으므로, 상태를 초기화시키는
   // 풀 네비게이션(page.goto) 대신 클라이언트 라우팅으로 이동해야 방금 만든 아카이브가 보인다.
