@@ -381,3 +381,18 @@ test("archive shows archival guidance once every entry is deleted", async ({ pag
   await expect(page.getByRole("listitem")).toHaveCount(0);
 });
 
+test("mobile viewport displays the mobile notice and hides desktop navigation", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto("/");
+
+  await expect(
+    page.getByRole("heading", {
+      name: "아직 모바일 버전의 화면은 준비되지 않았어요!",
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  await expect(page.getByRole("navigation", { name: "주 내비게이션" })).toBeHidden();
+});
+
+
