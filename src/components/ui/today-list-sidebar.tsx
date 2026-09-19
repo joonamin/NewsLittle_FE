@@ -1,7 +1,7 @@
 // lib: 홈 · 오늘 목록 사이드바 (BtNvT), 타임라인_아이템 (diE46), 타임라인 레일 (CfqQX)
 import { LockKeyhole, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { HomeViewModel } from "@/features/contracts/view-models";
 import { ApiError } from "@/lib/api-client";
@@ -51,13 +51,9 @@ export function TodayListSidebar({
   const readyCount = items.filter((item) => item.quizStatusLabel === "출제 가능").length;
   const preparingCount = items.filter((item) => item.quizStatusLabel === "문항 준비 중").length;
 
-  const [title, setTitle] = useState("Untitled");
+  const [title, setTitle] = useState(createUntitledTitle);
   const [isArchiving, setIsArchiving] = useState(false);
   const [archiveError, setArchiveError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setTitle(createUntitledTitle());
-  }, []);
 
   const canArchive = title.trim().length > 0 && items.length > 0 && !isArchiving;
 
@@ -91,16 +87,22 @@ export function TodayListSidebar({
                 placeholder="목록 제목을 입력하세요"
                 aria-label="오늘 목록 제목"
                 maxLength={200}
+                suppressHydrationWarning
                 className="min-w-0 flex-1 rounded-nl-button border border-nl-border bg-nl-bg px-3 py-1.5 text-[20px] leading-[1.5] font-bold text-nl-text outline-none focus:border-nl-accent"
               />
               <button
                 type="button"
+                aria-busy={isArchiving}
                 disabled={!canArchive}
                 onClick={() => void handleArchive()}
-                className="flex shrink-0 items-center gap-1.5 rounded-nl-button border border-nl-accent bg-nl-accent px-3 py-2 text-nl-caption font-bold text-nl-on-accent transition-colors hover:bg-nl-accent/90 disabled:opacity-40 disabled:hover:bg-nl-accent"
+                className="relative flex shrink-0 items-center justify-center rounded-nl-button border border-nl-accent bg-nl-accent px-3 py-2 text-nl-caption font-bold text-nl-on-accent transition-colors hover:bg-nl-accent/90 disabled:opacity-40 disabled:hover:bg-nl-accent"
               >
-                {isArchiving ? <Spinner className="h-4 w-4 text-nl-on-accent" /> : null}
-                아카이빙
+                {isArchiving ? (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <Spinner className="h-4 w-4 text-nl-on-accent" />
+                  </span>
+                ) : null}
+                <span className={isArchiving ? "invisible" : undefined}>아카이빙</span>
               </button>
             </div>
             <p className="text-nl-caption text-nl-muted">{list?.dateLabel} · 선택한 순서대로</p>
