@@ -4,6 +4,8 @@
  * 상위 API 모델의 변경 및 요구사항 고도화에 맞춰 뷰 모델 및 매핑 함수가 추후 변경될 가능성이 존재합니다.
  */
 
+import { isSameText } from "@/lib/sentences";
+
 import type {
   AccountMenuItemApiModel,
   ArchiveApiModel,
@@ -102,12 +104,15 @@ function mapArticleCard(
     id: article.id,
     category: topicLabels[article.topicIds[0] ?? ""] ?? "뉴스",
     title: article.title,
-    bodyText: article.body.status === "available" ? article.body.text : null,
+    bodyText: pickBodyText(article),
     sourceName: article.source.name,
     publishedLabel: formatDate(article.source.publishedAt),
     originalUrl: article.source.originalUrl,
-    summaryText: article.summary.status === "available" ? article.summary.text : null,
-    showsAiSummary: article.summary.status === "available" && article.summary.aiGenerated,
+    summaryText: pickSummaryText(article),
+    showsAiSummary:
+      article.summary.status === "available" &&
+      article.summary.aiGenerated &&
+      pickSummaryText(article) !== null,
     image:
       article.image?.status === "available" && article.image.url
         ? {
@@ -118,8 +123,26 @@ function mapArticleCard(
         : null,
     originalIsAvailable: article.availability.original === "available",
     isFromPreviousFeedDate,
-    isRestricted: article.summary.status !== "available",
+    isRestricted: article.summary.status !== "available" && article.body.status !== "available",
   };
+}
+
+/**
+ * 카드 본문. 단문(body)이 있으면 그것, 없으면(v3 legacy·만료) 요약을 본문 자리에 대신 쓴다.
+ * 이때 요약 박스는 `pickSummaryText`가 비워 같은 글을 두 번 보여주지 않는다.
+ */
+function pickBodyText(article: ArticleApiModel): string | null {
+  if (article.body.status === "available" && article.body.text) return article.body.text;
+  if (article.summary.status === "available") return article.summary.text;
+  return null;
+}
+
+function pickSummaryText(article: ArticleApiModel): string | null {
+  if (article.summary.status !== "available" || !article.summary.text) return null;
+  const body = article.body.status === "available" ? article.body.text : null;
+  // 단문이 없어 요약이 본문 자리로 갔거나, 단문과 요약이 사실상 같은 글이면 박스를 숨긴다.
+  if (!body || isSameText(body, article.summary.text)) return null;
+  return article.summary.text;
 }
 
 export type FeedViewModel = {

@@ -44,6 +44,38 @@ describe("screen view-model mappers", () => {
     expect(card?.bodyText).not.toBe(card?.summaryText);
   });
 
+  it("falls back to the summary as body and hides the AI summary box when body is unavailable", () => {
+    const legacy = structuredClone(homeFixture);
+    legacy.feed.items[0]!.article.body = { status: "unavailable", text: null };
+    const card = toHomeViewModel(legacy).feed.cards[0];
+
+    expect(card?.bodyText).toBe(legacy.feed.items[0]?.article.summary.text);
+    expect(card?.summaryText).toBeNull();
+    expect(card?.showsAiSummary).toBe(false);
+    expect(card?.isRestricted).toBe(false);
+  });
+
+  it("hides the AI summary box when body and summary are effectively the same text", () => {
+    const duplicated = structuredClone(homeFixture);
+    const article = duplicated.feed.items[0]!.article;
+    article.body = { status: "available", text: `${article.summary.text} ` };
+    const card = toHomeViewModel(duplicated).feed.cards[0];
+
+    expect(card?.summaryText).toBeNull();
+    expect(card?.showsAiSummary).toBe(false);
+  });
+
+  it("marks the card restricted only when both body and summary are unavailable", () => {
+    const expired = structuredClone(homeFixture);
+    const article = expired.feed.items[0]!.article;
+    article.body = { status: "unavailable", text: null };
+    article.summary = { ...article.summary, status: "unavailable", text: null };
+    const card = toHomeViewModel(expired).feed.cards[0];
+
+    expect(card?.bodyText).toBeNull();
+    expect(card?.isRestricted).toBe(true);
+  });
+
   it("maps feed API model to FeedViewModel with cards and nextCursor", () => {
     const feedViewModel = toFeedViewModel(nextFeedPageFixture);
 

@@ -78,7 +78,7 @@ export const firstArticle: ArticleApiModel = {
   },
   body: {
     status: "available",
-    text: "지역 공공도서관 12곳이 다음 달부터 주말 운영을 시작한다. 어린이 독서 모임과 가족 체험 강좌가 새로 열린다. 참가 신청은 도서관 누리집에서 받는다. 시는 이용자 반응을 보고 내년 확대를 검토한다.",
+    text: "공공도서관 12곳이 주말 운영을 시작한다. 어린이 독서 모임이 새로 열린다. 신청은 누리집에서 받는다. 내년 확대를 검토한다.",
   },
   image: {
     status: "available",
@@ -108,7 +108,7 @@ export const secondArticle: ArticleApiModel = {
   },
   body: {
     status: "available",
-    text: "시 교육청이 중학생 대상 주말 과학 교실을 연다. 실험 실습과 연구자 강연으로 구성된다. 신청은 이달 20일부터 선착순으로 받는다. 정원은 학교별 열 명이다.",
+    text: "교육청이 중학생 과학 교실을 연다. 실험과 강연으로 구성된다. 신청은 20일부터 선착순이다. 정원은 학교별 열 명이다.",
   },
   image: null,
   availability: { feed: "published", original: "available" },
