@@ -11,6 +11,7 @@ import { screenApi } from "@/features/contracts/screen-api";
 import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
 import type { ArchiveViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useDebouncedAction } from "@/hooks/use-debounced-action";
 
 export default function ArchivePage() {
   const router = useRouter();
@@ -91,6 +92,7 @@ function ArchiveContent() {
     () => new Set(archive.groups.slice(0, 1).map((group) => group.date)),
   );
 
+  const { run: runDelete } = useDebouncedAction();
   const deleteEntry = useMutation({
     mutationFn: (entryId: string) => screenApi.deleteArchiveEntry(entryId),
     onSuccess: (_result, entryId) => {
@@ -148,7 +150,7 @@ function ArchiveContent() {
               items={group.items}
               expanded={expandedDates.has(group.date)}
               onToggleExpanded={() => toggleGroup(group.date)}
-              onDeleteItem={(id) => deleteEntry.mutate(id)}
+              onDeleteItem={(id) => void runDelete(() => deleteEntry.mutateAsync(id).catch(() => undefined))}
             />
           </div>
         ))

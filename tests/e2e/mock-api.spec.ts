@@ -413,6 +413,8 @@ test("archive shows archival guidance once every entry is deleted", async ({ pag
   for (let remaining = 5; remaining > 0; remaining -= 1) {
     await page.getByRole("button", { name: "삭제" }).first().click();
     await expect(page.getByRole("listitem")).toHaveCount(remaining - 1);
+    // 삭제 버튼은 연타 방지 쿨다운이 있어, 다음 클릭 전에 풀릴 때까지 기다린다.
+    await page.waitForTimeout(650);
   }
 
   await page.getByRole("button", { name: /2026\. 8\. 10\. 선택/ }).click();
