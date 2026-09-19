@@ -47,7 +47,7 @@ describe("screen view-model mappers", () => {
   it("maps bodyText from article.body and summaryText from article.summary separately", () => {
     const card = toHomeViewModel(homeFixture).feed.cards[0];
 
-    expect(card?.bodyText).toBe(homeFixture.feed.items[0]?.article.body.text);
+    expect(card?.bodyText).toBe(homeFixture.feed.items[0]?.article.body?.text);
     expect(card?.summaryText).toBe(homeFixture.feed.items[0]?.article.summary.text);
     expect(card?.bodyText).not.toBe(card?.summaryText);
   });

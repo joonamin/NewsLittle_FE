@@ -123,7 +123,7 @@ function mapArticleCard(
         : null,
     originalIsAvailable: article.availability.original === "available",
     isFromPreviousFeedDate,
-    isRestricted: article.summary.status !== "available" && article.body.status !== "available",
+    isRestricted: article.summary.status !== "available" && article.body?.status !== "available",
   };
 }
 
@@ -132,14 +132,14 @@ function mapArticleCard(
  * 이때 요약 박스는 `pickSummaryText`가 비워 같은 글을 두 번 보여주지 않는다.
  */
 function pickBodyText(article: ArticleApiModel): string | null {
-  if (article.body.status === "available" && article.body.text) return article.body.text;
+  if (article.body?.status === "available" && article.body.text) return article.body.text;
   if (article.summary.status === "available") return article.summary.text;
   return null;
 }
 
 function pickSummaryText(article: ArticleApiModel): string | null {
   if (article.summary.status !== "available" || !article.summary.text) return null;
-  const body = article.body.status === "available" ? article.body.text : null;
+  const body = article.body?.status === "available" ? article.body.text : null;
   // 단문이 없어 요약이 본문 자리로 갔거나, 단문과 요약이 사실상 같은 글이면 박스를 숨긴다.
   if (!body || isSameText(body, article.summary.text)) return null;
   return article.summary.text;

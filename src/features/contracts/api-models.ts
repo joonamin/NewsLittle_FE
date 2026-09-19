@@ -88,7 +88,7 @@ export type ArticleApiModel = {
    * 홈 카드 본문(bodyText): AI가 기사를 함축해 새로 쓴 단문 4~5문장(BE key_sentence).
    * summary(AI 한 줄 요약)와 다른 글이다 — 둘을 같은 값으로 채우지 않는다.
    */
-  body: {
+  body?: {
     status: "available" | "unavailable";
     text: string | null;
   };
