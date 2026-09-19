@@ -2,10 +2,7 @@ import { delay, http, HttpResponse } from "msw";
 
 import type { TopicCode } from "@/features/contracts/api-models";
 
-import {
-  randomPreviewFixture,
-  shortformResultFixture,
-} from "./fixtures";
+import { randomPreviewFixture } from "./fixtures";
 import { mockHomeStore } from "./home-store";
 import {
   abandonRandomQuizSession,
@@ -32,7 +29,8 @@ import {
 } from "./shortform-quiz-store";
 import { mockAdminReviewStore } from "./admin-review-store";
 import { mockAdminDashboardStore } from "./admin-dashboard-store";
-import type { ReviewDecisionRequest } from "@/features/contracts/admin-models";
+import { mockAdminOperationsStore } from "./admin-operations-store";
+import type { ReportClassification, ReviewDecisionRequest, UsageBasisStatusV2 } from "@/features/contracts/admin-models";
 
 const api = "/api/v1";
 const timedOutShortformSessions = new Set<string>();
@@ -71,6 +69,7 @@ export const handlers = [
     const topicIds = payload && "browserTopicIds" in payload ? payload.browserTopicIds : payload?.topicIds;
     return successResponse(mockHomeStore.login(topicIds));
   }),
+  http.post(`${api}/auth/dev-session`, () => successResponse(mockHomeStore.loginAsAdmin())),
   /** 설정 화면(SCR-09)은 전용 조회 엔드포인트 없이 이 응답 하나로 구성된다. */
   http.get(`${api}/auth/me`, () => successResponse(mockHomeStore.authMe())),
   http.post(`${api}/auth/logout`, () => {
@@ -232,10 +231,6 @@ export const handlers = [
     }
     return successResponse(mockAdminDashboardStore.getSummary());
   }),
-  http.post(`${api}/operations/dashboard/toggle-deletion-failure`, () => {
-    return successResponse(mockAdminDashboardStore.toggleDeletionFailure());
-  }),
-
   // ADM-03 검수 대기열
   http.get(`${api}/operations/reviews/queue`, () => {
     return successResponse(mockAdminReviewStore.getQueueSummary());
@@ -268,4 +263,32 @@ export const handlers = [
       return failureResponse(error);
     }
   }),
+
+  // ADM-02 이용 근거·상태
+  http.get(`${api}/operations/usage-bases`, () => successResponse({ items: mockAdminOperationsStore.usageBases(), totalCount: mockAdminOperationsStore.usageBases().length })),
+  http.get(`${api}/operations/usage-bases/:id`, ({ params }) => successResponse(mockAdminOperationsStore.usageBasis(String(params.id)))),
+  http.put(`${api}/operations/usage-bases/:id`, async ({ params, request }) => successResponse(mockAdminOperationsStore.updateUsageBasis(String(params.id), await request.json() as never))),
+  http.post(`${api}/operations/usage-bases/:id/transition`, async ({ params, request }) => { const body = await request.json() as { status: UsageBasisStatusV2; reason: string }; return successResponse(mockAdminOperationsStore.transitionUsageBasis(String(params.id), body.status, body.reason)); }),
+
+  // ADM-04 게시·정정·중단
+  http.get(`${api}/operations/assets`, () => successResponse({ items: mockAdminOperationsStore.assets(), totalCount: mockAdminOperationsStore.assets().length })),
+  http.get(`${api}/operations/assets/:articleId`, ({ params }) => successResponse(mockAdminOperationsStore.asset(Number(params.articleId)))),
+  http.post(`${api}/operations/assets/:articleId/publish`, ({ params }) => successResponse(mockAdminOperationsStore.assetAction(Number(params.articleId), "publish", "게시 조건 확인"))),
+  http.post(`${api}/operations/assets/:articleId/corrections`, async ({ params, request }) => { const body = await request.json() as { correction: string }; return successResponse(mockAdminOperationsStore.assetAction(Number(params.articleId), "correct", body.correction)); }),
+  ...(["suspend", "withdraw", "restore"] as const).map((action) => http.post(`${api}/operations/assets/:articleId/${action}`, async ({ params, request }) => { const body = await request.json() as { reason: string }; return successResponse(mockAdminOperationsStore.assetAction(Number(params.articleId), action, body.reason)); })),
+
+  // ADM-05 삭제·만료
+  http.get(`${api}/operations/deletions`, () => successResponse({ items: mockAdminOperationsStore.deletions(), totalCount: mockAdminOperationsStore.deletions().length })),
+  http.get(`${api}/operations/deletions/:id`, ({ params }) => successResponse(mockAdminOperationsStore.deletion(String(params.id)))),
+  http.post(`${api}/operations/deletions/:id/retry`, ({ params }) => successResponse(mockAdminOperationsStore.retryDeletion(String(params.id)))),
+  http.post(`${api}/operations/deletions/:id/scopes/:scope/confirm`, async ({ params, request }) => { const body = await request.json() as { reason: string }; return successResponse(mockAdminOperationsStore.confirmScope(String(params.id), String(params.scope), body.reason)); }),
+  http.post(`${api}/operations/deletions/:id/retention-exception`, async ({ params, request }) => successResponse(mockAdminOperationsStore.retention(String(params.id), await request.json() as { basis: string; period: string; accessScope: string }))),
+
+  // ADM-06 신고 처리
+  http.get(`${api}/operations/reports`, () => successResponse({ items: mockAdminOperationsStore.reports(), totalCount: mockAdminOperationsStore.reports().length })),
+  http.get(`${api}/operations/reports/:id`, ({ params }) => successResponse(mockAdminOperationsStore.report(String(params.id)))),
+  http.post(`${api}/operations/reports/:id/classify`, async ({ params, request }) => { const body = await request.json() as { classification: ReportClassification; note: string }; return successResponse(mockAdminOperationsStore.classify(String(params.id), body.classification, body.note)); }),
+  http.post(`${api}/operations/reports/:id/hold`, async ({ params, request }) => { const body = await request.json() as { reason: string }; return successResponse(mockAdminOperationsStore.hold(String(params.id), body.reason)); }),
+  http.post(`${api}/operations/reports/:id/resolve`, async ({ params, request }) => { const body = await request.json() as { status: "RESOLVED" | "REJECTED"; reason: string }; return successResponse(mockAdminOperationsStore.resolve(String(params.id), body.status, body.reason)); }),
+  http.post(`${api}/operations/reports/:id/reply-record`, async ({ params, request }) => { const body = await request.json() as { reply: string }; return successResponse(mockAdminOperationsStore.reply(String(params.id), body.reply)); }),
 ];

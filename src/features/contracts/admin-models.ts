@@ -144,3 +144,99 @@ export type AdminDashboardSummary = {
   recentActivities: DashboardActivityLog[];
 };
 
+export type AdminAuditLog = {
+  id: string;
+  actor: string;
+  action: string;
+  reason: string;
+  createdAt: string;
+};
+
+export type AdminListResponse<T> = { items: T[]; totalCount: number };
+
+export type UsageBasisStatusV2 = "PENDING" | "CONDITIONAL" | "SUSPENDED" | "EXPIRED";
+export type UsageBasis = {
+  id: string;
+  sourceName: string;
+  targetLabel: string;
+  basisType: "LICENSE" | "FAIR_USE_REVIEW";
+  status: UsageBasisStatusV2;
+  documentUrl: string | null;
+  documentVersion: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  attributionRequirement: string;
+  reviewer: string | null;
+  approver: string | null;
+  allowedActions: {
+    collect: boolean;
+    store: boolean;
+    externalAi: boolean;
+    generate: boolean;
+    publish: boolean;
+    retain: boolean;
+  };
+  blockedOperations: string[];
+  auditLogs: AdminAuditLog[];
+};
+export type UsageBasisUpsertRequest = Pick<
+  UsageBasis,
+  | "sourceName"
+  | "targetLabel"
+  | "basisType"
+  | "documentUrl"
+  | "documentVersion"
+  | "startDate"
+  | "endDate"
+  | "attributionRequirement"
+  | "allowedActions"
+>;
+
+export type AssetStatus = "READY" | "PUBLISHED" | "CORRECTING" | "SUSPENDED" | "WITHDRAWN";
+export type AdminAsset = {
+  articleId: number;
+  articleCode: string;
+  title: string;
+  status: AssetStatus;
+  usageBasisStatus: UsageBasisStatusV2;
+  bodyRetained: boolean;
+  publishedAt: string | null;
+  expiresAt: string | null;
+  activeQuizSessionCount: number;
+  linkedAssets: Array<{ id: string; type: string; status: string; publishedAt: string | null; expiresAt: string | null }>;
+  auditLogs: AdminAuditLog[];
+};
+
+export type DeletionStatus = "PENDING" | "IN_PROGRESS" | "FAILED" | "CONFIRMED";
+export type DeletionScopeStatus = "PENDING" | "IN_PROGRESS" | "FAILED" | "CONFIRMED";
+export type AdminDeletionTask = {
+  id: string;
+  assetCode: string;
+  reason: string;
+  status: DeletionStatus;
+  requestedAt: string;
+  dueAt: string | null;
+  scopes: Array<{ scope: string; label: string; status: DeletionScopeStatus; detail: string | null }>;
+  retentionException: { basis: string; period: string; accessScope: string } | null;
+  auditLogs: AdminAuditLog[];
+};
+
+export type ReportType = "CONTENT_ERROR" | "JUDGMENT_ERROR" | "RIGHTS" | "SOURCE_UNREACHABLE";
+export type ReportStatus = "RECEIVED" | "TRIAGED" | "HOLDING" | "RESOLVED" | "REJECTED";
+export type ReportClassification = "ACCESS_FAILURE" | "CORRECTION" | "CONTRACT_EXPIRED" | "RIGHTS_CLAIM";
+export type AdminReport = {
+  id: string;
+  targetCode: string;
+  type: ReportType;
+  status: ReportStatus;
+  receivedAt: string;
+  content: string;
+  contact: string | null;
+  classification: ReportClassification | null;
+  attachedAnswer: string | null;
+  judgeVersion: string | null;
+  onHold: boolean;
+  decisionNote: string | null;
+  replyRecord: string | null;
+  auditLogs: AdminAuditLog[];
+};
