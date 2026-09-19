@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useEffect, type ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  AlertTriangle,
   CheckSquare,
   FileText,
-  HelpCircle,
   LayoutDashboard,
   MonitorX,
   Send,
@@ -31,14 +29,14 @@ const adminMenus = [
   { id: "reports", label: "ADM-06 신고 처리", href: "/admin/reports", icon: ShieldAlert },
 ] as const;
 
+function subscribeNever() {
+  return () => {};
+}
+
 export function AdminShell({ children, activeMenuId = "review" }: AdminShellProps) {
   const router = useRouter();
   const { data: nav } = useQuery(navigationQueryOptions);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const isClient = useSyncExternalStore(subscribeNever, () => true, () => false);
 
   // 1. 존재 비노출 (COM-08, IA 2.2절): 비관리자가 /admin/* 에 접근하면 일반 404 화면과 동일하게 위장
   const hasOperationsMenu = nav?.primaryItems.some((item) => item.id === "operations") ?? false;

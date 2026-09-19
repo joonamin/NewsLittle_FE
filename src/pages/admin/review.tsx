@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Head from "next/head";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -31,14 +31,8 @@ export default function AdminReviewPage() {
   const [assetFilter, setAssetFilter] = useState<"all" | "summary" | "quiz">("all");
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
 
-  // 첫 기사 자동 선택
-  useEffect(() => {
-    if (queue && queue.items.length > 0 && selectedArticleId === null) {
-      setSelectedArticleId(queue.items[0].articleId);
-    }
-  }, [queue, selectedArticleId]);
-
   // 3. 현재 선택된 기사의 상세 대조 데이터 조회
+  // 첫 기사 자동 선택: 별도 effect 없이 렌더링 중 파생시켜 커스케이드 렌더를 피한다.
   const activeId = selectedArticleId ?? (queue?.items[0]?.articleId ?? 3);
   const { data: reviewItem, isLoading: isItemLoading } = useQuery({
     ...adminArticleReviewQueryOptions(activeId),
