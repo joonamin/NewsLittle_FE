@@ -126,6 +126,7 @@ type HomeFlowContextValue = HomeFlowState & {
   previousListDecision: PreviousListDecision | null;
   previousListError: boolean;
   removeArticle: (articleId: string) => Promise<void>;
+  archiveTodayList: (title: string) => Promise<void>;
   requestLogin: () => void;
   requestArticleSelection: (articleId: string) => Promise<ArticleSelectionResult>;
   resolvePreviousLists: (decision: PreviousListDecision) => Promise<ArticleSelectionResult>;
@@ -200,6 +201,10 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
       }
     },
     onSettled: invalidateHomeQueries,
+  });
+  const archiveTodayListMutation = useMutation({
+    mutationFn: screenApi.archiveTodayList,
+    onSuccess: invalidateHomeQueries,
   });
   const signIn = useMutation({
     mutationFn: screenApi.signInWithGoogle,
@@ -301,6 +306,13 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
     [removeFromTodayList],
   );
 
+  const archiveTodayList = useCallback(
+    async (title: string) => {
+      await archiveTodayListMutation.mutateAsync(title);
+    },
+    [archiveTodayListMutation],
+  );
+
   const logout = useCallback(async () => {
     disableGoogleAutoSignIn();
     dispatch({ type: "clear-pending-action" });
@@ -325,11 +337,13 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
         : null,
       previousListError: resolvePreviousListsMutation.isError,
       removeArticle,
+      archiveTodayList,
       requestLogin: () => dispatch({ type: "open-login" }),
       requestArticleSelection,
       resolvePreviousLists,
     }),
     [
+      archiveTodayList,
       completeLogin,
       home,
       logout,

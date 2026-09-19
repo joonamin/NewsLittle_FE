@@ -398,6 +398,7 @@ export type ArchiveViewModel = {
   groups: Array<{
     date: string;
     dateLabel: string;
+    title: string | null;
     items: Array<{
       id: string;
       title: string | null;
@@ -415,6 +416,7 @@ export function toArchiveViewModel(api: ArchiveApiModel): ArchiveViewModel {
     groups: api.groups.map((group) => ({
       date: group.date,
       dateLabel: formatDate(group.date),
+      title: group.title ?? null,
       items: group.entries.map((entry) => ({
         id: entry.id,
         title: entry.article?.title ?? null,

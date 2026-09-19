@@ -48,8 +48,11 @@ function failureResponse(error: unknown) {
         ? 404
         : code === "VALIDATION_ERROR"
           ? 422
-          : 500;
-  return HttpResponse.json({ error: { code } }, { status });
+          : code === "DUPLICATE_ARCHIVE_TITLE"
+            ? 409
+            : 500;
+  const message = code === "DUPLICATE_ARCHIVE_TITLE" ? "이미 사용 중인 이름입니다." : undefined;
+  return HttpResponse.json({ error: { code, message } }, { status });
 }
 
 export const handlers = [
@@ -182,6 +185,14 @@ export const handlers = [
   http.delete(`${api}/today-list/:articleId`, ({ params }) => {
     try {
       return successResponse(mockHomeStore.removeFromTodayList(String(params.articleId)));
+    } catch (error) {
+      return failureResponse(error);
+    }
+  }),
+  http.post(`${api}/today-list/archive`, async ({ request }) => {
+    try {
+      const payload = (await request.json().catch(() => null)) as { title?: string } | null;
+      return successResponse(mockHomeStore.archiveTodayList(payload?.title ?? ""));
     } catch (error) {
       return failureResponse(error);
     }
