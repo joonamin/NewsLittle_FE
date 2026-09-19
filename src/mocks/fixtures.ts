@@ -372,6 +372,7 @@ export const randomResultFixture: QuizResultApiModel = {
 export const archiveFixture: ArchiveApiModel = {
   groups: [
     {
+      id: "date:2026-09-12",
       date: "2026-09-12",
       entries: [
         {
@@ -418,6 +419,7 @@ export const archiveFixture: ArchiveApiModel = {
       ],
     },
     {
+      id: "date:2026-08-10",
       date: "2026-08-10",
       entries: [
         {

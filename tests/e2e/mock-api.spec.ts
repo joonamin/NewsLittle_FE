@@ -72,6 +72,32 @@ test("archiving with a duplicate title shows an inline error and keeps the list"
   await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(firstArticle.title);
 });
 
+test("archiving twice on the same day with different titles shows up as two separate archive cards", async ({ page }) => {
+  await page.goto("/");
+
+  const titleInput = page.getByRole("textbox", { name: "오늘 목록 제목" });
+  await titleInput.fill("첫 번째 묶음");
+  await page.getByRole("button", { name: "아카이빙" }).click();
+  await expect(page.getByText("아직 담은 기사가 없어요")).toBeVisible();
+
+  await page.getByRole("button", { name: "다음 기사" }).click();
+  await page.getByRole("button", { name: "오늘 목록에 담기" }).click();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(secondArticle.title);
+
+  await titleInput.fill("두 번째 묶음");
+  await page.getByRole("button", { name: "아카이빙" }).click();
+  await expect(page.getByText("아직 담은 기사가 없어요")).toBeVisible();
+
+  await page.getByRole("link", { name: "아카이브" }).click();
+  await expect(page.getByText("첫 번째 묶음", { exact: false })).toBeVisible();
+  await expect(page.getByText("두 번째 묶음", { exact: false })).toBeVisible();
+
+  // 최신 아카이빙(두 번째 묶음)만 기본으로 펼쳐지므로, 첫 번째 묶음은 펼쳐야 안의 링크가 보인다.
+  await page.getByRole("button", { name: /첫 번째 묶음/ }).click();
+  await expect(page.getByRole("link", { name: firstArticle.title })).toBeVisible();
+  await expect(page.getByRole("link", { name: secondArticle.title })).toBeVisible();
+});
+
 test("fetches next cursor items and appends them to feed when reaching the end", async ({ page }) => {
   await page.goto("/");
 

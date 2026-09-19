@@ -87,8 +87,8 @@ export default function ArchivePage() {
 function ArchiveContent() {
   const queryClient = useQueryClient();
   const { data: archive } = useSuspenseQuery(archiveQueryOptions);
-  const [expandedDates, setExpandedDates] = useState<Set<string>>(
-    () => new Set(archive.groups.slice(0, 1).map((group) => group.date)),
+  const [expandedGroupIds, setExpandedGroupIds] = useState<Set<string>>(
+    () => new Set(archive.groups.slice(0, 1).map((group) => group.id)),
   );
 
   const deleteEntry = useMutation({
@@ -104,13 +104,13 @@ function ArchiveContent() {
     },
   });
 
-  const toggleGroup = (date: string) => {
-    setExpandedDates((previous) => {
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroupIds((previous) => {
       const next = new Set(previous);
-      if (next.has(date)) {
-        next.delete(date);
+      if (next.has(groupId)) {
+        next.delete(groupId);
       } else {
-        next.add(date);
+        next.add(groupId);
       }
       return next;
     });
@@ -139,14 +139,14 @@ function ArchiveContent() {
       ) : (
         archive.groups.map((group) => (
           <div
-            key={group.date}
+            key={group.id}
             className="flex flex-col gap-4 rounded-nl-card border border-nl-border bg-nl-bg p-6"
           >
             <ArchiveGroup
               dateLabel={`${group.title ? `${group.title} · ` : ""}${group.dateLabel} 선택 · ${group.items.length}개`}
               items={group.items}
-              expanded={expandedDates.has(group.date)}
-              onToggleExpanded={() => toggleGroup(group.date)}
+              expanded={expandedGroupIds.has(group.id)}
+              onToggleExpanded={() => toggleGroup(group.id)}
               onDeleteItem={(id) => deleteEntry.mutate(id)}
             />
           </div>

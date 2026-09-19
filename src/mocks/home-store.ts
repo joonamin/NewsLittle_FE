@@ -195,7 +195,9 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
       archiveGroupTitle: trimmedTitle,
     }));
 
-    member.archive.groups.push({ date, title: trimmedTitle, entries });
+    // 실제 BE는 archived_at 최신순으로 정렬해 내려준다 — 목도 방금 아카이빙한
+    // 그룹이 맨 앞(기본 펼침 대상)에 오도록 맞춘다.
+    member.archive.groups.unshift({ id: archiveGroupId, date, title: trimmedTitle, entries });
     const archivedCount = member.todayList.items.length;
     member.todayList = { selectedForDate: date, items: [] };
 
@@ -207,8 +209,9 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     if (!member) throw new Error("AUTHENTICATION_REQUIRED");
 
     for (const list of member.pendingPreviousLists) {
-      const existingGroup = member.archive.groups.find((group) => group.date === list.date);
-      const group = existingGroup ?? { date: list.date, entries: [] };
+      const dateGroupId = `date:${list.date}`;
+      const existingGroup = member.archive.groups.find((group) => group.id === dateGroupId);
+      const group = existingGroup ?? { id: dateGroupId, date: list.date, entries: [] };
       if (!existingGroup) member.archive.groups.push(group);
 
       for (const item of list.items) {
