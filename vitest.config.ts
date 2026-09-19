@@ -24,6 +24,9 @@ export default defineConfig({
           name: "unit",
           environment: "node",
           include: ["src/**/*.test.ts"],
+          env: {
+            NEXT_PUBLIC_API_BASE_URL: "",
+          },
         },
       },
       {
