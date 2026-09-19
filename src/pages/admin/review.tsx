@@ -19,7 +19,12 @@ export default function AdminReviewPage() {
   const queryClient = useQueryClient();
 
   // 1. 검수 대기열 전체 목록 조회
-  const { data: queue, isLoading: isQueueLoading } = useQuery(adminReviewQueueQueryOptions);
+  const {
+    data: queue,
+    isLoading: isQueueLoading,
+    isError: isQueueError,
+    refetch: refetchQueue,
+  } = useQuery(adminReviewQueueQueryOptions);
 
   // 2. 현재 선택된 기사 ID 상태
   const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
@@ -82,10 +87,21 @@ export default function AdminReviewPage() {
         <title>ADM-03 검수 대기열 | NewsLittle Admin</title>
       </Head>
       <AdminShell activeMenuId="review">
-        {isQueueLoading || !queue ? (
+        {isQueueLoading ? (
           <div className="flex min-h-[400px] flex-col items-center justify-center gap-3">
             <Spinner className="h-8 w-8 text-nl-accent" />
             <p className="text-sm text-nl-muted">검수 대기열을 불러오는 중입니다...</p>
+          </div>
+        ) : isQueueError || !queue ? (
+          <div className="flex min-h-[400px] flex-col items-center justify-center gap-3 text-center">
+            <p className="text-sm font-semibold text-red-600">검수 대기열을 불러오지 못했습니다.</p>
+            <button
+              type="button"
+              onClick={() => void refetchQueue()}
+              className="rounded-full bg-nl-surface border border-nl-border px-4 py-1.5 text-xs text-nl-text hover:bg-nl-subtle cursor-pointer"
+            >
+              다시 시도
+            </button>
           </div>
         ) : (
           <div className="space-y-6">
