@@ -233,9 +233,10 @@ export type ArchiveEntryApiModel = {
 
 export type ArchiveApiModel = {
   groups: Array<{
+    /** 제목 붙인 아카이빙은 archive_group 단위, 그 외(전체 보관)는 날짜 단위로 묶인 그룹 식별자. */
+    id: string;
     date: string;
     entries: ArchiveEntryApiModel[];
-    /** 한 날짜에 제목이 다른 그룹이 섞이면 null(모호함 방지). */
     title?: string | null;
   }>;
 };

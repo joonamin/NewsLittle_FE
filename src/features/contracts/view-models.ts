@@ -393,6 +393,7 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
 
 export type ArchiveViewModel = {
   groups: Array<{
+    id: string;
     date: string;
     dateLabel: string;
     title: string | null;
@@ -411,6 +412,7 @@ export type ArchiveViewModel = {
 export function toArchiveViewModel(api: ArchiveApiModel): ArchiveViewModel {
   return {
     groups: api.groups.map((group) => ({
+      id: group.id,
       date: group.date,
       dateLabel: formatDate(group.date),
       title: group.title ?? null,
