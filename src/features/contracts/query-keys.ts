@@ -4,6 +4,8 @@ import type { QuizDomain } from "./api-models";
 import { screenApi } from "./screen-api";
 import { defaultGuestNavigation } from "./view-models";
 
+import { adminApi } from "./admin-api";
+
 export const queryKeys = {
   home: ["home"] as const,
   navigation: ["navigation"] as const,
@@ -15,6 +17,11 @@ export const queryKeys = {
       ["quiz", domain, "session", sessionId] as const,
     result: (domain: QuizDomain, sessionId: string) =>
       ["quiz", domain, "result", sessionId] as const,
+  },
+  admin: {
+    dashboard: ["admin", "dashboard"] as const,
+    queue: ["admin", "review", "queue"] as const,
+    articleReview: (articleId: number) => ["admin", "review", "article", articleId] as const,
   },
 };
 
@@ -57,5 +64,22 @@ export function quizResultQueryOptions(domain: QuizDomain, sessionId: string) {
   return queryOptions({
     queryKey: queryKeys.quiz.result(domain, sessionId),
     queryFn: () => screenApi.result(domain, sessionId),
+  });
+}
+
+export const adminDashboardSummaryQueryOptions = queryOptions({
+  queryKey: queryKeys.admin.dashboard,
+  queryFn: () => adminApi.dashboardSummary(),
+});
+
+export const adminReviewQueueQueryOptions = queryOptions({
+  queryKey: queryKeys.admin.queue,
+  queryFn: () => adminApi.reviewQueue(),
+});
+
+export function adminArticleReviewQueryOptions(articleId: number) {
+  return queryOptions({
+    queryKey: queryKeys.admin.articleReview(articleId),
+    queryFn: () => adminApi.articleReview(articleId),
   });
 }

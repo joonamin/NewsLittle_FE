@@ -30,6 +30,9 @@ import {
   previousShortformQuizQuestion,
   submitShortformQuizAnswer,
 } from "./shortform-quiz-store";
+import { mockAdminReviewStore } from "./admin-review-store";
+import { mockAdminDashboardStore } from "./admin-dashboard-store";
+import type { ReviewDecisionRequest } from "@/features/contracts/admin-models";
 
 const api = "/api/v1";
 const timedOutShortformSessions = new Set<string>();
@@ -202,6 +205,51 @@ export const handlers = [
     try {
       const payload = (await request.json().catch(() => null)) as { kind?: DeletionRequestKind } | null;
       return successResponse(mockHomeStore.requestAccountDeletion(payload?.kind ?? "records"));
+    } catch (error) {
+      return failureResponse(error);
+    }
+  }),
+
+  // ADM-01 운영 대시보드
+  http.get(`${api}/operations/dashboard/summary`, ({ request }) => {
+    const url = new URL(request.url);
+    if (url.searchParams.get("refresh") === "true") {
+      mockAdminDashboardStore.refresh();
+    }
+    return successResponse(mockAdminDashboardStore.getSummary());
+  }),
+  http.post(`${api}/operations/dashboard/toggle-deletion-failure`, () => {
+    return successResponse(mockAdminDashboardStore.toggleDeletionFailure());
+  }),
+
+  // ADM-03 검수 대기열
+  http.get(`${api}/operations/reviews/queue`, () => {
+    return successResponse(mockAdminReviewStore.getQueueSummary());
+  }),
+  http.get(`${api}/operations/reviews/:articleId`, ({ params }) => {
+    const articleId = Number(params.articleId);
+    const item = mockAdminReviewStore.getArticleReview(articleId);
+    if (!item) {
+      return failureResponse(new Error("ARTICLE_NOT_FOUND"));
+    }
+    return successResponse(item);
+  }),
+  http.post(`${api}/operations/reviews/:articleId/decision`, async ({ params, request }) => {
+    try {
+      const articleId = Number(params.articleId);
+      const body = (await request.json()) as ReviewDecisionRequest;
+      const updated = mockAdminReviewStore.submitDecision(articleId, body);
+
+      // 대시보드 최근 활동 로그에 실시간 반영
+      const actionText =
+        body.decisionType === "APPROVE"
+          ? "검수 통과"
+          : body.decisionType === "REJECT"
+            ? "검수 반려"
+            : "재생성 요청";
+      mockAdminDashboardStore.recordActivity(actionText, updated.articleCode);
+
+      return successResponse(updated);
     } catch (error) {
       return failureResponse(error);
     }

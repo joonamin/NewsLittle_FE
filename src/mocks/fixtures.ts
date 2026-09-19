@@ -46,6 +46,13 @@ export const adminNavigationFixture: NavigationApiModel = {
   ],
 };
 
+export const guestViewer: ViewerApiModel = {
+  id: "guest",
+  role: "guest",
+  displayName: null,
+  storageScope: "browser",
+};
+
 export const mockViewer: ViewerApiModel = {
   id: "member-demo",
   role: "member",

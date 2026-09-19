@@ -13,8 +13,10 @@ import type {
 } from "@/features/contracts/api-models";
 
 import {
+  adminNavigationFixture,
   archiveFixture,
   guestNavigationFixture,
+  guestViewer,
   homeFixture,
   memberNavigationFixture,
   mockViewer,
@@ -22,7 +24,7 @@ import {
 } from "./fixtures";
 import { articles as randomQuizArticles } from "./random-quiz-fixtures";
 
-type AccountId = "member-demo" | "member-alt";
+type AccountId = "member-demo" | "member-alt" | "admin-demo";
 type ActiveAccountId = AccountId | "guest";
 
 type MemberRecord = {
@@ -54,24 +56,33 @@ function clone<T>(value: T): T {
 
 function createMemberRecord(accountId: AccountId): MemberRecord {
   const isPrimaryAccount = accountId === "member-demo";
-  const displayName = isPrimaryAccount ? mockViewer.displayName : "다른 뉴스리틀 사용자";
+  const isAdminAccount = accountId === "admin-demo";
+  const displayName = isAdminAccount
+    ? "뉴스리틀 관리자"
+    : isPrimaryAccount
+      ? mockViewer.displayName
+      : "다른 뉴스리틀 사용자";
 
   return {
     viewer: {
       id: accountId,
-      role: "member",
+      role: isAdminAccount ? "admin" : "member",
       displayName,
       storageScope: "account",
     },
-    email: isPrimaryAccount ? "member-demo@newslittle.example" : "member-alt@newslittle.example",
+    email: isAdminAccount
+      ? "dev-admin@newslittle.local"
+      : isPrimaryAccount
+        ? "member-demo@newslittle.example"
+        : "member-alt@newslittle.example",
     // 백엔드는 interests를 ORDER BY topic(알파벳순)으로 내려주며, 프론트가 보낸 순서를 보존하지 않는다.
     interests: isPrimaryAccount ? ["AI_IT", "ECONOMY"] : [],
     interestsSetAt: isPrimaryAccount ? "2026-09-01T00:00:00+09:00" : null,
-    todayList: isPrimaryAccount
+    todayList: isPrimaryAccount || isAdminAccount
       ? clone(homeFixture.todayList!)
       : { selectedForDate: "2026-09-13", items: [] },
     pendingPreviousLists: [],
-    archive: isPrimaryAccount ? clone(archiveFixture) : { groups: [] },
+    archive: isPrimaryAccount || isAdminAccount ? clone(archiveFixture) : { groups: [] },
     lastDeletionRequest: null,
   };
 }
@@ -80,6 +91,7 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
   const accounts = new Map<AccountId, MemberRecord>([
     ["member-demo", createMemberRecord("member-demo")],
     ["member-alt", createMemberRecord("member-alt")],
+    ["admin-demo", createMemberRecord("admin-demo")],
   ]);
   let activeAccountId: ActiveAccountId = options.activeAccountId ?? "member-demo";
 
@@ -120,10 +132,12 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     const member = activeMember();
     if (!member) return clone(guestNavigationFixture);
 
-    const result = clone(memberNavigationFixture);
+    const isAdmin = member.viewer.role === "admin";
+    const template = isAdmin ? adminNavigationFixture : memberNavigationFixture;
+    const result = clone(template);
     result.account = {
       status: "member",
-      displayName: member.viewer.displayName ?? "뉴스리틀 사용자",
+      displayName: member.viewer.displayName ?? (isAdmin ? "뉴스리틀 관리자" : "뉴스리틀 사용자"),
       menuItems: result.account.status === "member" ? result.account.menuItems : [],
     };
     result.todayListCount = member.todayList.items.length;
@@ -278,6 +292,10 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
         interestsSetAt: member.interestsSetAt,
         role: "member",
       };
+    },
+    loginAsAdmin: () => {
+      activeAccountId = "admin-demo";
+      return clone(accounts.get(activeAccountId)!.viewer);
     },
     logout: () => {
       activeAccountId = "guest";

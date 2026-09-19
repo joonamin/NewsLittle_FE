@@ -19,7 +19,7 @@ export type ApiResponse<T> = {
   meta: ApiMeta;
 };
 
-export type ViewerRole = "guest" | "member";
+export type ViewerRole = "guest" | "member" | "admin";
 export type AccountRole = "member" | "admin";
 export type TopicCode = "ECONOMY" | "SOCIETY" | "AI_IT" | "SCIENCE" | "WORLD" | "POLITICS";
 export type QuizDomain = "shortform" | "random";
