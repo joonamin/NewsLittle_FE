@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import type { QuizDomain } from "@/features/contracts/api-models";
 import { screenApi } from "@/features/contracts/screen-api";
+import { ApiError } from "@/lib/api-client";
 
 type QuizAbandonGuardOptions = {
   active: boolean;
@@ -30,7 +31,9 @@ export function useQuizAbandonGuard({
   const abandon = useCallback(() => {
     if (!active || skipAbandonRef.current || abandonStartedRef.current) return;
     abandonStartedRef.current = true;
-    void screenApi.abandonSession(domain, sessionId, true).catch(() => {
+    void screenApi.abandonSession(domain, sessionId, true).catch((error) => {
+      // 404는 서버가 이미 세션을 종료 처리했다는 뜻이므로 재시도 가드를 풀지 않는다.
+      if (error instanceof ApiError && error.status === 404) return;
       abandonStartedRef.current = false;
     });
   }, [active, domain, sessionId]);
