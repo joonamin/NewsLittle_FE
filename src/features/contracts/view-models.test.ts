@@ -35,6 +35,23 @@ describe("screen view-model mappers", () => {
     });
   });
 
+  it("maps each BE topic code to its Korean category label instead of falling back to '뉴스'", () => {
+    const viewModel = toHomeViewModel({
+      ...homeFixture,
+      feed: {
+        ...homeFixture.feed,
+        items: [
+          { article: { ...homeFixture.feed.items[0]!.article, topicIds: ["ECONOMY"] }, isFromPreviousFeedDate: false },
+          { article: { ...homeFixture.feed.items[0]!.article, topicIds: ["WORLD"] }, isFromPreviousFeedDate: false },
+          { article: { ...homeFixture.feed.items[0]!.article, topicIds: ["POLITICS"] }, isFromPreviousFeedDate: false },
+          { article: { ...homeFixture.feed.items[0]!.article, topicIds: [] }, isFromPreviousFeedDate: false },
+        ],
+      },
+    });
+
+    expect(viewModel.feed.cards.map((card) => card.category)).toEqual(["경제", "국제", "정치", "뉴스"]);
+  });
+
   it("treats an admin viewer as a member on the home screen (BE도 admin을 로그인 상태로 취급)", () => {
     const viewModel = toHomeViewModel({
       ...homeFixture,

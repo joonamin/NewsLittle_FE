@@ -73,12 +73,9 @@ function formatDate(value: string) {
   return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date);
 }
 
-const topicLabels: Record<string, string> = {
-  economy: "경제",
-  society: "사회",
-  "ai-it": "AI·IT",
-  science: "과학",
-};
+const topicLabels: Record<TopicCode, string> = Object.fromEntries(
+  TOPIC_CATALOG.map((topic) => [topic.id, topic.label]),
+) as Record<TopicCode, string>;
 
 export type HomeArticleCardViewModel = {
   id: string;
@@ -102,7 +99,7 @@ function mapArticleCard(
 ): HomeArticleCardViewModel {
   return {
     id: article.id,
-    category: topicLabels[article.topicIds[0] ?? ""] ?? "뉴스",
+    category: topicLabels[article.topicIds[0] as TopicCode] ?? "뉴스",
     title: article.title,
     bodyText: pickBodyText(article),
     sourceName: article.source.name,
