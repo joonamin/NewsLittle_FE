@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 function PrivacyContent({
   title,
@@ -42,14 +43,24 @@ export default function PrivacyPage() {
           </h1>
 
           <div className="mt-6 space-y-1 text-sm leading-6 text-slate-500">
-            <p>최근 개정일: {"{{시행일}}"}</p>
-            <p>시행일: {"{{시행일}}"}</p>
+            <p>최근 개정일: 2026년 9월 20일</p>
+            <p>시행일: 2026년 9월 20일</p>
           </div>
 
-          <p className="mt-7 max-w-3xl text-[15px] leading-7 text-slate-700">
-            {"{{사업자_명칭}}"}(이하 “처리자”)는 NewsLittle(뉴스리틀,
-            이하 “서비스”)을 운영하면서 이용자의 개인정보를 처리하는 경우
-            「개인정보 보호법」 등 관계 법령을 준수합니다.
+          <div className="mt-7 rounded-xl border border-sky-200 bg-sky-50/70 p-5 text-[15px] leading-7 text-slate-800">
+            <h2 className="mb-2 font-bold text-sky-950">
+              [비상업적 사이드 프로젝트 운영 고지]
+            </h2>
+            <p>
+              NewsLittle(뉴스리틀, 이하 “서비스”)은 비상업적·학습용 목적으로 운영되는 <strong>개인 사이드 프로젝트</strong>입니다.
+              본 서비스는 일체의 유료 과금, 영리 목적의 데이터 판매, 제3자 타겟 광고 등을 전혀 수행하지 않으며,
+              이용자 식별 및 서비스 핵심 기능 제공에 필요한 최소한의 정보만을 처리합니다.
+            </p>
+          </div>
+
+          <p className="mt-6 max-w-3xl text-[15px] leading-7 text-slate-700">
+            NewsLittle (뉴스리틀)(이하 “처리자”)는 서비스를 운영하면서 이용자의 개인정보를 처리하는 경우
+            「개인정보 보호법」 및 Google API Services User Data Policy 등 관계 법령과 플랫폼 정책을 준수합니다.
           </p>
         </header>
 
@@ -67,11 +78,11 @@ export default function PrivacyPage() {
               <p>
                 서비스의 프론트엔드 도메인은{" "}
                 <strong className="font-semibold text-slate-900">
-                  {"{{앱_도메인}}"}
+                  https://newslittle.joonamin.dev
                 </strong>
                 , 백엔드 API 도메인은{" "}
                 <strong className="font-semibold text-slate-900">
-                  {"{{API_도메인}}"}
+                  https://api-newslittle.joonamin.dev
                 </strong>
                 입니다.
               </p>
@@ -164,7 +175,7 @@ export default function PrivacyPage() {
                   <strong className="font-semibold text-slate-900">
                     openid, email, profile
                   </strong>
-                  입니다.
+                  의 기본 범위에 한정됩니다. 서비스는 Gmail, 구글 드라이브(Drive), 캘린더, 연락처 등 일체의 민감하거나 제한된 권한(Sensitive/Restricted Scopes)을 요청하거나 접근하지 않습니다.
                 </p>
               </div>
 
@@ -374,10 +385,10 @@ export default function PrivacyPage() {
                         "로그인 세션",
                         "유휴 30분 또는 최초 발급 후 절대 8시간까지. 로그아웃 시 즉시 삭제",
                       ],
-                      ["접속 로그", "{{접속로그_보유기간}}"],
+                      ["접속 로그", "3개월 (통신비밀보호법 기준)"],
                       [
                         "탈퇴 요청 처리 이력",
-                        "{{삭제요청기록_보유기간}}",
+                        "30일 (부정 이용 방지 및 처리 이력 확인)",
                       ],
                     ].map(([label, period]) => (
                       <tr key={label}>
@@ -393,7 +404,7 @@ export default function PrivacyPage() {
 
               <p>
                 데이터베이스, Redis 및 로그가 저장되는 물리적 위치 또는 클라우드
-                리전은 <strong>{"{{인프라_위치}}"}</strong>입니다.
+                리전은 <strong>대한민국 서울 (Microsoft Azure Korea Central)</strong>입니다.
               </p>
 
               <p>
@@ -409,7 +420,7 @@ export default function PrivacyPage() {
               <p>
                 탈퇴 요청 처리 이력은 처리 완료 후에도 별도로 유지하며 기존
                 이용자 계정 식별값은 제거됩니다. 최종 파기 시점은{" "}
-                <strong>{"{{삭제요청기록_보유기간}}"}</strong>입니다.
+                <strong>30일</strong>입니다.
               </p>
 
               <p>
@@ -421,13 +432,18 @@ export default function PrivacyPage() {
         />
 
         <PrivacyContent
-          title="제6조 개인정보의 제3자 제공 및 처리위탁 (Google 로그인)"
+          title="제6조 개인정보의 제3자 제공, 처리위탁 및 Google 사용자 데이터 보호 정책"
           content={
             <>
-              <p>
-                서비스는 Google 로그인을 제공하기 위해 Google LLC의 OAuth 2.0
-                및 OpenID Connect 관련 API와 통신합니다.
-              </p>
+              <div>
+                <h3 className="mb-3 font-semibold text-slate-950">
+                  1. Google 로그인 통신 및 처리위탁
+                </h3>
+                <p>
+                  서비스는 Google 로그인을 제공하기 위해 Google LLC의 OAuth 2.0
+                  및 OpenID Connect 관련 API와 통신합니다.
+                </p>
+              </div>
 
               <div className="overflow-x-auto rounded-xl border border-slate-200">
                 <table className={tableClassName}>
@@ -475,36 +491,82 @@ export default function PrivacyPage() {
 
               <p>
                 이용자의 Google 비밀번호는 서비스에 전달되지 않으며 처리자가
-                이를 수집하거나 저장하지 않습니다.
+                이를 수집하거나 저장하지 않습니다. 서비스는 Google 로그인 검증
+                목적 외의 목적으로 이용자 데이터를 Google에 전송하지 않습니다.
               </p>
-
-              <p>
-                서비스는 Google 로그인 검증 목적 외의 목적으로 이용자 데이터를
-                Google에 전송하지 않습니다.
-              </p>
-
-              <p>
-                Google이 자체적으로 처리하는 정보는 Google 개인정보처리방침을
-                따릅니다.
-              </p>
-
-              <a
-                href="https://policies.google.com/privacy"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex font-medium text-slate-950 underline underline-offset-4"
-              >
-                Google 개인정보처리방침
-              </a>
 
               <div className="rounded-lg bg-slate-50 px-4 py-4">
                 <p>
                   Google 이외 호스팅·관제·CDN 등 개인정보 처리업무 수탁자:
                   <br />
                   <strong className="font-semibold text-slate-900">
-                    {"{{수탁자_목록}}"}
+                    Vercel Inc. (프론트엔드 호스팅 및 CDN), Microsoft Azure (백엔드 서버 호스팅 및 AI 추론 API), Cloudflare, Inc. (DNS, CDN 및 네트워크 터널 보안)
                   </strong>
                 </p>
+              </div>
+
+              <div>
+                <h3 className="mb-3 font-semibold text-slate-950">
+                  2. Google 사용자 데이터 제3자 공유 및 판매 금지 (No-Sharing Policy)
+                </h3>
+                <p>
+                  서비스는 Google API를 통해 수집된 이용자의 데이터(Google 사용자 ID, 이메일 주소, 프로필 등)를 어떠한 경우에도 제3자에게 판매(Sell), 임대(Rent), 대여, 거래(Trade)하거나 상업적·마케팅 목적으로 공유하지 않습니다.
+                </p>
+                <p>
+                  수집된 데이터는 광고주, 데이터 브로커, 마케팅 분석 업체 등에 일체 제공되지 않으며, 오직 서비스의 구동 및 핵심 기능 제공을 위한 필수적인 기술 인프라 수탁 처리(Vercel, Microsoft Azure) 이외에는 외부로 이전되지 않습니다.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="mb-3 font-semibold text-slate-950">
+                  3. Google 사용자 데이터의 삭제 및 연동 해제 (Revocation)
+                </h3>
+                <p>
+                  이용자는 언제든지 자신의 Google 계정과 연동된 데이터를 삭제하거나 권한을 직접 철회할 수 있습니다.
+                </p>
+                <ul className="list-disc space-y-2 pl-5">
+                  <li>
+                    <strong className="text-slate-900">서비스 내 즉시 삭제:</strong> 서비스 설정 화면(<code className="rounded bg-slate-100 px-1 py-0.5 text-sm text-slate-900">/settings</code>)에서 &lsquo;회원 탈퇴&rsquo; 또는 &lsquo;기록 삭제&rsquo;를 요청하면 데이터베이스 및 캐시 서버에서 이용자의 Google 고유 식별자, 이메일 및 모든 활동 데이터가 즉시 영구 파기됩니다.
+                  </li>
+                  <li>
+                    <strong className="text-slate-900">Google 계정에서 직접 권한 철회:</strong> 서비스 화면에 접속하지 않더라도,{" "}
+                    <a
+                      href="https://myaccount.google.com/permissions"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium text-slate-950 underline underline-offset-4"
+                    >
+                      Google 계정 권한 관리 페이지(https://myaccount.google.com/permissions)
+                    </a>
+                    에서 NewsLittle 앱에 부여한 접근 권한을 언제든지 직접 즉시 해제(Revoke)할 수 있습니다. 권한을 해제하면 서비스는 더 이상 이용자의 Google 데이터에 접근할 수 없습니다.
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="mb-3 font-semibold text-slate-950">
+                  4. Google API Services User Data Policy 및 Limited Use 준수
+                </h3>
+                <p>
+                  NewsLittle이 Google API로부터 수신한 정보의 사용 및 다른 앱으로의 이전은{" "}
+                  <a
+                    href="https://developers.google.com/terms/api-services-user-data-policy"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-slate-950 underline underline-offset-4"
+                  >
+                    Google API Services User Data Policy
+                  </a>
+                  의 제한적 사용(Limited Use) 요구사항을 엄격히 준수합니다.
+                </p>
+                <ul className="list-disc space-y-2 pl-5">
+                  <li>
+                    <strong className="text-slate-900">AI/ML 모델 학습 금지:</strong> 수집된 이용자의 Google 데이터 및 서비스 이용 내역은 일반 인공지능(AI)이나 머신러닝(ML) 모델의 개발, 개선 또는 파인튜닝에 일체 사용되지 않습니다.
+                  </li>
+                  <li>
+                    <strong className="text-slate-900">사람의 열람 제한:</strong> 이용자의 명시적 사전 동의가 있거나, 법률 준수 또는 시스템 보안상 긴급한 조치가 요구되는 경우를 제외하고 어떠한 사람도 이용자의 Google 사용자 데이터를 열람하지 않습니다.
+                  </li>
+                </ul>
               </div>
             </>
           }
@@ -704,24 +766,24 @@ export default function PrivacyPage() {
             <div className="rounded-xl bg-slate-50 p-5">
               <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-[160px_1fr]">
                 <dt className="font-medium text-slate-900">사업자 명칭</dt>
-                <dd>{"{{사업자_명칭}}"}</dd>
+                <dd>NewsLittle (뉴스리틀)</dd>
 
                 <dt className="font-medium text-slate-900">사업자 주소</dt>
-                <dd>{"{{사업자_주소}}"}</dd>
+                <dd>서울특별시 (온라인 서비스 제공)</dd>
 
                 <dt className="font-medium text-slate-900">
                   개인정보 보호책임자
                 </dt>
-                <dd>{"{{성명}}"}</dd>
+                <dd>강민준</dd>
 
                 <dt className="font-medium text-slate-900">직책</dt>
-                <dd>{"{{직책}}"}</dd>
+                <dd>개인정보 보호책임자 / 개발 및 운영 총괄</dd>
 
                 <dt className="font-medium text-slate-900">이메일</dt>
-                <dd>{"{{이메일}}"}</dd>
+                <dd>joonamin44@gmail.com</dd>
 
                 <dt className="font-medium text-slate-900">전화</dt>
-                <dd>{"{{전화}}"}</dd>
+                <dd>이메일 문의(joonamin44@gmail.com) 대응</dd>
               </dl>
             </div>
           }
@@ -769,20 +831,95 @@ export default function PrivacyPage() {
         />
 
         <PrivacyContent
+          title="제14조 Google API Services User Data Policy Compliance (English Disclosure)"
+          content={
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-[14px] leading-6 text-slate-700 space-y-4">
+              <p className="font-semibold text-slate-900 text-[15px]">
+                Google API Services User Data Policy &amp; Limited Use Disclosure
+              </p>
+              <p>
+                <strong>Application Name:</strong> NewsLittle (뉴스리틀)<br />
+                <strong>Project Nature:</strong> Personal, non-commercial, and educational side project. NewsLittle does NOT charge fees, sell user data, or display commercial third-party advertisements.<br />
+                <strong>Google User Data Accessed:</strong> Google User ID (<code className="rounded bg-slate-200 px-1 py-0.5 text-xs">sub</code>), Email address (<code className="rounded bg-slate-200 px-1 py-0.5 text-xs">email</code>), and display name (<code className="rounded bg-slate-200 px-1 py-0.5 text-xs">profile</code>). No sensitive or restricted scopes (such as Gmail, Google Drive, Contacts, or Calendar) are requested or accessed.
+              </p>
+              <p>
+                <strong>How Google User Data is Used:</strong>
+              </p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>To securely authenticate and identify user accounts without storing passwords.</li>
+                <li>To maintain user login sessions and associate user-selected news topic preferences and reading bookmarks (archive).</li>
+                <li>Data is never used for marketing, advertising, profiling, or commercial resale.</li>
+              </ul>
+              <p>
+                <strong>Data Sharing &amp; Third-Party Disclosure:</strong>
+              </p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>We do NOT sell, rent, trade, or transfer Google user data to any third party.</li>
+                <li>Data is never shared with data brokers, advertisers, or third-party marketers.</li>
+                <li>Data is only processed by essential cloud infrastructure providers (Vercel for frontend hosting, Microsoft Azure for backend API and database) solely for the technical operation of the application.</li>
+              </ul>
+              <p>
+                <strong>User Control, Data Deletion, and Revocation:</strong>
+              </p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>
+                  <strong>In-App Deletion:</strong> Users can permanently delete their account and all associated data at any time through the in-app Settings page (<code className="rounded bg-slate-200 px-1 py-0.5 text-xs">/settings</code>) by selecting &ldquo;회원 탈퇴&rdquo; (Delete Account) or &ldquo;기록 삭제&rdquo; (Delete Records).
+                </li>
+                <li>
+                  <strong>Direct Revocation via Google:</strong> Users can revoke NewsLittle&rsquo;s access to their Google account at any time by visiting the{" "}
+                  <a
+                    href="https://myaccount.google.com/permissions"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-slate-900 underline underline-offset-2"
+                  >
+                    Google Account Permissions Page
+                  </a>
+                  .
+                </li>
+              </ul>
+              <div className="rounded-lg border border-slate-300 bg-white p-4 font-medium text-slate-900">
+                &ldquo;NewsLittle&rsquo;s use and transfer to any other app of information received from Google APIs will adhere to the{" "}
+                <a
+                  href="https://developers.google.com/terms/api-services-user-data-policy"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline underline-offset-2"
+                >
+                  Google API Services User Data Policy
+                </a>
+                , including the Limited Use requirements.&rdquo;
+              </div>
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>No AI/ML Training:</strong> Google user data is not used to train or fine-tune artificial intelligence (AI) or machine learning (ML) models.</li>
+                <li><strong>Human Access Restrictions:</strong> No humans are permitted to read or inspect Google user data unless affirmative user consent is granted, or when necessary for security audits or legal requirements.</li>
+                <li><strong>Privacy Inquiries:</strong> joonamin44@gmail.com</li>
+              </ul>
+            </div>
+          }
+        />
+
+        <PrivacyContent
           title="부칙"
           content={
             <p>
               본 개인정보 처리방침은{" "}
               <strong className="font-semibold text-slate-950">
-                {"{{시행일}}"}
+                2026년 9월 20일
               </strong>
               부터 시행합니다.
             </p>
           }
         />
 
-        <footer className="pt-10 text-sm text-slate-400">
-          © NewsLittle
+        <footer className="flex items-center justify-between border-t border-slate-200 pt-10 text-sm text-slate-400">
+          <span>© NewsLittle</span>
+          <Link
+            href="/terms"
+            className="text-slate-600 underline underline-offset-4 hover:text-slate-950"
+          >
+            서비스 이용약관 보기
+          </Link>
         </footer>
       </div>
     </main>

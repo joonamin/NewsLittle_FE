@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import type { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { ArticleGesture } from "@/components/ui/article-gesture";
@@ -124,6 +125,17 @@ function HomeContent() {
               onReport={() => window.alert("신고 기능은 준비 중입니다.")}
             />
           ) : <LoadingState title="표시할 뉴스가 없어요" />}
+          <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-nl-muted md:hidden">
+            <Link href="/privacy" className="hover:text-nl-text underline underline-offset-2">
+              개인정보 처리방침
+            </Link>
+            <span>·</span>
+            <Link href="/terms" className="hover:text-nl-text underline underline-offset-2">
+              서비스 이용약관
+            </Link>
+            <span>·</span>
+            <span>사이드 프로젝트</span>
+          </div>
         </main>
         <TodayListSidebar
           isLoggedIn={home.viewer.isMember}

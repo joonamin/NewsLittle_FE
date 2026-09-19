@@ -248,9 +248,14 @@ function SettingsContent() {
         </section>
       )}
 
-      <Link href="/privacy" className="text-nl-caption text-nl-accent">
-        개인정보 처리 안내 ↗
-      </Link>
+      <div className="flex flex-wrap items-center gap-4">
+        <Link href="/terms" className="text-nl-caption text-nl-accent hover:underline">
+          서비스 이용약관 ↗
+        </Link>
+        <Link href="/privacy" className="text-nl-caption text-nl-accent hover:underline">
+          개인정보 처리 안내 ↗
+        </Link>
+      </div>
 
       <Modal
         open={confirmKind === "records"}

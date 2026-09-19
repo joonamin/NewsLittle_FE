@@ -1,5 +1,6 @@
 // lib: 홈 · 오늘 목록 사이드바 (BtNvT), 타임라인_아이템 (diE46), 타임라인 레일 (CfqQX)
 import { LockKeyhole, X } from "lucide-react";
+import Link from "next/link";
 
 import type { HomeViewModel } from "@/features/contracts/view-models";
 
@@ -99,6 +100,17 @@ export function TodayListSidebar({
             <p className="text-nl-micro text-nl-muted">로그인 없이도 기사는 읽을 수 있어요. 담기와 퀴즈만 로그인이 필요해요.</p>
           </>
         )}
+        <div className="flex items-center justify-between border-t border-nl-border pt-3 text-[11px] text-nl-muted">
+          <Link href="/privacy" className="hover:text-nl-text underline underline-offset-2">
+            개인정보 처리방침
+          </Link>
+          <span>·</span>
+          <Link href="/terms" className="hover:text-nl-text underline underline-offset-2">
+            서비스 이용약관
+          </Link>
+          <span>·</span>
+          <span>사이드 프로젝트</span>
+        </div>
       </div>
     </aside>
   );
