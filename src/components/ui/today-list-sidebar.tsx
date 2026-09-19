@@ -1,7 +1,7 @@
 // lib: 홈 · 오늘 목록 사이드바 (BtNvT), 타임라인_아이템 (diE46), 타임라인 레일 (CfqQX)
 import { LockKeyhole, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { HomeViewModel } from "@/features/contracts/view-models";
 import { ApiError } from "@/lib/api-client";
@@ -11,6 +11,12 @@ import { Button } from "./button";
 import { Spinner } from "./spinner";
 
 type TodayList = NonNullable<HomeViewModel["todayList"]>;
+
+function createUntitledTitle() {
+  const unique =
+    globalThis.crypto?.randomUUID?.().replaceAll("-", "").slice(0, 8) ?? Date.now().toString(36);
+  return `Untitled_${unique}`;
+}
 
 export type TodayListSidebarProps = {
   isLoggedIn: boolean;
@@ -45,9 +51,13 @@ export function TodayListSidebar({
   const readyCount = items.filter((item) => item.quizStatusLabel === "출제 가능").length;
   const preparingCount = items.filter((item) => item.quizStatusLabel === "문항 준비 중").length;
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState("Untitled");
   const [isArchiving, setIsArchiving] = useState(false);
   const [archiveError, setArchiveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTitle(createUntitledTitle());
+  }, []);
 
   const canArchive = title.trim().length > 0 && items.length > 0 && !isArchiving;
 
@@ -58,7 +68,7 @@ export function TodayListSidebar({
     setArchiveError(null);
     try {
       await onArchive(trimmedTitle);
-      setTitle("");
+      setTitle(createUntitledTitle());
     } catch (error) {
       setArchiveError(
         error instanceof ApiError ? error.message : "아카이빙에 실패했어요. 다시 시도해 주세요.",
@@ -71,10 +81,6 @@ export function TodayListSidebar({
   return (
     <aside aria-label="오늘 목록" className="hidden h-full min-h-0 w-[336px] shrink-0 flex-col overflow-hidden border-l border-nl-border bg-nl-bg md:flex">
       <div className="flex shrink-0 flex-col gap-3 border-b border-nl-border px-6 pt-6 pb-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-[20px] leading-[1.5] font-bold text-nl-text">오늘 목록 {isLoggedIn ? ` ${items.length}` : ""}</h2>
-          <p className="text-nl-caption text-nl-muted">{isLoggedIn ? `${list?.dateLabel} · 선택한 순서대로` : "로그인하면 담은 기사가 여기에 쌓여요"}</p>
-        </div>
         {isLoggedIn ? (
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
@@ -85,21 +91,27 @@ export function TodayListSidebar({
                 placeholder="목록 제목을 입력하세요"
                 aria-label="오늘 목록 제목"
                 maxLength={200}
-                className="min-w-0 flex-1 rounded-nl-button border border-nl-border bg-nl-bg px-3 py-2 text-nl-caption text-nl-text outline-none focus:border-nl-accent"
+                className="min-w-0 flex-1 rounded-nl-button border border-nl-border bg-nl-bg px-3 py-1.5 text-[20px] leading-[1.5] font-bold text-nl-text outline-none focus:border-nl-accent"
               />
               <button
                 type="button"
                 disabled={!canArchive}
                 onClick={() => void handleArchive()}
-                className="flex shrink-0 items-center gap-1.5 rounded-nl-button border border-nl-accent bg-nl-accent px-3 py-2 text-nl-caption font-bold text-nl-on-accent disabled:opacity-40"
+                className="flex shrink-0 items-center gap-1.5 rounded-nl-button border border-nl-accent bg-nl-accent px-3 py-2 text-nl-caption font-bold text-nl-on-accent transition-colors hover:bg-nl-accent/90 disabled:opacity-40 disabled:hover:bg-nl-accent"
               >
                 {isArchiving ? <Spinner className="h-4 w-4 text-nl-on-accent" /> : null}
                 아카이빙
               </button>
             </div>
+            <p className="text-nl-caption text-nl-muted">{list?.dateLabel} · 선택한 순서대로</p>
             {archiveError ? <p className="text-nl-micro text-nl-negative">{archiveError}</p> : null}
           </div>
-        ) : null}
+        ) : (
+          <div className="flex flex-col gap-1">
+            <h2 className="text-[20px] leading-[1.5] font-bold text-nl-text">오늘 목록</h2>
+            <p className="text-nl-caption text-nl-muted">로그인하면 담은 기사가 여기에 쌓여요</p>
+          </div>
+        )}
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
         {isLoggedIn ? (
@@ -112,8 +124,8 @@ export function TodayListSidebar({
                     <TimelineRail order={index + 1} isFirst={index === 0} isLast={index === items.length - 1} isPreparing={isPreparing} />
                     <div className="min-w-0 flex-1 pt-[7px] pb-[22px]">
                       <div className="flex items-center gap-2">
-                        <a href={item.originalUrl} target="_blank" rel="noreferrer" onClick={(event) => { event.preventDefault(); onOpenArticle(item.originalUrl); }} className="min-w-0 flex-1 text-nl-caption leading-[1.5] text-nl-accent">{item.title}</a>
-                        <button type="button" aria-label={`${item.title} 삭제`} onClick={() => onRemoveArticle(item.articleId)} className="text-[20px] leading-[1.5] text-nl-muted"><X width={20} height={20} /></button>
+                        <a href={item.originalUrl} target="_blank" rel="noreferrer" onClick={(event) => { event.preventDefault(); onOpenArticle(item.originalUrl); }} className="min-w-0 flex-1 text-nl-caption leading-[1.5] text-nl-accent hover:underline">{item.title}</a>
+                        <button type="button" aria-label={`${item.title} 삭제`} onClick={() => onRemoveArticle(item.articleId)} className="rounded-nl-button text-[20px] leading-[1.5] text-nl-muted transition-colors hover:bg-nl-subtle hover:text-nl-text"><X width={20} height={20} /></button>
                       </div>
                       <Badge tone={isPreparing ? "default" : "positive"} className="mt-1.5">{item.quizStatusLabel}</Badge>
                     </div>
