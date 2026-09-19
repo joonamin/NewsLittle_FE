@@ -12,6 +12,7 @@ import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { quizResultQueryOptions } from "@/features/contracts/query-keys";
 import type { QuizRecapItemViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useReportFlow } from "@/features/report/report-flow";
 
 type RandomQuizResultPageProps = {
   sessionId: string;
@@ -223,6 +224,7 @@ function RecapRow({
   onToggle: () => void;
   onSaveArticle: () => void;
 }) {
+  const { openReport } = useReportFlow();
   const outcomeColor =
     item.outcome === "correct"
       ? "text-nl-positive"
@@ -283,6 +285,16 @@ function RecapRow({
                 publishedLabel={item.evidence.publishedLabel}
                 originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
                 showsAiSummary={item.evidence.showsAiSummary}
+                onReport={() => {
+                  const evidence = item.evidence;
+                  if (!evidence) return;
+                  openReport({
+                    surface: "HOME_CARD",
+                    articleId: evidence.id,
+                    targetLabel: evidence.title,
+                    availableReasons: ["CONTENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
+                  });
+                }}
               />
 
               <div className="flex flex-wrap items-center gap-4 pt-1">
@@ -298,7 +310,23 @@ function RecapRow({
             </article>
           ) : null}
 
-          <button type="button" className="text-nl-micro text-nl-negative hover:underline">
+          <button
+            type="button"
+            onClick={() => {
+              const evidence = item.evidence;
+              if (!evidence) return;
+              // SCR-12 결과 화면 응답(QuizResultData.explanations)에는 quizId·answerRef가
+              // 없어 surface=QUIZ를 쓸 수 없다 — 근거 기사 id로 HOME_CARD로 보낸다.
+              openReport({
+                surface: "HOME_CARD",
+                articleId: evidence.id,
+                targetLabel: item.prompt,
+                availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
+                defaultReason: "JUDGMENT_ERROR",
+              });
+            }}
+            className="text-nl-micro text-nl-negative hover:underline"
+          >
             판정 오류 신고
           </button>
         </div>

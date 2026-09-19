@@ -1,6 +1,10 @@
 import { delay, http, HttpResponse } from "msw";
 
-import type { DeletionRequestKind, TopicCode } from "@/features/contracts/api-models";
+import type {
+  DeletionRequestKind,
+  SubmitReportRequest,
+  TopicCode,
+} from "@/features/contracts/api-models";
 
 import {
   randomPreviewFixture,
@@ -48,7 +52,9 @@ function failureResponse(error: unknown) {
       ? 401
       : code === "ARTICLE_NOT_FOUND" || code === "NOT_FOUND"
         ? 404
-        : 500;
+        : code === "VALIDATION_ERROR"
+          ? 422
+          : 500;
   return HttpResponse.json({ error: { code } }, { status });
 }
 
@@ -208,6 +214,49 @@ export const handlers = [
     } catch (error) {
       return failureResponse(error);
     }
+  }),
+  /**
+   * GLB-03 신고 접수(FR-14). BE `newslittle.modules.reports.schemas.CreateReportRequest`의
+   * model_validator(권리는 연락 경로 필수, quizId는 surface=QUIZ일 때만·반드시,
+   * answerRef는 JUDGMENT_ERROR일 때만·반드시, JUDGMENT_ERROR는 surface=QUIZ여야 함)를
+   * 그대로 흉내낸다 — 로컬에서도 같은 조건으로 422가 나야 계약 어긋남을 바로 잡을 수 있다.
+   */
+  http.post(`${api}/reports`, async ({ request }) => {
+    const payload = (await request.json().catch(() => null)) as Partial<SubmitReportRequest> | null;
+    if (!payload?.reportType || !payload.surface || !payload.articleId || !payload.details?.trim()) {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    if (payload.reportType === "RIGHTS" && !payload.contact?.trim()) {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    if ((payload.surface === "QUIZ") !== Boolean(payload.quizId)) {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    if ((payload.reportType === "JUDGMENT_ERROR") !== Boolean(payload.answerRef)) {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    if (payload.reportType === "JUDGMENT_ERROR" && payload.surface !== "QUIZ") {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    return successResponse(
+      {
+        id: `mock-report-${Date.now()}`,
+        reportType: payload.reportType,
+        surface: payload.surface,
+        status: "RECEIVED",
+        contactProvided: Boolean(payload.contact?.trim()),
+        judgmentAttachment: payload.answerRef
+          ? {
+              answerRef: payload.answerRef,
+              submittedAnswer: "모의 답변",
+              quizVersion: 1,
+              judgeVersion: "mock-judge-v1",
+            }
+          : null,
+        createdAt: new Date().toISOString(),
+      },
+      { status: 201 },
+    );
   }),
 
   // ADM-01 운영 대시보드

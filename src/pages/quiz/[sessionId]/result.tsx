@@ -12,6 +12,7 @@ import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { quizResultQueryOptions } from "@/features/contracts/query-keys";
 import type { QuizRecapItemViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useReportFlow } from "@/features/report/report-flow";
 
 type QuizResultPageProps = {
   sessionId: string;
@@ -197,6 +198,23 @@ function RecapRow({
   isExpanded: boolean;
   onToggle: () => void;
 }) {
+  const { openReport } = useReportFlow();
+  /**
+   * 결과·복기 화면(SCR-05)의 응답 계약(QuizResultData.explanations)에는 문항의
+   * quizId도 답변 PK(answerRef)도 내려오지 않는다 — 근거 기사 id만 있다. 그래서
+   * surface는 QUIZ가 아니라 HOME_CARD로 보낸다("판정 오류"는 target.answerRef가
+   * 없어 report-modal.tsx가 제출을 막는다).
+   */
+  const openQuestionReport = (defaultReason: "JUDGMENT_ERROR" | "CONTENT_ERROR") => {
+    if (!item.evidence) return;
+    openReport({
+      surface: "HOME_CARD",
+      articleId: item.evidence.id,
+      targetLabel: item.prompt,
+      availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
+      defaultReason,
+    });
+  };
   const outcomeColor =
     item.outcome === "correct"
       ? "text-nl-positive"
@@ -265,14 +283,14 @@ function RecapRow({
           <div className="flex items-center gap-4 pt-1">
             <button
               type="button"
-              onClick={() => alert("판정 오류 신고가 접수되었습니다.")}
+              onClick={() => openQuestionReport("JUDGMENT_ERROR")}
               className="text-nl-micro text-nl-negative hover:underline"
             >
               판정 오류 신고
             </button>
             <button
               type="button"
-              onClick={() => alert("내용 오류 신고가 접수되었습니다.")}
+              onClick={() => openQuestionReport("CONTENT_ERROR")}
               className="text-nl-micro text-nl-muted hover:underline"
             >
               내용 오류 신고

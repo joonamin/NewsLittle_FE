@@ -9,6 +9,7 @@ import { archiveQueryOptions, navigationQueryOptions } from "@/features/contract
 import { screenApi } from "@/features/contracts/screen-api";
 import type { ArchiveViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useReportFlow } from "@/features/report/report-flow";
 
 export default function ArchivePage() {
   const router = useRouter();
@@ -84,6 +85,7 @@ export default function ArchivePage() {
 
 function ArchiveContent() {
   const queryClient = useQueryClient();
+  const { openReport } = useReportFlow();
   const { data: archive } = useSuspenseQuery(archiveQueryOptions);
   const [expandedDates, setExpandedDates] = useState<Set<string>>(
     () => new Set(archive.groups.slice(0, 1).map((group) => group.date)),
@@ -146,6 +148,15 @@ function ArchiveContent() {
               expanded={expandedDates.has(group.date)}
               onToggleExpanded={() => toggleGroup(group.date)}
               onDeleteItem={(id) => deleteEntry.mutate(id)}
+              onReportItem={(item) => {
+                if (!item.articleId) return;
+                openReport({
+                  surface: "ARCHIVE",
+                  articleId: item.articleId,
+                  targetLabel: item.title ?? "보관한 기사",
+                  availableReasons: ["RIGHTS", "SOURCE_UNREACHABLE"],
+                });
+              }}
             />
           </div>
         ))

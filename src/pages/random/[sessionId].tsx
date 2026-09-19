@@ -22,6 +22,7 @@ import {
   WRITTEN_JUDGEMENT_TIMEOUT_MS,
 } from "@/features/quiz/judgement-timeout";
 import { useQuizAbandonGuard } from "@/features/quiz/use-quiz-abandon-guard";
+import { useReportFlow } from "@/features/report/report-flow";
 import { submitValidated, useValidatedForm } from "@/lib/form";
 
 type RandomQuizPlayPageProps = { sessionId: string };
@@ -253,6 +254,7 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
   const evidence = resolution.evidence;
   const positive = resolution.outcome === "correct";
   const { home, requestArticleSelection } = useHomeFlow();
+  const { openReport } = useReportFlow();
   const [isSaving, setIsSaving] = useState(false);
   const [savedLocally, setSavedLocally] = useState(false);
   const isSaved =
@@ -287,6 +289,14 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
               publishedLabel={evidence.publishedLabel}
               originalUrl={evidence.originalIsAvailable ? evidence.originalUrl : null}
               showsAiSummary={evidence.showsAiSummary}
+              onReport={() =>
+                openReport({
+                  surface: "HOME_CARD",
+                  articleId: evidence.id,
+                  targetLabel: evidence.title,
+                  availableReasons: ["CONTENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
+                })
+              }
             />
             <div className="flex flex-wrap items-center gap-4">
               <Button variant={isSaved ? "default" : "secondary"} size="s" disabled={isSaved || isSaving} onClick={() => void saveArticle()}>
@@ -295,7 +305,24 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
             </div>
           </article>
         ) : null}
-        <button type="button" className="text-nl-micro text-nl-negative underline-offset-4 hover:underline">판정 오류 신고</button>
+        {evidence && session.question ? (
+          <button
+            type="button"
+            onClick={() =>
+              openReport({
+                surface: "QUIZ",
+                articleId: evidence.id,
+                quizId: session.question!.id,
+                targetLabel: session.question!.prompt,
+                availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
+                defaultReason: "JUDGMENT_ERROR",
+              })
+            }
+            className="text-nl-micro text-nl-negative underline-offset-4 hover:underline"
+          >
+            판정 오류 신고
+          </button>
+        ) : null}
       </section>
     </>
   );

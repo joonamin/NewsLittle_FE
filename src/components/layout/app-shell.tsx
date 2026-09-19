@@ -6,6 +6,7 @@ import { GlobalNav } from "@/components/ui/global-nav";
 import { GoogleLoginButton } from "@/components/ui/google-login-button";
 import { Modal } from "@/components/ui/modal";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { ReportModal } from "@/features/report/report-modal";
 
 type AppShellProps = { children: ReactNode };
 type NavigationTarget = { id: string; label: string; href: string };
@@ -108,6 +109,8 @@ export function AppShell({ children }: AppShellProps) {
       >
         <p className="text-nl-body text-nl-muted">아카이브와 회원 기능을 이용하려면 로그인해 주세요.</p>
       </Modal>
+
+      <ReportModal />
     </div>
   );
 }

@@ -285,3 +285,49 @@ export type SubmitQuizAnswerRequest = {
 export type UpdateInterestTopicsRequest = {
   topicIds: TopicCode[];
 };
+
+/**
+ * GLB-03 신고 모달의 접수 유형 4종·대상 화면 3종. BE `newslittle.modules.reports`
+ * (schemas.py·models.py)와 1:1로 맞춘 값이며, 이 값이 아니면 `extra="forbid"`·
+ * enum 검증에 의해 422로 거절된다. ADM-06 접수 유형과 동일한 코드를 쓴다.
+ */
+export type ReportType = "CONTENT_ERROR" | "JUDGMENT_ERROR" | "RIGHTS" | "SOURCE_UNREACHABLE";
+
+export type ReportSurface = "HOME_CARD" | "QUIZ" | "ARCHIVE";
+
+export type SubmitReportRequest = {
+  reportType: ReportType;
+  surface: ReportSurface;
+  /** 신고 대상 기사의 실제 article id. surface와 무관하게 항상 필요하다. */
+  articleId: string;
+  /** surface가 "QUIZ"일 때만, 그리고 반드시 있어야 한다(BE model_validator). */
+  quizId?: string | null;
+  /**
+   * 판정 오류 신고에서만, 그리고 반드시 있어야 한다. `"shortform:<answerId>"` |
+   * `"random:<answerId>"` — answerId는 문항이 아니라 실제 제출된 답변 행의 PK다.
+   * 현재 숏폼·랜덤 퀴즈 응답 계약(QuizSessionData/QuizResolutionApiModel) 어디에도
+   * 이 PK가 내려오지 않아 FE가 구성할 방법이 없다 — BE가 필드를 추가하기 전까지는
+   * 판정 오류 신고를 제출 단계에서 막아야 한다(report-modal.tsx 참고).
+   */
+  answerRef?: string | null;
+  details: string;
+  /** 권리 신고만 필수, 그 외는 선택. 계정 이메일을 자동으로 채우지 않는다(COM-04). */
+  contact?: string | null;
+};
+
+export type ReportJudgmentAttachmentApiModel = {
+  answerRef: string;
+  submittedAnswer: string;
+  quizVersion: number;
+  judgeVersion: string | null;
+};
+
+export type SubmitReportApiModel = {
+  id: string;
+  reportType: ReportType;
+  surface: ReportSurface;
+  status: "RECEIVED";
+  contactProvided: boolean;
+  judgmentAttachment: ReportJudgmentAttachmentApiModel | null;
+  createdAt: ApiTimestamp;
+};

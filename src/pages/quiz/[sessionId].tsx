@@ -30,6 +30,7 @@ import {
   WRITTEN_JUDGEMENT_TIMEOUT_MS,
 } from "@/features/quiz/judgement-timeout";
 import { useQuizAbandonGuard } from "@/features/quiz/use-quiz-abandon-guard";
+import { useReportFlow } from "@/features/report/report-flow";
 import { submitValidated, useValidatedForm } from "@/lib/form";
 import { ApiError } from "@/lib/api-client";
 
@@ -491,6 +492,7 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
   const resolution = session.resolution!;
   const evidence = resolution.evidence;
   const positive = resolution.outcome === "correct";
+  const { openReport } = useReportFlow();
 
   if (resolution.outcome === "service-excluded") {
     return (
@@ -538,9 +540,24 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
           />
         </>
       ) : null}
-      <button type="button" className="text-nl-micro text-nl-negative underline-offset-4 hover:underline">
-        판정 오류 신고
-      </button>
+      {evidence && session.question ? (
+        <button
+          type="button"
+          onClick={() =>
+            openReport({
+              surface: "QUIZ",
+              articleId: evidence.id,
+              quizId: session.question!.id,
+              targetLabel: session.question!.prompt,
+              availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
+              defaultReason: "JUDGMENT_ERROR",
+            })
+          }
+          className="text-nl-micro text-nl-negative underline-offset-4 hover:underline"
+        >
+          판정 오류 신고
+        </button>
+      ) : null}
     </div>
   );
 }

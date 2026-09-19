@@ -12,6 +12,7 @@ import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { TodayListSidebar } from "@/components/ui/today-list-sidebar";
 import { homeQueryOptions } from "@/features/contracts/query-keys";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useReportFlow } from "@/features/report/report-flow";
 
 export default function HomePage() {
   const router = useRouter();
@@ -50,6 +51,7 @@ function HomeContent() {
     previousListDecision,
     previousListError,
   } = useHomeFlow();
+  const { openReport } = useReportFlow();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const cardIndex = Math.min(currentIndex, Math.max(home.feed.cards.length - 1, 0));
@@ -79,6 +81,14 @@ function HomeContent() {
                 }
                 void requestArticleSelection(card.id);
               }}
+              onReport={() =>
+                openReport({
+                  surface: "HOME_CARD",
+                  articleId: card.id,
+                  targetLabel: card.title,
+                  availableReasons: ["CONTENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
+                })
+              }
             />
           ) : <LoadingState title="표시할 뉴스가 없어요" />}
         </main>

@@ -239,6 +239,8 @@ export type QuizPlayViewModel = {
   progress: { current: number; total: number };
   progressLabel: string;
   question: {
+    /** BE 신고 계약(surface=QUIZ)의 quizId. 문항 정의 자체의 id이며 세션 id와 다르다. */
+    id: string;
     title: string;
     prompt: string;
     context: string | null;
@@ -276,6 +278,7 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
     progressLabel: `${api.progress.current}/${api.progress.total}`,
     question: api.question
       ? {
+          id: api.question.id,
           title: api.question.articleTitle,
           prompt: api.question.prompt,
           context: api.question.context,
@@ -359,6 +362,12 @@ export type ArchiveViewModel = {
     dateLabel: string;
     items: Array<{
       id: string;
+      /**
+       * 보관 항목이 가리키는 실제 기사 id(BE 신고 계약의 articleId). 항목 자체의
+       * id(entry.id)와는 다르다. "이용 중단"(article이 null)이면 신고 대상 기사를
+       * 특정할 수 없어 null — 이 경우 신고 접점을 비활성화해야 한다.
+       */
+      articleId: string | null;
       title: string | null;
       originalUrl: string | null;
       sourceName: string | null;
@@ -376,6 +385,7 @@ export function toArchiveViewModel(api: ArchiveApiModel): ArchiveViewModel {
       dateLabel: formatDate(group.date),
       items: group.entries.map((entry) => ({
         id: entry.id,
+        articleId: entry.article?.id ?? null,
         title: entry.article?.title ?? null,
         originalUrl: entry.article?.source.originalUrl ?? null,
         discontinuedReason: entry.discontinuedReason ?? null,
