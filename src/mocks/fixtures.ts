@@ -69,7 +69,7 @@ export const firstArticle: ArticleApiModel = {
     originalUrl: "https://example.com/articles/library-program",
     publishedAt: "2026-09-13T09:00:00+09:00",
   },
-  topicIds: ["society"],
+  topicIds: ["SOCIETY"],
   summary: {
     status: "available",
     text: "지역 공공도서관이 주말 독서·체험 프로그램을 늘리는 모의 콘텐츠입니다.",
@@ -99,7 +99,7 @@ export const secondArticle: ArticleApiModel = {
     originalUrl: "https://example.com/articles/science-class",
     publishedAt: "2026-09-13T08:00:00+09:00",
   },
-  topicIds: ["science"],
+  topicIds: ["SCIENCE"],
   summary: {
     status: "available",
     text: "청소년 대상 과학 교실의 참가 신청 일정을 소개하는 모의 콘텐츠입니다.",
@@ -123,7 +123,7 @@ export const longArticle: ArticleApiModel = {
     originalUrl: "https://example.com/articles/science-class",
     publishedAt: "2026-09-13T08:00:00+09:00",
   },
-  topicIds: ["science"],
+  topicIds: ["SCIENCE"],
   summary: {
     status: "available",
     text: "본문 펼치기 동작을 확인하기 위한 긴 기사 모의 콘텐츠입니다.",
@@ -147,7 +147,7 @@ export const nextPageArticle: ArticleApiModel = {
     originalUrl: "https://example.com/articles/next-page",
     publishedAt: "2026-09-12T10:00:00+09:00",
   },
-  topicIds: ["economy"],
+  topicIds: ["ECONOMY"],
   summary: {
     status: "available",
     text: "무한 스크롤 및 다음 커서로 새롭게 페치된 모의 기사 요약입니다.",
