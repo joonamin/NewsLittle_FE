@@ -12,7 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiError } from "@/lib/api-client";
 import { clearGuestTopics, getGuestTopics } from "@/lib/guest-topics";
-import { GoogleSignInCancelledError, resolveGoogleCredential } from "@/lib/google-identity";
+import { disableGoogleAutoSignIn } from "@/lib/google-identity";
 import {
   homeQueryOptions,
   navigationQueryOptions,
@@ -121,7 +121,7 @@ type HomeFlowContextValue = HomeFlowState & {
   navigation: GlobalNavigationViewModel;
   cancelPendingAction: () => void;
   closeLogin: () => void;
-  completeLogin: () => Promise<ArticleSelectionResult>;
+  completeLogin: (credential: string) => Promise<ArticleSelectionResult>;
   logout: () => Promise<void>;
   previousListDecision: PreviousListDecision | null;
   previousListError: boolean;
@@ -222,20 +222,8 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
     [addArticle, home, queryClient],
   );
 
-  const completeLogin = useCallback(async (): Promise<ArticleSelectionResult> => {
+  const completeLogin = useCallback(async (credential: string): Promise<ArticleSelectionResult> => {
     dispatch({ type: "login-pending" });
-
-    let credential: string;
-    try {
-      credential = await resolveGoogleCredential();
-    } catch (error) {
-      dispatch(
-        error instanceof GoogleSignInCancelledError
-          ? { type: "login-idle" }
-          : { type: "login-error", message: describeSignInError(error) },
-      );
-      return "login-required";
-    }
 
     const browserTopicIds = getGuestTopics();
     try {
@@ -284,6 +272,7 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
   );
 
   const logout = useCallback(async () => {
+    disableGoogleAutoSignIn();
     dispatch({ type: "clear-pending-action" });
     dispatch({ type: "clear-interests-source" });
     await signOut.mutateAsync();
