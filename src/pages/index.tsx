@@ -121,6 +121,7 @@ function HomeContent() {
                 }
                 void requestArticleSelection(card.id);
               }}
+              onReport={() => window.alert("신고 기능은 준비 중입니다.")}
             />
           ) : <LoadingState title="표시할 뉴스가 없어요" />}
         </main>

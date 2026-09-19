@@ -89,6 +89,14 @@ export const TextOnly: Story = {
   },
 };
 
+export const ReportOnSingleClick: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "신고" }));
+    await expect(args.onReport).toHaveBeenCalledOnce();
+  },
+};
+
 export const LongBody: Story = {
   args: { card: longCard },
   play: async ({ canvasElement }) => {
