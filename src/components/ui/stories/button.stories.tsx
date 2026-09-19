@@ -82,3 +82,50 @@ export const SizeMatrix: Story = {
     </div>
   ),
 };
+
+export const Loading: Story = {
+  args: { variant: "primary", loading: true },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole("button", { name: "기본 액션" });
+    await expect(button).toBeVisible();
+    await expect(button).toBeDisabled();
+    await expect(button).toHaveAttribute("aria-busy", "true");
+    await expect(button.querySelector("[role='status']")).toBeInTheDocument();
+    await userEvent.click(button);
+    await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+export const LoadingMatrix: Story = {
+  render: (args) => (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <Button {...args} variant="primary" loading>
+          Primary
+        </Button>
+        <Button {...args} variant="secondary" loading>
+          Secondary
+        </Button>
+        <Button {...args} variant="default" loading>
+          Default
+        </Button>
+      </div>
+      <div className="flex items-center gap-3">
+        <Button {...args} size="l" loading>
+          Large
+        </Button>
+        <Button {...args} size="m" loading>
+          Medium
+        </Button>
+        <Button {...args} size="s" loading>
+          Small
+        </Button>
+        <Button {...args} size="xs" loading>
+          XSmall
+        </Button>
+      </div>
+    </div>
+  ),
+};
+
