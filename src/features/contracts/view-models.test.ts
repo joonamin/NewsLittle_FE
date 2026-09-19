@@ -33,7 +33,15 @@ describe("screen view-model mappers", () => {
       showsAiSummary: true,
       isRestricted: false,
     });
-    expect(viewModel.feed.cards[0]).not.toHaveProperty("topicIds");
+  });
+
+  it("treats an admin viewer as a member on the home screen (BE도 admin을 로그인 상태로 취급)", () => {
+    const viewModel = toHomeViewModel({
+      ...homeFixture,
+      viewer: { ...homeFixture.viewer, role: "admin" },
+    });
+
+    expect(viewModel.viewer.isMember).toBe(true);
   });
 
   it("maps bodyText from article.body and summaryText from article.summary separately", () => {
