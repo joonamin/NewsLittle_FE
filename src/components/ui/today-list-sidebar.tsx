@@ -1,11 +1,14 @@
 // lib: 홈 · 오늘 목록 사이드바 (BtNvT), 타임라인_아이템 (diE46), 타임라인 레일 (CfqQX)
 import { LockKeyhole, X } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 import type { HomeViewModel } from "@/features/contracts/view-models";
+import { ApiError } from "@/lib/api-client";
 
 import { Badge } from "./badge";
 import { Button } from "./button";
+import { Spinner } from "./spinner";
 
 type TodayList = NonNullable<HomeViewModel["todayList"]>;
 
@@ -16,6 +19,7 @@ export type TodayListSidebarProps = {
   onOpenArticle: (url: string) => void;
   onRemoveArticle: (articleId: string) => void;
   onStartQuiz: () => void;
+  onArchive: (title: string) => Promise<void>;
 };
 
 function TimelineRail({ order, isFirst, isLast, isPreparing }: { order: number; isFirst: boolean; isLast: boolean; isPreparing: boolean }) {
@@ -35,16 +39,67 @@ export function TodayListSidebar({
   onOpenArticle,
   onRemoveArticle,
   onStartQuiz,
+  onArchive,
 }: TodayListSidebarProps) {
   const items = list?.items ?? [];
   const readyCount = items.filter((item) => item.quizStatusLabel === "출제 가능").length;
   const preparingCount = items.filter((item) => item.quizStatusLabel === "문항 준비 중").length;
 
+  const [title, setTitle] = useState("");
+  const [isArchiving, setIsArchiving] = useState(false);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
+
+  const canArchive = title.trim().length > 0 && items.length > 0 && !isArchiving;
+
+  const handleArchive = async () => {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle || items.length === 0 || isArchiving) return;
+    setIsArchiving(true);
+    setArchiveError(null);
+    try {
+      await onArchive(trimmedTitle);
+      setTitle("");
+    } catch (error) {
+      setArchiveError(
+        error instanceof ApiError ? error.message : "아카이빙에 실패했어요. 다시 시도해 주세요.",
+      );
+    } finally {
+      setIsArchiving(false);
+    }
+  };
+
   return (
     <aside aria-label="오늘 목록" className="hidden h-full min-h-0 w-[336px] shrink-0 flex-col overflow-hidden border-l border-nl-border bg-nl-bg md:flex">
-      <div className="flex shrink-0 flex-col gap-1 border-b border-nl-border px-6 pt-6 pb-4">
-        <h2 className="text-[20px] leading-[1.5] font-bold text-nl-text">오늘 목록 {isLoggedIn ? ` ${items.length}` : ""}</h2>
-        <p className="text-nl-caption text-nl-muted">{isLoggedIn ? `${list?.dateLabel} · 선택한 순서대로` : "로그인하면 담은 기사가 여기에 쌓여요"}</p>
+      <div className="flex shrink-0 flex-col gap-3 border-b border-nl-border px-6 pt-6 pb-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-[20px] leading-[1.5] font-bold text-nl-text">오늘 목록 {isLoggedIn ? ` ${items.length}` : ""}</h2>
+          <p className="text-nl-caption text-nl-muted">{isLoggedIn ? `${list?.dateLabel} · 선택한 순서대로` : "로그인하면 담은 기사가 여기에 쌓여요"}</p>
+        </div>
+        {isLoggedIn ? (
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="목록 제목을 입력하세요"
+                aria-label="오늘 목록 제목"
+                maxLength={200}
+                className="min-w-0 flex-1 rounded-nl-button border border-nl-border bg-nl-bg px-3 py-2 text-nl-caption text-nl-text outline-none focus:border-nl-accent"
+              />
+              <button
+                type="button"
+                disabled={!canArchive}
+                onClick={() => void handleArchive()}
+                className="flex shrink-0 items-center gap-1.5 rounded-nl-button border border-nl-accent bg-nl-accent px-3 py-2 text-nl-caption font-bold text-nl-on-accent disabled:opacity-40"
+              >
+                {isArchiving ? <Spinner className="h-4 w-4 text-nl-on-accent" /> : null}
+                아카이빙
+              </button>
+            </div>
+            {archiveError ? <p className="text-nl-micro text-nl-negative">{archiveError}</p> : null}
+          </div>
+        ) : null}
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
         {isLoggedIn ? (
@@ -92,7 +147,7 @@ export function TodayListSidebar({
           <>
             <p className="text-nl-micro text-nl-muted">{items.length ? `출제 가능 ${readyCount}개${preparingCount ? ` · 준비 중 ${preparingCount}개` : ""}` : "담은 기사 0개 · 1개 이상 담으면 퀴즈를 시작할 수 있어요"}</p>
             <Button className="w-full" disabled={items.length === 0} onClick={onStartQuiz}>숏폼 퀴즈 시작</Button>
-            <p className="text-nl-micro text-nl-muted">기사 전환과 무관하게 유지돼요. 퀴즈를 마쳐도 목록은 사라지지 않아요.</p>
+            <p className="text-nl-micro text-nl-muted">아카이빙 하기 전까지 목록은 사라지지 않아요.</p>
           </>
         ) : (
           <>

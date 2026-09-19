@@ -227,10 +227,23 @@ export type ArchiveEntryApiModel = {
    * 제공사 요청 등). 생략하면 화면에서 일반 안내 문구로 대체한다.
    */
   discontinuedReason?: string | null;
+  /** 제목을 붙여 아카이빙된 항목만 채워진다. 날짜별 "전체 보관"으로 넘어간 항목엔 없다. */
+  archiveGroupTitle?: string | null;
 };
 
 export type ArchiveApiModel = {
-  groups: Array<{ date: string; entries: ArchiveEntryApiModel[] }>;
+  groups: Array<{
+    date: string;
+    entries: ArchiveEntryApiModel[];
+    /** 한 날짜에 제목이 다른 그룹이 섞이면 null(모호함 방지). */
+    title?: string | null;
+  }>;
+};
+
+export type ArchiveTodayListResultApiModel = {
+  archiveGroupId: string;
+  title: string;
+  archivedCount: number;
 };
 
 /** "records"는 기록 삭제 요청, "account"는 탈퇴 요청. 서버는 둘을 별도 경로로 받는다. */

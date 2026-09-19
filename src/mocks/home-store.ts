@@ -172,6 +172,36 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     return clone(member.todayList);
   }
 
+  function archiveTodayList(title: string): { archiveGroupId: string; title: string; archivedCount: number } {
+    const member = activeMember();
+    if (!member) throw new Error("AUTHENTICATION_REQUIRED");
+
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) throw new Error("DUPLICATE_ARCHIVE_TITLE");
+    if (member.archive.groups.some((group) => group.title === trimmedTitle)) {
+      throw new Error("DUPLICATE_ARCHIVE_TITLE");
+    }
+
+    const date = member.todayList.selectedForDate;
+    const archiveGroupId = `archive-group-${date}-${trimmedTitle}`;
+    const entries = member.todayList.items.map((item) => ({
+      id: `archive-${date}-${item.article.id}`,
+      selectedAt: item.selectedAt,
+      article: item.article,
+      displayStatus:
+        item.quizStatus === "suspended"
+          ? ("discontinued" as const)
+          : ("available" as const),
+      archiveGroupTitle: trimmedTitle,
+    }));
+
+    member.archive.groups.push({ date, title: trimmedTitle, entries });
+    const archivedCount = member.todayList.items.length;
+    member.todayList = { selectedForDate: date, items: [] };
+
+    return { archiveGroupId, title: trimmedTitle, archivedCount };
+  }
+
   function archivePreviousLists(): HomeApiModel {
     const member = activeMember();
     if (!member) throw new Error("AUTHENTICATION_REQUIRED");
@@ -300,6 +330,7 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
   return {
     addToTodayList,
     archive: () => clone(activeMember()?.archive ?? { groups: [] }),
+    archiveTodayList,
     authMe,
     archivePreviousLists,
     deleteArchiveEntry,

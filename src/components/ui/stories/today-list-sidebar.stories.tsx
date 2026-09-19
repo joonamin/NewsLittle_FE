@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
 
 import { toHomeViewModel } from "@/features/contracts/view-models";
+import { ApiError } from "@/lib/api-client";
 import { homeFixture } from "@/mocks/fixtures";
 
 import { TodayListSidebar } from "../today-list-sidebar";
@@ -64,6 +65,7 @@ const meta = {
     onOpenArticle: fn(),
     onRemoveArticle: fn(),
     onStartQuiz: fn(),
+    onArchive: fn(async () => {}),
   },
 } satisfies Meta<typeof TodayListSidebar>;
 
@@ -100,6 +102,37 @@ export const Filled: Story = {
     await expect(args.onRemoveArticle).toHaveBeenCalledWith(filledList.items[0].articleId);
     await userEvent.click(canvas.getByRole("button", { name: "숏폼 퀴즈 시작" }));
     await expect(args.onStartQuiz).toHaveBeenCalledOnce();
+  },
+};
+
+export const Archiving: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const titleInput = canvas.getByRole("textbox", { name: "오늘 목록 제목" });
+    const archiveButton = canvas.getByRole("button", { name: "아카이빙" });
+    await expect(archiveButton).toBeDisabled();
+
+    await userEvent.type(titleInput, "이번 주 읽을거리");
+    await expect(archiveButton).toBeEnabled();
+    await userEvent.click(archiveButton);
+    await expect(args.onArchive).toHaveBeenCalledWith("이번 주 읽을거리");
+    await expect(titleInput).toHaveValue("");
+  },
+};
+
+export const ArchivingDuplicateTitle: Story = {
+  args: {
+    onArchive: fn(async () => {
+      throw new ApiError(409, "DUPLICATE_ARCHIVE_TITLE", "이미 사용 중인 이름입니다.");
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const titleInput = canvas.getByRole("textbox", { name: "오늘 목록 제목" });
+    await userEvent.type(titleInput, "중복된 제목");
+    await userEvent.click(canvas.getByRole("button", { name: "아카이빙" }));
+    await expect(canvas.getByText("이미 사용 중인 이름입니다.")).toBeVisible();
+    await expect(titleInput).toHaveValue("중복된 제목");
   },
 };
 

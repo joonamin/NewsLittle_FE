@@ -57,6 +57,7 @@ function HomeContent() {
     requestLogin,
     requestArticleSelection,
     removeArticle,
+    archiveTodayList,
     resolvePreviousLists,
     previousListDecision,
     previousListError,
@@ -143,6 +144,7 @@ function HomeContent() {
           onLogin={requestLogin}
           onOpenArticle={(url) => window.open(url, "_blank", "noopener,noreferrer")}
           onRemoveArticle={(articleId) => void removeArticle(articleId)}
+          onArchive={archiveTodayList}
           onStartQuiz={() => void router.push("/quiz")}
         />
       </div>
