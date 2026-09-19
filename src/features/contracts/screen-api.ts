@@ -15,6 +15,7 @@ import type {
   DeletionConfirmationRequest,
   DeletionRequestApiModel,
   DeletionRequestKind,
+  FeedApiModel,
   HomeApiModel,
   InterestsApiModel,
   NavigationApiModel,
@@ -29,6 +30,7 @@ import type {
 } from "./api-models";
 import {
   toArchiveViewModel,
+  toFeedViewModel,
   toGlobalNavigationViewModel,
   toHomeViewModel,
   toQuizPlayViewModel,
@@ -40,25 +42,38 @@ import {
 export const screenApi = {
   navigation: () =>
     apiRequest<NavigationApiModel>("/api/v1/navigation").then(toGlobalNavigationViewModel),
-  home: () => apiRequest<HomeApiModel>("/api/v1/home").then(toHomeViewModel),
+  home: (init?: RequestInit) => apiRequest<HomeApiModel>("/api/v1/home", init).then(toHomeViewModel),
+  feed: (options?: { cursor?: string | null; topics?: string[] }) => {
+    const params = new URLSearchParams();
+    if (options?.cursor) params.set("cursor", options.cursor);
+    if (options?.topics && options.topics.length > 0) {
+      params.set("topics", options.topics.join(","));
+    }
+    const query = params.toString();
+    return apiRequest<FeedApiModel>(`/api/v1/feed${query ? `?${query}` : ""}`).then(
+      toFeedViewModel,
+    );
+  },
   signInWithGoogle: (payload: SignInWithGoogleRequest) =>
     apiRequest<AuthenticationApiModel>("/api/v1/auth/google", jsonRequest("POST", payload)),
   signOut: () => apiRequest<void>("/api/v1/auth/logout", { method: "POST" }),
-  shortformPreview: () =>
-    apiRequest<QuizPreviewApiModel>("/api/v1/quiz/shortform/preview").then(
+  shortformPreview: (init?: RequestInit) =>
+    apiRequest<QuizPreviewApiModel>("/api/v1/quiz/shortform/preview", init).then(
       toQuizStartViewModel,
     ),
-  randomPreview: () =>
-    apiRequest<QuizPreviewApiModel>("/api/v1/quiz/random/preview").then(toQuizStartViewModel),
-  session: (domain: QuizDomain, sessionId: string) =>
-    apiRequest<QuizSessionApiModel>(`/api/v1/quiz/${domain}/sessions/${sessionId}`).then(
+  randomPreview: (init?: RequestInit) =>
+    apiRequest<QuizPreviewApiModel>("/api/v1/quiz/random/preview", init).then(toQuizStartViewModel),
+  session: (domain: QuizDomain, sessionId: string, init?: RequestInit) =>
+    apiRequest<QuizSessionApiModel>(`/api/v1/quiz/${domain}/sessions/${sessionId}`, init).then(
       toQuizPlayViewModel,
     ),
-  result: (domain: QuizDomain, sessionId: string) =>
-    apiRequest<QuizResultApiModel>(`/api/v1/quiz/${domain}/sessions/${sessionId}/result`).then(
-      toQuizResultViewModel,
-    ),
-  archive: () => apiRequest<ArchiveApiModel>("/api/v1/archive").then(toArchiveViewModel),
+  result: (domain: QuizDomain, sessionId: string, init?: RequestInit) =>
+    apiRequest<QuizResultApiModel>(
+      `/api/v1/quiz/${domain}/sessions/${sessionId}/result`,
+      init,
+    ).then(toQuizResultViewModel),
+  archive: (init?: RequestInit) =>
+    apiRequest<ArchiveApiModel>("/api/v1/archive", init).then(toArchiveViewModel),
   /** SCR-07 개별 삭제(FR-10·FR-15). 응답 본문 없음(204). */
   deleteArchiveEntry: (entryId: string) =>
     apiRequest<void>(`/api/v1/archive/${entryId}`, { method: "DELETE" }),
@@ -66,7 +81,8 @@ export const screenApi = {
    * 설정 화면(SCR-09) 조회. 백엔드에 화면 전용 엔드포인트가 없어 세션 주체 조회를
    * 그대로 쓰고, 주제 라벨·저장 위치 문구는 프론트 카탈로그가 채운다.
    */
-  settings: () => apiRequest<AuthMeApiModel>("/api/v1/auth/me").then(toSettingsViewModel),
+  settings: (init?: RequestInit) =>
+    apiRequest<AuthMeApiModel>("/api/v1/auth/me", init).then(toSettingsViewModel),
   addToTodayList: (payload: AddToTodayListRequest) =>
     apiRequest<TodayListApiModel>("/api/v1/today-list", jsonRequest("POST", payload)),
   removeFromTodayList: (articleId: string) =>

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   adminNavigationFixture,
   homeFixture,
+  nextFeedPageFixture,
   authMeFixture,
   shortformPreviewFixture,
   shortformResultFixture,
@@ -10,6 +11,7 @@ import {
 } from "@/mocks/fixtures";
 
 import {
+  toFeedViewModel,
   toGlobalNavigationViewModel,
   toHomeViewModel,
   toQuizPlayViewModel,
@@ -21,16 +23,74 @@ import {
 } from "./view-models";
 
 describe("screen view-model mappers", () => {
-  it("keeps API-only article fields out of the home view model", () => {
+  it("keeps API-only article fields out of the home view model and maps nextCursor", () => {
     const viewModel = toHomeViewModel(homeFixture);
 
     expect(viewModel.viewer.isMember).toBe(true);
+    expect(viewModel.feed.nextCursor).toBe("demo-next-cursor");
     expect(viewModel.feed.cards[0]).toMatchObject({
       sourceName: "데모 뉴스",
       showsAiSummary: true,
       isRestricted: false,
     });
-    expect(viewModel.feed.cards[0]).not.toHaveProperty("topicIds");
+  });
+
+  it("treats an admin viewer as a member on the home screen (BE도 admin을 로그인 상태로 취급)", () => {
+    const viewModel = toHomeViewModel({
+      ...homeFixture,
+      viewer: { ...homeFixture.viewer, role: "admin" },
+    });
+
+    expect(viewModel.viewer.isMember).toBe(true);
+  });
+
+  it("maps bodyText from article.body and summaryText from article.summary separately", () => {
+    const card = toHomeViewModel(homeFixture).feed.cards[0];
+
+    expect(card?.bodyText).toBe(homeFixture.feed.items[0]?.article.body.text);
+    expect(card?.summaryText).toBe(homeFixture.feed.items[0]?.article.summary.text);
+    expect(card?.bodyText).not.toBe(card?.summaryText);
+  });
+
+  it("falls back to the summary as body and hides the AI summary box when body is unavailable", () => {
+    const legacy = structuredClone(homeFixture);
+    legacy.feed.items[0]!.article.body = { status: "unavailable", text: null };
+    const card = toHomeViewModel(legacy).feed.cards[0];
+
+    expect(card?.bodyText).toBe(legacy.feed.items[0]?.article.summary.text);
+    expect(card?.summaryText).toBeNull();
+    expect(card?.showsAiSummary).toBe(false);
+    expect(card?.isRestricted).toBe(false);
+  });
+
+  it("hides the AI summary box when body and summary are effectively the same text", () => {
+    const duplicated = structuredClone(homeFixture);
+    const article = duplicated.feed.items[0]!.article;
+    article.body = { status: "available", text: `${article.summary.text} ` };
+    const card = toHomeViewModel(duplicated).feed.cards[0];
+
+    expect(card?.summaryText).toBeNull();
+    expect(card?.showsAiSummary).toBe(false);
+  });
+
+  it("marks the card restricted only when both body and summary are unavailable", () => {
+    const expired = structuredClone(homeFixture);
+    const article = expired.feed.items[0]!.article;
+    article.body = { status: "unavailable", text: null };
+    article.summary = { ...article.summary, status: "unavailable", text: null };
+    const card = toHomeViewModel(expired).feed.cards[0];
+
+    expect(card?.bodyText).toBeNull();
+    expect(card?.isRestricted).toBe(true);
+  });
+
+  it("maps feed API model to FeedViewModel with cards and nextCursor", () => {
+    const feedViewModel = toFeedViewModel(nextFeedPageFixture);
+
+    expect(feedViewModel.cards).toHaveLength(1);
+    expect(feedViewModel.cards[0]?.title).toBe("모의 기사: 다음 커서로 불러온 새로운 기사입니다");
+    expect(feedViewModel.nextCursor).toBeNull();
+    expect(feedViewModel.canLoadPreviousDates).toBe(false);
   });
 
   it("maps quiz format availability into UI-ready labels", () => {

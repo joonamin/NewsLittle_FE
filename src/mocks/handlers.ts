@@ -55,6 +55,11 @@ function failureResponse(error: unknown) {
 export const handlers = [
   http.get(`${api}/navigation`, () => successResponse(mockHomeStore.navigation())),
   http.get(`${api}/home`, () => successResponse(mockHomeStore.home())),
+  http.get(`${api}/feed`, ({ request }) => {
+    const url = new URL(request.url);
+    const cursor = url.searchParams.get("cursor");
+    return successResponse(mockHomeStore.feed(cursor));
+  }),
   http.post(`${api}/auth/google`, async ({ request }) => {
     const payload = (await request.json().catch(() => null)) as {
       credential?: string;

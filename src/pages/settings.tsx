@@ -1,3 +1,4 @@
+import type { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -14,6 +15,7 @@ import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import type { DeletionRequestKind, TopicCode } from "@/features/contracts/api-models";
 import { settingsQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
+import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
 import {
   withDeletionRequest,
   withUpdatedInterests,
@@ -246,9 +248,14 @@ function SettingsContent() {
         </section>
       )}
 
-      <Link href="/privacy" className="text-nl-caption text-nl-accent">
-        개인정보 처리 안내 ↗
-      </Link>
+      <div className="flex flex-wrap items-center gap-4">
+        <Link href="/terms" className="text-nl-caption text-nl-accent hover:underline">
+          서비스 이용약관 ↗
+        </Link>
+        <Link href="/privacy" className="text-nl-caption text-nl-accent hover:underline">
+          개인정보 처리 안내 ↗
+        </Link>
+      </div>
 
       <Modal
         open={confirmKind === "records"}
@@ -327,3 +334,9 @@ function DeletionRequestNotice({
 function Page({ children }: { children: ReactNode }) {
   return <div className="mx-auto flex w-full max-w-[880px] flex-col gap-6 px-5 py-9 md:px-8">{children}</div>;
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => ({
+  props: await dehydrateScreenQueries(req, (queryClient, init) =>
+    queryClient.prefetchQuery({ ...settingsQueryOptions, queryFn: () => screenApi.settings(init) }),
+  ),
+});

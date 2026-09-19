@@ -89,6 +89,14 @@ export const TextOnly: Story = {
   },
 };
 
+export const ReportOnSingleClick: Story = {
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "신고" }));
+    await expect(args.onReport).toHaveBeenCalledOnce();
+  },
+};
+
 export const LongBody: Story = {
   args: { card: longCard },
   play: async ({ canvasElement }) => {
@@ -99,6 +107,18 @@ export const LongBody: Story = {
     await userEvent.click(more);
     await expect(canvas.getByRole("button", { name: "접기" })).toBeVisible();
     await expect(canvas.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
+  },
+};
+
+export const SummaryOnlyLegacy: Story = {
+  name: "Summary only (legacy body)",
+  args: {
+    card: { ...textCard, bodyText: textCard.summaryText, summaryText: null, showsAiSummary: false },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText(textCard.summaryText ?? "")).toBeVisible();
+    await expect(canvas.queryByRole("note", { name: "AI 한 줄 요약" })).not.toBeInTheDocument();
   },
 };
 

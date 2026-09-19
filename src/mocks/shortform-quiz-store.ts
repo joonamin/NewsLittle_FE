@@ -147,6 +147,7 @@ function articleFor(state: SessionState): ArticleApiModel {
       aiGenerated: true,
       reviewedAt: "2026-09-14T10:00:00+09:00",
     },
+    body: { status: "available", text: null },
     image: null,
     availability: { feed: "published", original: "available" },
   };

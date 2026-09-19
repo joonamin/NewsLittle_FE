@@ -84,6 +84,14 @@ export type ArticleApiModel = {
     aiGenerated: boolean;
     reviewedAt: ApiTimestamp | null;
   };
+  /**
+   * 홈 카드 본문(bodyText): AI가 기사를 함축해 새로 쓴 단문 4~5문장(BE key_sentence).
+   * summary(AI 한 줄 요약)와 다른 글이다 — 둘을 같은 값으로 채우지 않는다.
+   */
+  body: {
+    status: "available" | "unavailable";
+    text: string | null;
+  };
   image: ArticleImageApiModel | null;
   availability: {
     feed: "published" | "removed";
@@ -114,14 +122,16 @@ export type PreviousListApiModel = {
   items: TodayListItemApiModel[];
 };
 
+export type FeedApiModel = {
+  items: FeedItemApiModel[];
+  currentIndex: number;
+  nextCursor: string | null;
+  canLoadPreviousDates: boolean;
+};
+
 export type HomeApiModel = {
   viewer: ViewerApiModel;
-  feed: {
-    items: FeedItemApiModel[];
-    currentIndex: number;
-    nextCursor: string | null;
-    canLoadPreviousDates: boolean;
-  };
+  feed: FeedApiModel;
   todayList: TodayListApiModel | null;
   pendingPreviousLists: PreviousListApiModel[];
 };

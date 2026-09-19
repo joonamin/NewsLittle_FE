@@ -4,6 +4,7 @@ import type {
   AuthMeApiModel,
   DeletionRequestApiModel,
   DeletionRequestKind,
+  FeedApiModel,
   HomeApiModel,
   InterestsApiModel,
   NavigationApiModel,
@@ -20,6 +21,7 @@ import {
   homeFixture,
   memberNavigationFixture,
   mockViewer,
+  nextFeedPageFixture,
 } from "./fixtures";
 import { articles as randomQuizArticles } from "./random-quiz-fixtures";
 
@@ -107,6 +109,9 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
   function feedItem(articleId: string) {
     const homeItem = homeFixture.feed.items.find((item) => item.article.id === articleId);
     if (homeItem) return homeItem;
+
+    const nextPageItem = nextFeedPageFixture.items.find((item) => item.article.id === articleId);
+    if (nextPageItem) return nextPageItem;
 
     const quizArticle = randomQuizArticles.find((article) => article.id === articleId);
     return quizArticle ? { article: quizArticle, isFromPreviousFeedDate: false } : null;
@@ -299,6 +304,12 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     archivePreviousLists,
     deleteArchiveEntry,
     discardPreviousLists,
+    feed: (cursor?: string | null): FeedApiModel => {
+      if (cursor === "demo-next-cursor") {
+        return clone(nextFeedPageFixture);
+      }
+      return clone(homeFixture.feed);
+    },
     home,
     /**
      * FR-12/AC-33: 계정에 관심 주제가 설정된 적이 없을 때만(interestsSetAt이 null일 때만)
