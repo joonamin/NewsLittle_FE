@@ -2,6 +2,7 @@ import type {
   ArchiveApiModel,
   ArticleApiModel,
   AuthMeApiModel,
+  FeedApiModel,
   HomeApiModel,
   NavigationApiModel,
   QuizFormat,
@@ -123,6 +124,35 @@ export const longArticle: ArticleApiModel = {
   },
   image: null,
   availability: { feed: "published", original: "available" },
+};
+
+export const nextPageArticle: ArticleApiModel = {
+  id: "article-next-page-demo",
+  title: "모의 기사: 다음 커서로 불러온 새로운 기사입니다",
+  source: {
+    id: "source-demo-news",
+    name: "데모 뉴스",
+    originalUrl: "https://example.com/articles/next-page",
+    publishedAt: "2026-09-12T10:00:00+09:00",
+  },
+  topicIds: ["economy"],
+  summary: {
+    status: "available",
+    text: "무한 스크롤 및 다음 커서로 새롭게 페치된 모의 기사 본문입니다.",
+    aiGenerated: true,
+    reviewedAt: "2026-09-12T10:30:00+09:00",
+  },
+  image: null,
+  availability: { feed: "published", original: "available" },
+};
+
+export const nextFeedPageFixture: FeedApiModel = {
+  items: [
+    { article: nextPageArticle, isFromPreviousFeedDate: true },
+  ],
+  currentIndex: 0,
+  nextCursor: null,
+  canLoadPreviousDates: false,
 };
 
 export const homeFixture: HomeApiModel = {

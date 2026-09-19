@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Noto_Sans_KR } from "next/font/google";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { HydrationBoundary, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { AppShell } from "@/components/layout/app-shell";
@@ -39,13 +39,15 @@ export default function App({ Component, pageProps }: AppProps) {
       `}</style>
       <MockingProvider>
         <QueryClientProvider client={queryClient}>
-          <ErrorBoundary FallbackComponent={AppErrorFallback}>
-            <HomeFlowProvider>
-              <AppShell>
-                <Component {...pageProps} />
-              </AppShell>
-            </HomeFlowProvider>
-          </ErrorBoundary>
+          <HydrationBoundary state={pageProps.dehydratedState}>
+            <ErrorBoundary FallbackComponent={AppErrorFallback}>
+              <HomeFlowProvider>
+                <AppShell>
+                  <Component {...pageProps} />
+                </AppShell>
+              </HomeFlowProvider>
+            </ErrorBoundary>
+          </HydrationBoundary>
         </QueryClientProvider>
       </MockingProvider>
     </>

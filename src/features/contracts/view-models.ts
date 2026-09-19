@@ -12,6 +12,7 @@ import type {
   AuthMeApiModel,
   DeletionRequestKind,
   DeletionRequestState,
+  FeedApiModel,
   HomeApiModel,
   NavigationApiModel,
   NavigationItemId,
@@ -121,13 +122,25 @@ function mapArticleCard(
   };
 }
 
+export type FeedViewModel = {
+  cards: ReturnType<typeof mapArticleCard>[];
+  currentPositionLabel: string;
+  canLoadPreviousDates: boolean;
+  nextCursor: string | null;
+};
+
+export function toFeedViewModel(api: FeedApiModel): FeedViewModel {
+  return {
+    cards: api.items.map((item) => mapArticleCard(item.article, item.isFromPreviousFeedDate)),
+    currentPositionLabel: `${api.currentIndex + 1}/${api.items.length}`,
+    canLoadPreviousDates: api.canLoadPreviousDates,
+    nextCursor: api.nextCursor,
+  };
+}
+
 export type HomeViewModel = {
   viewer: { isMember: boolean; displayName: string | null };
-  feed: {
-    cards: ReturnType<typeof mapArticleCard>[];
-    currentPositionLabel: string;
-    canLoadPreviousDates: boolean;
-  };
+  feed: FeedViewModel;
   todayList: {
     count: number;
     dateLabel: string;
@@ -160,13 +173,7 @@ export function toHomeViewModel(api: HomeApiModel): HomeViewModel {
       isMember: api.viewer.role === "member",
       displayName: api.viewer.displayName,
     },
-    feed: {
-      cards: api.feed.items.map((item) =>
-        mapArticleCard(item.article, item.isFromPreviousFeedDate),
-      ),
-      currentPositionLabel: `${api.feed.currentIndex + 1}/${api.feed.items.length}`,
-      canLoadPreviousDates: api.feed.canLoadPreviousDates,
-    },
+    feed: toFeedViewModel(api.feed),
     todayList: api.todayList
       ? {
           count: api.todayList.items.length,

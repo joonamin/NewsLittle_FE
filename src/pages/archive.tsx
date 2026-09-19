@@ -1,3 +1,4 @@
+import type { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
@@ -7,6 +8,7 @@ import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { archiveQueryOptions, navigationQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
+import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
 import type { ArchiveViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
 
@@ -157,3 +159,9 @@ function ArchiveContent() {
 function Page({ children }: { children: ReactNode }) {
   return <div className="mx-auto flex w-full max-w-[880px] flex-col gap-6 px-5 py-9 md:px-8">{children}</div>;
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => ({
+  props: await dehydrateScreenQueries(req, (queryClient, init) =>
+    queryClient.prefetchQuery({ ...archiveQueryOptions, queryFn: () => screenApi.archive(init) }),
+  ),
+});

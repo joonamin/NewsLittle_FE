@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import type { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 
@@ -9,6 +10,7 @@ import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import type { QuizFormat } from "@/features/contracts/api-models";
 import { quizPreviewQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
+import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
 import { cn } from "@/lib/cn";
 
 const formatDescription: Record<QuizFormat, string> = {
@@ -141,3 +143,9 @@ function RandomQuizStartContent() {
 function PageContainer({ children }: { children: ReactNode }) {
   return <div className="mx-auto flex w-full max-w-[960px] flex-col gap-6 px-5 py-10 md:px-8">{children}</div>;
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => ({
+  props: await dehydrateScreenQueries(req, (queryClient, init) =>
+    queryClient.prefetchQuery({ ...quizPreviewQueryOptions("random"), queryFn: () => screenApi.randomPreview(init) }),
+  ),
+});
