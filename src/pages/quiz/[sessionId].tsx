@@ -390,7 +390,13 @@ function ChoiceAnswer({
   onRetry: () => void;
   onGiveUp: () => void;
 }) {
-  const choices = session.question?.choices ?? [];
+  const choices =
+    session.question?.choices && session.question.choices.length > 0
+      ? session.question.choices
+      : [
+          { id: "O", label: "O" },
+          { id: "X", label: "X" },
+        ];
 
   return (
     <div className="space-y-4">

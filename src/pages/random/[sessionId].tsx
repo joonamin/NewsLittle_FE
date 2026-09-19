@@ -186,7 +186,13 @@ function RandomQuizPlayContent({ sessionId }: { sessionId: string }) {
 
           {session.format === "choice" ? (
             <div className="grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="답 선택">
-              {question.choices?.map((choice, index) => choice.label === "O" || choice.label === "X" ? (
+              {(question.choices && question.choices.length > 0
+                ? question.choices
+                : [
+                    { id: "O", label: "O" },
+                    { id: "X", label: "X" },
+                  ]
+              ).map((choice, index) => choice.label === "O" || choice.label === "X" ? (
                 <QuizOptionOX key={choice.id} label={choice.label} selected={selectedAnswer === choice.id} disabled={isJudging} onClick={() => setSelectedAnswer(choice.id)} />
               ) : (
                 <QuizOptionChoice key={choice.id} index={index + 1} text={choice.label} selected={selectedAnswer === choice.id} disabled={isJudging} onClick={() => setSelectedAnswer(choice.id)} />
