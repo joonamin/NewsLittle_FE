@@ -1,14 +1,13 @@
 import type {
   ArchiveApiModel,
   ArticleApiModel,
+  AuthMeApiModel,
   HomeApiModel,
   NavigationApiModel,
   QuizFormat,
   QuizPreviewApiModel,
   QuizResultApiModel,
   QuizSessionApiModel,
-  SettingsApiModel,
-  TopicCode,
   ViewerApiModel,
 } from "@/features/contracts/api-models";
 
@@ -395,25 +394,16 @@ export const archiveFixture: ArchiveApiModel = {
   ],
 };
 
-export const topicCatalog: Array<{ id: TopicCode; label: string }> = [
-  { id: "ECONOMY", label: "경제" },
-  { id: "SOCIETY", label: "사회" },
-  { id: "AI_IT", label: "AI·IT" },
-  { id: "SCIENCE", label: "과학" },
-  { id: "WORLD", label: "국제" },
-  { id: "POLITICS", label: "정치" },
-];
-
-export const settingsFixture: SettingsApiModel = {
-  viewer: mockViewer,
-  topics: topicCatalog.map((topic) => ({
-    ...topic,
-    selected: topic.id === "SOCIETY" || topic.id === "AI_IT",
-  })),
-  account: {
-    emailMasked: "me•••@newslittle.example",
-    canRequestDeletion: true,
-    persistenceDescription: "관심 주제와 오늘 목록, 아카이브는 계정에 저장됩니다.",
-    lastDeletionRequest: null,
-  },
+/** GET /api/v1/auth/me 회원 응답. 설정 화면(SCR-09)이 이 하나로 구성된다. */
+export const authMeFixture: AuthMeApiModel = {
+  status: "authenticated",
+  email: "member-demo@newslittle.example",
+  displayName: mockViewer.displayName,
+  role: "member",
+  interests: ["AI_IT", "SOCIETY"],
+  interestsSetAt: "2026-09-01T00:00:00+09:00",
+  accountDeletionRequest: null,
+  canRequestAccountDeletion: true,
+  recordsDeletionRequest: null,
+  canRequestRecordsDeletion: true,
 };

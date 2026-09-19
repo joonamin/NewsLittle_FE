@@ -51,6 +51,8 @@ export type HomeFlowState = {
   loginPending: boolean;
   loginError: string | null;
   pendingAction: PendingAction;
+  /** 로그인 직후 설정 화면이 한 번 안내할 관심 주제 반영 경로(AC-33). */
+  interestsSource: InterestsSource | null;
 };
 
 type HomeFlowAction =
@@ -60,13 +62,16 @@ type HomeFlowAction =
   | { type: "close-login" }
   | { type: "login-pending" }
   | { type: "login-idle" }
-  | { type: "login-error"; message: string };
+  | { type: "login-error"; message: string }
+  | { type: "login-succeeded"; interestsSource: InterestsSource | null }
+  | { type: "clear-interests-source" };
 
 export const initialHomeFlowState: HomeFlowState = {
   loginOpen: false,
   loginPending: false,
   loginError: null,
   pendingAction: null,
+  interestsSource: null,
 };
 
 export function isHomeRoute(url: string) {
@@ -89,6 +94,10 @@ export function homeFlowReducer(state: HomeFlowState, action: HomeFlowAction): H
       return { ...state, loginPending: false };
     case "login-error":
       return { ...state, loginPending: false, loginError: action.message };
+    case "login-succeeded":
+      return { ...state, interestsSource: action.interestsSource };
+    case "clear-interests-source":
+      return state.interestsSource === null ? state : { ...state, interestsSource: null };
   }
 }
 
@@ -100,6 +109,12 @@ export type ArticleSelectionResult =
   | "unavailable";
 
 export type PreviousListDecision = "archive" | "discard";
+
+/**
+ * AC-33: 로그인 직후 관심 주제가 어디서 왔는지를 설정 화면이 한 번 안내한다.
+ * 서버가 로그인 응답으로 알려주는 값이라 화면에서 추측하지 않는다.
+ */
+export type InterestsSource = "browser" | "account";
 
 type HomeFlowContextValue = HomeFlowState & {
   home: HomeViewModel | null;
@@ -143,6 +158,10 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
     const refreshWhenHomeReturns = (url: string) => {
       if (isHomeRoute(url)) {
         void queryClient.invalidateQueries({ queryKey: queryKeys.home });
+      }
+      // AC-33 안내는 로그인 직후 설정 화면에서 한 번만 쓰인다. 화면을 떠나면 비운다.
+      if (url.split(/[?#]/, 1)[0] !== "/settings") {
+        dispatch({ type: "clear-interests-source" });
       }
     };
 
@@ -220,10 +239,11 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
 
     const browserTopicIds = getGuestTopics();
     try {
-      await signIn.mutateAsync({
+      const authenticated = await signIn.mutateAsync({
         credential,
         ...(browserTopicIds.length > 0 ? { topicIds: browserTopicIds } : {}),
       });
+      dispatch({ type: "login-succeeded", interestsSource: authenticated.interestsSource ?? null });
     } catch (error) {
       dispatch({ type: "login-error", message: describeSignInError(error) });
       return "login-required";
@@ -265,6 +285,7 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     dispatch({ type: "clear-pending-action" });
+    dispatch({ type: "clear-interests-source" });
     await signOut.mutateAsync();
   }, [signOut]);
 
