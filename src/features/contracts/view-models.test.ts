@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   adminNavigationFixture,
   homeFixture,
+  settingsFixture,
   shortformPreviewFixture,
   shortformResultFixture,
   shortformSessionFixture,
@@ -14,6 +15,7 @@ import {
   toQuizPlayViewModel,
   toQuizResultViewModel,
   toQuizStartViewModel,
+  toSettingsViewModel,
 } from "./view-models";
 
 describe("screen view-model mappers", () => {
@@ -91,5 +93,42 @@ describe("screen view-model mappers", () => {
       status: "ended-by-service",
       question: null,
     });
+  });
+
+  it("maps a member's settings with masked email and all six interest topics", () => {
+    const viewModel = toSettingsViewModel(settingsFixture);
+
+    expect(viewModel.viewer.isMember).toBe(true);
+    expect(viewModel.emailMasked).toBe("me•••@newslittle.example");
+    expect(viewModel.canRequestDeletion).toBe(true);
+    expect(viewModel.topics).toHaveLength(6);
+    expect(viewModel.topics).toContainEqual({ id: "WORLD", label: "국제", selected: false });
+    expect(viewModel.lastDeletionRequest).toBeNull();
+  });
+
+  it("falls back to a browser persistence description and hides account fields for a guest", () => {
+    const viewModel = toSettingsViewModel({
+      ...settingsFixture,
+      viewer: { id: null, role: "guest", displayName: null, storageScope: "browser" },
+      account: null,
+    });
+
+    expect(viewModel.viewer.isMember).toBe(false);
+    expect(viewModel.canRequestDeletion).toBe(false);
+    expect(viewModel.emailMasked).toBeNull();
+    expect(viewModel.lastDeletionRequest).toBeNull();
+    expect(viewModel.persistenceDescription).toBe("관심 주제는 이 브라우저에 저장됩니다.");
+  });
+
+  it("maps a failed deletion request so the screen can show a retry prompt", () => {
+    const viewModel = toSettingsViewModel({
+      ...settingsFixture,
+      account: {
+        ...settingsFixture.account!,
+        lastDeletionRequest: { kind: "account", outcome: "failed", requestedAt: "2026-09-13T00:00:00+09:00" },
+      },
+    });
+
+    expect(viewModel.lastDeletionRequest).toMatchObject({ kind: "account", outcome: "failed" });
   });
 });

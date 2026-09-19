@@ -11,6 +11,7 @@ import type {
   AuthenticationApiModel,
   ArchiveApiModel,
   CreateQuizSessionRequest,
+  DeletionRequestKind,
   HomeApiModel,
   NavigationApiModel,
   QuizDomain,
@@ -107,4 +108,10 @@ export const screenApi = {
     apiRequest<SettingsApiModel>("/api/v1/settings/topics", jsonRequest("PUT", payload)).then(
       toSettingsViewModel,
     ),
+  /** FR-15/AC-26: 기록 삭제 또는 계정 탈퇴를 요청한다. */
+  requestAccountDeletion: (kind: DeletionRequestKind) =>
+    apiRequest<SettingsApiModel>(
+      "/api/v1/settings/deletion-requests",
+      jsonRequest("POST", { kind }),
+    ).then(toSettingsViewModel),
 };

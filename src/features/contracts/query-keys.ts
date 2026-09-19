@@ -34,6 +34,11 @@ export const archiveQueryOptions = queryOptions({
   queryFn: screenApi.archive,
 });
 
+export const settingsQueryOptions = queryOptions({
+  queryKey: queryKeys.settings,
+  queryFn: screenApi.settings,
+});
+
 export function quizPreviewQueryOptions(domain: QuizDomain) {
   return queryOptions({
     queryKey: queryKeys.quiz.preview(domain),

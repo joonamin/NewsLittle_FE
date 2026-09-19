@@ -223,13 +223,29 @@ export type ArchiveApiModel = {
   groups: Array<{ date: string; entries: ArchiveEntryApiModel[] }>;
 };
 
+export type DeletionRequestKind = "records" | "account";
+export type DeletionRequestOutcome = "completed" | "failed";
+
+export type DeletionRequestApiModel = {
+  kind: DeletionRequestKind;
+  outcome: DeletionRequestOutcome;
+  requestedAt: ApiTimestamp;
+} | null;
+
 export type SettingsApiModel = {
   viewer: ViewerApiModel;
-  topics: Array<{ id: string; label: string; selected: boolean }>;
+  topics: Array<{ id: TopicCode; label: string; selected: boolean }>;
   account: {
+    emailMasked: string;
     canRequestDeletion: boolean;
     persistenceDescription: string;
+    /** 가장 최근 삭제·탈퇴 요청의 처리 결과. 요청이 없거나 처리 중이면 null. */
+    lastDeletionRequest: DeletionRequestApiModel;
   } | null;
+};
+
+export type RequestAccountDeletionRequest = {
+  kind: DeletionRequestKind;
 };
 
 export type AddToTodayListRequest = {
@@ -267,5 +283,5 @@ export type SubmitQuizAnswerRequest = {
 };
 
 export type UpdateInterestTopicsRequest = {
-  topicIds: string[];
+  topicIds: TopicCode[];
 };

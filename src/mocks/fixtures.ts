@@ -8,6 +8,7 @@ import type {
   QuizResultApiModel,
   QuizSessionApiModel,
   SettingsApiModel,
+  TopicCode,
   ViewerApiModel,
 } from "@/features/contracts/api-models";
 
@@ -387,16 +388,25 @@ export const archiveFixture: ArchiveApiModel = {
   ],
 };
 
+export const topicCatalog: Array<{ id: TopicCode; label: string }> = [
+  { id: "ECONOMY", label: "경제" },
+  { id: "SOCIETY", label: "사회" },
+  { id: "AI_IT", label: "AI·IT" },
+  { id: "SCIENCE", label: "과학" },
+  { id: "WORLD", label: "국제" },
+  { id: "POLITICS", label: "정치" },
+];
+
 export const settingsFixture: SettingsApiModel = {
   viewer: mockViewer,
-  topics: [
-    { id: "economy", label: "경제", selected: false },
-    { id: "society", label: "사회", selected: true },
-    { id: "ai-it", label: "AI·IT", selected: true },
-    { id: "science", label: "과학", selected: false },
-  ],
+  topics: topicCatalog.map((topic) => ({
+    ...topic,
+    selected: topic.id === "SOCIETY" || topic.id === "AI_IT",
+  })),
   account: {
+    emailMasked: "me•••@newslittle.example",
     canRequestDeletion: true,
     persistenceDescription: "관심 주제와 오늘 목록, 아카이브는 계정에 저장됩니다.",
+    lastDeletionRequest: null,
   },
 };

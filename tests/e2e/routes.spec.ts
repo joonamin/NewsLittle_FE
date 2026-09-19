@@ -10,6 +10,7 @@ const routes = [
   { path: "/quiz/quiz-session/result", heading: "숏폼 퀴즈 결과" },
   { path: "/archive", heading: "아카이브" },
   { path: "/settings", heading: "설정" },
+  { path: "/privacy", heading: "개인정보 처리방침" },
 ] as const;
 
 for (const route of routes) {

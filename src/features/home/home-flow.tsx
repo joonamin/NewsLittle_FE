@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { ApiError } from "@/lib/api-client";
+import { clearGuestTopics, getGuestTopics } from "@/lib/guest-topics";
 import { GoogleSignInCancelledError, resolveGoogleCredential } from "@/lib/google-identity";
 import {
   homeQueryOptions,
@@ -134,6 +135,7 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: queryKeys.home }),
       queryClient.invalidateQueries({ queryKey: queryKeys.navigation }),
+      queryClient.invalidateQueries({ queryKey: queryKeys.settings }),
     ]);
   }, [queryClient]);
 
@@ -216,12 +218,19 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
       return "login-required";
     }
 
+    const browserTopicIds = getGuestTopics();
     try {
-      await signIn.mutateAsync({ credential });
+      await signIn.mutateAsync({
+        credential,
+        ...(browserTopicIds.length > 0 ? { topicIds: browserTopicIds } : {}),
+      });
     } catch (error) {
       dispatch({ type: "login-error", message: describeSignInError(error) });
       return "login-required";
     }
+    // 로그인 성공 후에는 브라우저 저장값의 역할이 끝난다. 남겨두면 이후 다른 계정으로
+    // 로그인할 때 이번 계정과 무관한 값이 재사용될 수 있어 매 로그인 시도마다 비운다.
+    clearGuestTopics();
 
     dispatch({ type: "close-login" });
     const nextHome = await queryClient.ensureQueryData(homeQueryOptions);
