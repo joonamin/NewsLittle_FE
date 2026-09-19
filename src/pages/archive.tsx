@@ -143,7 +143,8 @@ function ArchiveContent() {
             className="flex flex-col gap-4 rounded-nl-card border border-nl-border bg-nl-bg p-6"
           >
             <ArchiveGroup
-              dateLabel={`${group.title ? `${group.title} · ` : ""}${group.dateLabel} 선택 · ${group.items.length}개`}
+              title={group.title}
+              dateText={`${group.dateLabel} 선택`}
               items={group.items}
               expanded={expandedDates.has(group.date)}
               onToggleExpanded={() => toggleGroup(group.date)}

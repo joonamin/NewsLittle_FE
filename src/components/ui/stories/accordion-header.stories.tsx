@@ -34,3 +34,42 @@ export const Collapsed: Story = {
     await expect(canvas.getByRole("button")).toHaveAttribute("aria-expanded", "false");
   },
 };
+
+export const WithPriorityHierarchy: Story = {
+  args: {
+    p1: "20260920_1",
+    p2: "2026. 9. 20. 선택",
+    p3: "7개",
+    expanded: true,
+    showsStateText: true,
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const p1 = canvas.getByText("20260920_1");
+    const p2 = canvas.getByText("2026. 9. 20. 선택");
+    const p3 = canvas.getByText("7개");
+    await expect(p1).toBeVisible();
+    await expect(p2).toBeVisible();
+    await expect(p3).toBeVisible();
+    await expect(canvas.getByText("펼침")).toBeVisible();
+    const button = canvas.getByRole("button");
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledOnce();
+  },
+};
+
+export const WithoutSecondary: Story = {
+  args: {
+    p1: "2026. 9. 20. 선택",
+    p3: "3개",
+    expanded: false,
+    showsStateText: true,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText("2026. 9. 20. 선택")).toBeVisible();
+    await expect(canvas.getByText("3개")).toBeVisible();
+    await expect(canvas.getByText("접힘")).toBeVisible();
+  },
+};
+
