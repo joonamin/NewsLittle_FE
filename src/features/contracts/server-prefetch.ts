@@ -33,5 +33,17 @@ export async function dehydrateScreenQueries(
   const queryClient = createQueryClient();
   await prefetch(queryClient, init);
 
-  return { dehydratedState: dehydrate(queryClient) };
+  // dehydrate는 성공한 쿼리만 싣는다. 프리페치가 실패해 빈 상태를 넘기면 클라이언트가
+  // 서버 캐시가 있다고 오해하므로, 아무것도 못 채웠으면 프리페치를 건너뛴 것과 같이 취급한다.
+  const dehydratedState = dehydrate(queryClient);
+  if (dehydratedState.queries.length === 0) {
+    for (const query of queryClient.getQueryCache().getAll()) {
+      if (query.state.status === "error") {
+        console.error("[ssr-prefetch] 서버 프리페치 실패", query.queryKey, query.state.error);
+      }
+    }
+    return {};
+  }
+
+  return { dehydratedState };
 }
