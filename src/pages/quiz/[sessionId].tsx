@@ -349,6 +349,7 @@ function QuizPlayContent({ sessionId }: { sessionId: string }) {
                 timedOut={judgementTimedOut}
                 onRetry={() => submitMutation.mutate(answer)}
                 onGiveUp={() => giveUpMutation.mutate()}
+                isJudging={isJudging}
               />
             ) : (
               <ActionButtons
@@ -437,6 +438,7 @@ function ChoiceAnswer({
           timedOut={judgementTimedOut}
           onRetry={onRetry}
           onGiveUp={onGiveUp}
+          isJudging={isJudging}
         />
       ) : (
         <div className="flex flex-col gap-3 sm:flex-row">
@@ -480,11 +482,13 @@ function JudgementIncomplete({
   timedOut,
   onRetry,
   onGiveUp,
+  isJudging,
 }: {
   timeoutSeconds: 3 | 10;
   timedOut: boolean;
   onRetry: () => void;
   onGiveUp: () => void;
+  isJudging: boolean;
 }) {
   return (
     <StateNotice
@@ -494,8 +498,8 @@ function JudgementIncomplete({
       className="max-w-none"
       actions={
         <>
-          <Button size="s" onClick={onRetry}>재시도</Button>
-          <Button size="s" variant="secondary" onClick={onGiveUp}>포기</Button>
+          <Button size="s" disabled={isJudging} onClick={onRetry}>재시도</Button>
+          <Button size="s" variant="secondary" disabled={isJudging} onClick={onGiveUp}>포기</Button>
         </>
       }
     />

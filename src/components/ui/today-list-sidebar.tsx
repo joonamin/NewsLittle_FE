@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import type { HomeViewModel } from "@/features/contracts/view-models";
+import { useDebouncedAction } from "@/hooks/use-debounced-action";
 import { ApiError } from "@/lib/api-client";
 
 import { Badge } from "./badge";
@@ -62,26 +63,26 @@ export function TodayListSidebar({
   const preparingCount = items.filter((item) => item.quizStatusLabel === "문항 준비 중").length;
 
   const [title, setTitle] = useState(createUntitledTitle);
-  const [isArchiving, setIsArchiving] = useState(false);
   const [archiveError, setArchiveError] = useState<string | null>(null);
+  const { run: runArchive, pending: isArchiving } = useDebouncedAction();
+  const { run: runRemove } = useDebouncedAction();
 
   const canArchive = title.trim().length > 0 && items.length > 0 && !isArchiving;
 
-  const handleArchive = async () => {
+  const handleArchive = () => {
     const trimmedTitle = title.trim();
     if (!trimmedTitle || items.length === 0 || isArchiving) return;
-    setIsArchiving(true);
     setArchiveError(null);
-    try {
-      await onArchive(trimmedTitle);
-      setTitle(createUntitledTitle());
-    } catch (error) {
-      setArchiveError(
-        error instanceof ApiError ? error.message : "아카이빙에 실패했어요. 다시 시도해 주세요.",
-      );
-    } finally {
-      setIsArchiving(false);
-    }
+    void runArchive(async () => {
+      try {
+        await onArchive(trimmedTitle);
+        setTitle(createUntitledTitle());
+      } catch (error) {
+        setArchiveError(
+          error instanceof ApiError ? error.message : "아카이빙에 실패했어요. 다시 시도해 주세요.",
+        );
+      }
+    });
   };
 
   return (
@@ -137,7 +138,7 @@ export function TodayListSidebar({
                     <div className="min-w-0 flex-1 pt-[7px] pb-[22px]">
                       <div className="flex items-center gap-2">
                         <a href={item.originalUrl} target="_blank" rel="noreferrer" onClick={(event) => { event.preventDefault(); onOpenArticle(item.originalUrl); }} className="min-w-0 flex-1 text-nl-caption leading-[1.5] text-nl-accent hover:underline">{item.title}</a>
-                        <button type="button" aria-label={`${item.title} 삭제`} onClick={() => onRemoveArticle(item.articleId)} className="rounded-nl-button text-[20px] leading-[1.5] text-nl-muted transition-colors hover:bg-nl-subtle hover:text-nl-text"><X width={20} height={20} /></button>
+                        <button type="button" aria-label={`${item.title} 삭제`} onClick={() => void runRemove(() => onRemoveArticle(item.articleId))} className="rounded-nl-button text-[20px] leading-[1.5] text-nl-muted transition-colors hover:bg-nl-subtle hover:text-nl-text"><X width={20} height={20} /></button>
                       </div>
                       <Badge tone={isPreparing ? "default" : "positive"} className="mt-1.5">{item.quizStatusLabel}</Badge>
                     </div>

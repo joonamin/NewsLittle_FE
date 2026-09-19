@@ -127,6 +127,9 @@ export const Archiving: Story = {
     await expect((titleInput as HTMLInputElement).value).toMatch(/^\d{8}_\d+$/);
     await expect(titleInput).not.toHaveValue(defaultTitle);
 
+    // 아카이빙 버튼은 연타 방지 쿨다운이 있어, 다시 눌리려면 쿨다운이 끝나야 한다.
+    await waitFor(() => expect(archiveButton).toBeEnabled());
+
     await userEvent.clear(titleInput);
     await userEvent.type(titleInput, "이번 주 읽을거리");
     await userEvent.click(archiveButton);
