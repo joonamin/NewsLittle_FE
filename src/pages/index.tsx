@@ -129,7 +129,10 @@ function HomeContent() {
                   surface: "HOME_CARD",
                   articleId: card.id,
                   targetLabel: card.title,
-                  availableReasons: ["CONTENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
+                  // GLB-03 디자인 mockup 기준 4유형 전부 노출. 판정 오류는 홈 카드에
+                  // quiz 컨텍스트가 없어 report-modal.tsx의 judgementBlocked가 항상
+                  // 제출을 막는다(내용 오류로 대신 신고하도록 안내).
+                  availableReasons: ["CONTENT_ERROR", "JUDGMENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
                 })
               }
             />
