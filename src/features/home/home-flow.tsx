@@ -177,7 +177,29 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
   });
   const removeFromTodayList = useMutation({
     mutationFn: screenApi.removeFromTodayList,
-    onSuccess: invalidateHomeQueries,
+    onMutate: async (articleId: string) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.home });
+      const previousHome = queryClient.getQueryData<HomeViewModel>(queryKeys.home);
+      queryClient.setQueryData<HomeViewModel>(queryKeys.home, (current) => {
+        if (!current?.todayList) return current;
+        return {
+          ...current,
+          todayList: {
+            ...current.todayList,
+            items: current.todayList.items.filter((item) => item.articleId !== articleId),
+          },
+        };
+      });
+      return { previousHome };
+    },
+    // 404는 이미 삭제된 상태이므로 방금 지운 항목을 다시 되돌리지 않는다.
+    onError: (error, _articleId, context) => {
+      if (error instanceof ApiError && error.status === 404) return;
+      if (context?.previousHome) {
+        queryClient.setQueryData(queryKeys.home, context.previousHome);
+      }
+    },
+    onSettled: invalidateHomeQueries,
   });
   const signIn = useMutation({
     mutationFn: screenApi.signInWithGoogle,
@@ -266,7 +288,15 @@ export function HomeFlowProvider({ children }: { children: ReactNode }) {
 
   const removeArticle = useCallback(
     async (articleId: string) => {
-      await removeFromTodayList.mutateAsync(articleId);
+      try {
+        await removeFromTodayList.mutateAsync(articleId);
+      } catch (error) {
+        // 낙관적 업데이트로 이미 화면에서는 제거됐다 — 404는 조용히 무시하고,
+        // 그 외 에러만 콘솔에 남긴다.
+        if (!(error instanceof ApiError && error.status === 404)) {
+          console.error("오늘 목록에서 기사를 삭제하지 못했습니다.", error);
+        }
+      }
     },
     [removeFromTodayList],
   );
