@@ -110,6 +110,18 @@ export const LongBody: Story = {
   },
 };
 
+export const SummaryOnlyLegacy: Story = {
+  name: "Summary only (legacy body)",
+  args: {
+    card: { ...textCard, bodyText: textCard.summaryText, summaryText: null, showsAiSummary: false },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText(textCard.summaryText ?? "")).toBeVisible();
+    await expect(canvas.queryByRole("note", { name: "AI 한 줄 요약" })).not.toBeInTheDocument();
+  },
+};
+
 export const Navigation: Story = {
   args: {
     canGoPrevious: true,

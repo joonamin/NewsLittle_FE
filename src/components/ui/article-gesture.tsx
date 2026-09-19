@@ -5,6 +5,7 @@ import type { PointerEvent } from "react";
 
 import type { HomeArticleCardViewModel } from "@/features/contracts/view-models";
 import { cn } from "@/lib/cn";
+import { splitSentences } from "@/lib/sentences";
 import { Spinner } from "@/components/ui/spinner";
 
 export type SaveToTodayButtonProps = {
@@ -61,16 +62,24 @@ function ExpandableBody({ articleId, text }: { articleId: string; text: string }
     return () => observer.disconnect();
   }, [articleId, expanded, text]);
 
+  // 단문은 "한 문장에 한 사실"(ADR 0012)이라 문장마다 줄을 나눠 보여준다. 접힘 기준은
+  // 단문 5문장이 한 줄씩일 때 전부 보이는 5줄이고, 넘치면(긴 문장·legacy 본문) 더보기.
+  const sentences = splitSentences(text);
+
   return (
     <div className="flex w-full shrink-0 flex-col items-start gap-2">
       <p
         ref={textRef}
         className={cn(
           "text-[18px] leading-[1.7] font-medium tracking-nl-tight text-nl-text",
-          expanded ? undefined : "line-clamp-4",
+          expanded ? undefined : "line-clamp-5",
         )}
       >
-        {text}
+        {sentences.map((sentence, index) => (
+          <span key={`${articleId}-${index}`} className="block">
+            {sentence}
+          </span>
+        ))}
       </p>
       {truncated ? (
         <button
@@ -234,7 +243,11 @@ export function ArticleGesture({
               <h1 className="text-nl-title leading-[1.375] font-bold tracking-[-0.0175em] text-nl-text">{card.title}</h1>
               {card.bodyText ? <ExpandableBody key={card.id} articleId={card.id} text={card.bodyText} /> : null}
               {card.showsAiSummary && card.summaryText ? (
-                <div className="flex items-center gap-3 rounded-[14px] border border-white/90 bg-linear-to-r from-nl-ai-summary-start to-nl-ai-summary-end p-4 backdrop-blur-[14px]">
+                <div
+                  role="note"
+                  aria-label="AI 한 줄 요약"
+                  className="flex items-center gap-3 rounded-[14px] border border-white/90 bg-linear-to-r from-nl-ai-summary-start to-nl-ai-summary-end p-4 backdrop-blur-[14px]"
+                >
                   <img src="/images/ai-summary-logo.png" alt="" width={28} height={28} />
                   <div className="min-w-0">
                     <p className="text-nl-micro font-bold text-nl-accent">AI 한 줄 요약</p>
