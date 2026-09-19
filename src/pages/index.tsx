@@ -105,7 +105,7 @@ function HomeContent() {
   return (
     <>
       <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-nl-subtle">
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col p-6 md:px-12">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col pb-6">
           {card ? (
             <ArticleGesture
               card={card}
