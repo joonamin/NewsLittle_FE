@@ -20,6 +20,7 @@ export function SaveToTodayButton({ saved, onClick }: SaveToTodayButtonProps) {
     <button
       type="button"
       aria-pressed={saved}
+      data-save-today-button="true"
       onClick={(event) => {
         event.stopPropagation();
         onClick();
@@ -165,6 +166,50 @@ export function ArticleGesture({
     return () => node.removeEventListener("wheel", handleWheel);
   }, [canGoNext, canGoPrevious, isLoadingNext, onNext, onPrevious]);
 
+  // 피드 단축키 (Enter로 담기/빼기, ArrowDown/ArrowUp으로 기사 전환)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isInsideInputOrModal =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable ||
+          target.closest("[role='dialog']") ||
+          target.closest("dialog"));
+
+      if (isInsideInputOrModal) return;
+
+      if (event.key === "Enter") {
+        if (target && target !== document.body && target !== sectionRef.current) {
+          if (target.tagName === "A") return;
+          if (target.tagName === "BUTTON" && !target.closest("[data-save-today-button]")) {
+            return;
+          }
+        }
+        event.preventDefault();
+        onToggleSave();
+        return;
+      }
+
+      if (event.key === "ArrowDown" && canGoNext && !isLoadingNext) {
+        event.preventDefault();
+        onNext();
+        return;
+      }
+
+      if (event.key === "ArrowUp" && canGoPrevious) {
+        event.preventDefault();
+        onPrevious();
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [canGoNext, canGoPrevious, isLoadingNext, onNext, onPrevious, onToggleSave]);
+
   // 본문이 넘칠 때는 네이티브 단계에서 전파를 끊어야 위 리스너(기사 전환)까지 올라가지 않는다.
   useEffect(() => {
     const node = scrollAreaRef.current;
@@ -185,20 +230,6 @@ export function ArticleGesture({
       tabIndex={0}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
-      onKeyDown={(event) => {
-        if (event.key === "ArrowDown" && canGoNext && !isLoadingNext) {
-          event.preventDefault();
-          onNext();
-        }
-        if (event.key === "ArrowUp" && canGoPrevious) {
-          event.preventDefault();
-          onPrevious();
-        }
-        if (event.key === "Enter") {
-          event.preventDefault();
-          onToggleSave();
-        }
-      }}
       className="relative isolate flex h-full min-h-0 w-full flex-1 flex-col items-center gap-4 overflow-hidden outline-none"
     >
       {card.image ? (
@@ -209,11 +240,11 @@ export function ArticleGesture({
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25 [mask-image:radial-gradient(ellipse_72%_78%_at_50%_46%,black_0%,transparent_100%)]"
         />
       ) : null}
-      <div className="relative z-10 flex h-full min-h-0 w-full flex-1 items-center gap-5">
+      <div className="relative flex h-full min-h-0 w-full flex-1 items-center">
         <article
           onDoubleClick={onToggleSave}
           className={cn(
-            "relative flex h-full min-h-[480px] min-w-0 flex-1 self-stretch overflow-hidden rounded-[24px] border px-10 py-6",
+            "relative z-10 flex h-full min-h-[480px] min-w-0 flex-1 self-stretch overflow-hidden rounded-[24px] border px-10 py-6",
             usesPhoto
               ? "border-nl-backdrop-card-stroke bg-nl-bg shadow-nl-backdrop-card"
               : "border-nl-border bg-nl-bg",
@@ -284,13 +315,27 @@ export function ArticleGesture({
             </div>
           </div>
         </article>
-        <div className="flex w-14 shrink-0 flex-col items-center gap-4">
-          <button type="button" aria-label="이전 기사" disabled={!canGoPrevious} onClick={onPrevious} className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text disabled:opacity-40"><ChevronUp width={24} height={24} /></button>
+        <div className="absolute top-1/2 right-4 z-20 flex -translate-y-1/2 flex-col items-center gap-4">
+          <button
+            type="button"
+            aria-label="이전 기사"
+            disabled={!canGoPrevious}
+            onClick={(event) => {
+              event.currentTarget.blur();
+              onPrevious();
+            }}
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text disabled:opacity-40"
+          >
+            <ChevronUp width={24} height={24} />
+          </button>
           <button
             type="button"
             aria-label="다음 기사"
             disabled={!canGoNext || isLoadingNext}
-            onClick={onNext}
+            onClick={(event) => {
+              event.currentTarget.blur();
+              onNext();
+            }}
             className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text disabled:opacity-40"
           >
             {isLoadingNext ? <Spinner className="h-5 w-5 text-nl-accent" /> : <ChevronDown width={24} height={24} />}

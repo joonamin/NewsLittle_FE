@@ -381,3 +381,38 @@ test("archive shows archival guidance once every entry is deleted", async ({ pag
   await expect(page.getByRole("listitem")).toHaveCount(0);
 });
 
+test("mobile viewport displays the mobile notice and hides desktop navigation", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto("/");
+
+  await expect(
+    page.getByRole("heading", {
+      name: "아직 모바일 버전의 화면은 준비되지 않았어요!",
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  await expect(page.getByRole("navigation", { name: "주 내비게이션" })).toBeHidden();
+});
+
+test("pressing Enter on home screen toggles article in today list", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
+
+  // 1번째 카드는 초기 목록에 이미 담김 상태 -> 2번째 카드로 이동 (초기 목록에 미포함 상태)
+  await page.getByRole("button", { name: "다음 기사" }).click();
+  await expect(page.getByRole("heading", { name: secondArticle.title })).toBeVisible();
+  await expect(page.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
+
+  // Enter 키 입력 시 담기 동작 수행
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: "오늘 목록에 담김" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(secondArticle.title);
+
+  // 다시 Enter 키 입력 시 빼기 동작 수행
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).not.toContainText(secondArticle.title);
+});
+
+

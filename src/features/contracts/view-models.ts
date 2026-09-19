@@ -193,7 +193,8 @@ export function toHomeViewModel(api: HomeApiModel): HomeViewModel {
 
   return {
     viewer: {
-      isMember: api.viewer.role === "member",
+      // BE는 admin도 로그인 상태(member 이상)로 취급한다(shell/service.py 참고) — 게스트만 제외한다.
+      isMember: api.viewer.role !== "guest",
       displayName: api.viewer.displayName,
     },
     feed: toFeedViewModel(api.feed),
