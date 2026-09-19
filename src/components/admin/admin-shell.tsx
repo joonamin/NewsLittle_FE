@@ -60,7 +60,7 @@ export function AdminShell({ children, activeMenuId = "review" }: AdminShellProp
         <p className="mt-2 text-nl-body text-nl-muted">요청하신 페이지를 찾을 수 없습니다.</p>
         <Link
           href="/"
-          className="mt-6 rounded-full bg-nl-accent px-6 py-2.5 text-nl-caption font-bold text-nl-on-accent"
+          className="mt-6 rounded-full bg-nl-accent px-6 py-2.5 text-nl-caption font-bold text-nl-on-accent transition-colors hover:bg-nl-accent/90"
         >
           홈으로 돌아가기
         </Link>
@@ -114,7 +114,7 @@ export function AdminShell({ children, activeMenuId = "review" }: AdminShellProp
           <div className="mt-6 flex justify-center gap-3">
             <Link
               href="/"
-              className="rounded-full bg-nl-accent px-5 py-2 text-xs font-semibold text-nl-on-accent"
+              className="rounded-full bg-nl-accent px-5 py-2 text-xs font-semibold text-nl-on-accent transition-colors hover:bg-nl-accent/90"
             >
               홈 화면으로 복귀
             </Link>

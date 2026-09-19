@@ -25,7 +25,7 @@ export type StatCardProps = {
 
 function StatCardBody({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div className="flex w-full flex-col gap-4 rounded-nl-card border border-nl-border bg-nl-bg p-6 text-left">
+    <div className="flex w-full flex-col gap-4 rounded-nl-card border border-nl-border bg-nl-bg p-6 text-left transition-colors group-hover:bg-nl-subtle">
       <p className="text-nl-micro text-nl-muted font-normal">{label}</p>
       <p className="text-[24px] leading-[1.5] text-nl-text font-bold">{value}</p>
     </div>
@@ -35,14 +35,14 @@ function StatCardBody({ label, value }: { label: string; value: ReactNode }) {
 export function StatCard({ label, value, href, onOpen }: StatCardProps) {
   if (href) {
     return (
-      <Link href={href} className="block w-full">
+      <Link href={href} className="group block w-full">
         <StatCardBody label={label} value={value} />
       </Link>
     );
   }
 
   return (
-    <button type="button" className="block w-full" onClick={onOpen}>
+    <button type="button" className="group block w-full" onClick={onOpen}>
       <StatCardBody label={label} value={value} />
     </button>
   );

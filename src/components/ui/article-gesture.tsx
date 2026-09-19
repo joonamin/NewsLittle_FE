@@ -26,9 +26,11 @@ export function SaveToTodayButton({ saved, onClick }: SaveToTodayButtonProps) {
         onClick();
       }}
       className={cn(
-        "box-border flex h-[52px] w-full shrink-0 items-center justify-center gap-2 rounded-nl-button border-2 px-5 text-nl-body font-bold",
+        "box-border flex h-[52px] w-full shrink-0 items-center justify-center gap-2 rounded-nl-button border-2 px-5 text-nl-body font-bold transition-colors",
         "shadow-nl-save-button",
-        saved ? "border-nl-accent bg-nl-accent-subtle text-nl-accent" : "border-nl-accent bg-nl-accent text-nl-on-accent",
+        saved
+          ? "border-nl-accent bg-nl-accent-subtle text-nl-accent hover:bg-nl-accent-wash"
+          : "border-nl-accent bg-nl-accent text-nl-on-accent hover:bg-nl-accent/90",
       )}
     >
       <Icon width={20} height={20} aria-hidden />
@@ -91,7 +93,7 @@ function ExpandableBody({ articleId, text }: { articleId: string; text: string }
             setExpanded((current) => !current);
           }}
           onKeyDown={(event) => event.stopPropagation()}
-          className="text-nl-caption font-bold text-nl-accent"
+          className="text-nl-caption font-bold text-nl-accent hover:underline"
         >
           {expanded ? "접기" : "더보기"}
         </button>
@@ -289,7 +291,7 @@ export function ArticleGesture({
               <p className="text-nl-caption text-nl-muted">{card.sourceName} · 원문 게시 {card.publishedLabel}</p>
               <div className="flex items-center gap-3 text-nl-body font-bold">
                 {card.originalIsAvailable ? (
-                  <a className="text-nl-accent" href={card.originalUrl} target="_blank" rel="noreferrer">
+                  <a className="text-nl-accent hover:underline" href={card.originalUrl} target="_blank" rel="noreferrer">
                     원문 읽기 ↗
                   </a>
                 ) : <span className="text-nl-muted">원문을 제공하지 않아요</span>}
@@ -300,7 +302,7 @@ export function ArticleGesture({
                       event.stopPropagation();
                       onReport();
                     }}
-                    className="text-nl-negative"
+                    className="text-nl-negative hover:underline"
                   >
                     신고
                   </button>
@@ -324,7 +326,7 @@ export function ArticleGesture({
               event.currentTarget.blur();
               onPrevious();
             }}
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text disabled:opacity-40"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text transition-colors hover:bg-nl-subtle disabled:opacity-40 disabled:hover:bg-nl-bg"
           >
             <ChevronUp width={24} height={24} />
           </button>
@@ -336,7 +338,7 @@ export function ArticleGesture({
               event.currentTarget.blur();
               onNext();
             }}
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text disabled:opacity-40"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text transition-colors hover:bg-nl-subtle disabled:opacity-40 disabled:hover:bg-nl-bg"
           >
             {isLoadingNext ? <Spinner className="h-5 w-5 text-nl-accent" /> : <ChevronDown width={24} height={24} />}
           </button>
