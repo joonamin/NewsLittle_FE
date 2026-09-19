@@ -102,7 +102,7 @@ function mapArticleCard(
     id: article.id,
     category: topicLabels[article.topicIds[0] ?? ""] ?? "뉴스",
     title: article.title,
-    bodyText: article.summary.status === "available" ? article.summary.text : null,
+    bodyText: article.body.status === "available" ? article.body.text : null,
     sourceName: article.source.name,
     publishedLabel: formatDate(article.source.publishedAt),
     originalUrl: article.source.originalUrl,
