@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 
 import { GlobalNav } from "@/components/ui/global-nav";
-import { GoogleLoginButton } from "@/components/ui/google-login-button";
+import { GoogleSignIn } from "@/components/ui/google-sign-in";
 import { Modal } from "@/components/ui/modal";
 import { useHomeFlow } from "@/features/home/home-flow";
 
@@ -93,7 +93,7 @@ export function AppShell({ children }: AppShellProps) {
         title="로그인이 필요해요"
         footer={
           <div className="space-y-3">
-            <GoogleLoginButton pending={loginPending} onClick={() => void completeLogin()} />
+            <GoogleSignIn pending={loginPending} onCredential={completeLogin} />
             {loginError ? (
               <p role="alert" className="text-nl-caption text-nl-negative">
                 {loginError}

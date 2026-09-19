@@ -12,21 +12,23 @@ declare global {
             client_id: string;
             callback: (response: { credential: string }) => void;
             ux_mode?: "popup" | "redirect";
-            use_fedcm_for_prompt?: boolean;
+            auto_select?: boolean;
           }): void;
-          prompt(momentListener?: (notification: GoogleIdMomentNotification) => void): void;
+          renderButton(parent: HTMLElement, options: {
+            type: "standard";
+            theme: "outline";
+            size: "large";
+            text: "continue_with";
+            width: number;
+            locale: string;
+          }): void;
+          disableAutoSelect(): void;
           cancel(): void;
         };
       };
     };
   }
 }
-
-type GoogleIdMomentNotification = {
-  isNotDisplayed(): boolean;
-  isSkippedMoment(): boolean;
-  isDismissedMoment(): boolean;
-};
 
 const GOOGLE_GSI_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
 
@@ -41,88 +43,83 @@ function loadGoogleIdentityScript(): Promise<void> {
       `script[src="${GOOGLE_GSI_SCRIPT_SRC}"]`,
     );
 
+    const script = existing ?? document.createElement("script");
+    const cleanup = () => {
+      window.clearTimeout(timeout);
+      script.removeEventListener("load", onLoad);
+      script.removeEventListener("error", onError);
+    };
+    const onLoad = () => {
+      cleanup();
+      resolve();
+    };
     const onError = () => {
+      cleanup();
+      script.remove();
       scriptLoadPromise = null;
       reject(new Error("Google Identity Services 스크립트를 불러오지 못했습니다."));
     };
 
-    if (existing) {
-      existing.addEventListener("load", () => resolve());
-      existing.addEventListener("error", onError);
-      return;
-    }
-
-    const script = document.createElement("script");
+    const timeout = window.setTimeout(onError, 12000);
+    script.addEventListener("load", onLoad);
+    script.addEventListener("error", onError);
+    if (existing) return;
     script.src = GOOGLE_GSI_SCRIPT_SRC;
     script.async = true;
     script.defer = true;
-    script.addEventListener("load", () => resolve());
-    script.addEventListener("error", onError);
     document.head.appendChild(script);
   });
 
   return scriptLoadPromise;
 }
 
-/** 사용자가 구글 로그인 창을 닫거나 표시되지 않아 취소된 경우(login_cancel). */
-export class GoogleSignInCancelledError extends Error {
-  constructor() {
-    super("Google 로그인 창이 완료되기 전에 닫혔습니다.");
-    this.name = "GoogleSignInCancelledError";
-  }
-}
+let initializedClientId: string | null = null;
+let credentialHandler: ((credential: string) => void) | null = null;
 
-/** GIS의 One Tap/팝업을 띄우고 credential(ID Token JWT)을 반환한다. */
-async function requestGoogleCredential(clientId: string): Promise<string> {
+/** 명시적인 로그인은 One Tap 표시 여부와 무관한 GIS 공식 버튼으로 시작한다. */
+export async function renderGoogleSignInButton(
+  parent: HTMLElement,
+  onCredential: (credential: string) => void,
+  signal: AbortSignal,
+): Promise<void> {
   if (typeof window === "undefined") {
     throw new Error("Google 로그인은 브라우저에서만 사용할 수 있습니다.");
   }
 
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  if (!clientId) throw new Error("Google 로그인 설정을 확인해 주세요.");
   await loadGoogleIdentityScript();
+  if (signal.aborted) return;
   const accountsId = window.google?.accounts.id;
   if (!accountsId) {
     throw new Error("Google Identity Services 초기화에 실패했습니다.");
   }
 
-  return new Promise<string>((resolve, reject) => {
-    let settled = false;
-
+  credentialHandler = onCredential;
+  signal.addEventListener("abort", () => {
+    if (credentialHandler === onCredential) credentialHandler = null;
+    parent.replaceChildren();
+  }, { once: true });
+  if (initializedClientId !== clientId) {
     accountsId.initialize({
       client_id: clientId,
       ux_mode: "popup",
-      use_fedcm_for_prompt: true,
+      auto_select: false,
       callback: (response) => {
-        settled = true;
-        resolve(response.credential);
+        if (response.credential) credentialHandler?.(response.credential);
       },
     });
-
-    accountsId.prompt((notification) => {
-      if (settled) return;
-      if (
-        notification.isNotDisplayed() ||
-        notification.isSkippedMoment() ||
-        notification.isDismissedMoment()
-      ) {
-        reject(new GoogleSignInCancelledError());
-      }
-    });
+    initializedClientId = clientId;
+  }
+  accountsId.renderButton(parent, {
+    type: "standard", theme: "outline", size: "large", text: "continue_with",
+    width: Math.min(400, parent.clientWidth || 320), locale: "ko",
   });
 }
 
-/**
- * 화면에서 호출하는 진입점. MSW 목 모드에서는 실제 구글 팝업 없이 목 credential을
- * 즉시 반환해 백엔드가 준비되기 전에도 로그인 플로우를 개발·테스트할 수 있게 한다.
- */
-export async function resolveGoogleCredential(): Promise<string> {
-  if (process.env.NEXT_PUBLIC_API_MOCKING === "enabled") {
-    return "mock-google-credential";
-  }
-
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  if (!clientId) {
-    throw new Error("NEXT_PUBLIC_GOOGLE_CLIENT_ID가 설정되지 않았습니다.");
-  }
-
-  return requestGoogleCredential(clientId);
+/** 서비스 로그아웃 뒤 자동 재로그인을 막는다. Google 계정 연결은 해제하지 않는다. */
+export function disableGoogleAutoSignIn(): void {
+  credentialHandler = null;
+  if (typeof window === "undefined") return;
+  window.google?.accounts.id.disableAutoSelect();
 }
