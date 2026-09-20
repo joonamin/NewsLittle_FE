@@ -14,6 +14,7 @@ import { ReviewHeader } from "@/features/admin/review-queue/review-header";
 import { SideBySideViewer } from "@/features/admin/review-queue/side-by-side-viewer";
 import { ReviewActionBar } from "@/features/admin/review-queue/review-action-bar";
 import { Spinner } from "@/components/ui/spinner";
+import { AdminError } from "@/components/admin/admin-ui";
 
 export default function AdminReviewPage() {
   const queryClient = useQueryClient();
@@ -99,16 +100,7 @@ export default function AdminReviewPage() {
             <p className="text-sm text-nl-muted">검수 대기열을 불러오는 중입니다...</p>
           </div>
         ) : isQueueError || !queue ? (
-          <div className="flex min-h-[400px] flex-col items-center justify-center gap-3 text-center">
-            <p className="text-sm font-semibold text-red-600">검수 대기열을 불러오지 못했습니다.</p>
-            <button
-              type="button"
-              onClick={() => void refetchQueue()}
-              className="rounded-full bg-nl-surface border border-nl-border px-4 py-1.5 text-xs text-nl-text hover:bg-nl-subtle cursor-pointer"
-            >
-              다시 시도
-            </button>
-          </div>
+          <AdminError onRetry={() => void refetchQueue()} />
         ) : (
           <div className="space-y-6">
             {/* 상단 피드백 토스트 알림 */}

@@ -43,7 +43,42 @@ export function AdminLoading() {
 }
 
 export function AdminError({ onRetry }: { onRetry: () => void }) {
-  return <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface"><AlertCircle className="h-8 w-8 text-nl-negative" /><p className="text-sm font-semibold text-nl-text">운영 데이터를 불러오지 못했습니다.</p><Button size="xs" variant="secondary" onClick={onRetry}>다시 시도</Button></div>;
+  return (
+    <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface p-6 text-center">
+      <AlertCircle className="h-8 w-8 text-nl-negative" />
+      <p className="text-sm font-semibold text-nl-text">운영 데이터를 불러오지 못했습니다.</p>
+      <p className="text-xs text-nl-muted max-w-sm">
+        관리자 권한이 없거나 세션이 만료되었을 수 있습니다.
+      </p>
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
+        <Button size="xs" variant="secondary" onClick={onRetry}>
+          다시 시도
+        </Button>
+        {process.env.NODE_ENV === "development" && (
+          <button
+            type="button"
+            onClick={async () => {
+              const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+              try {
+                await fetch(`${apiBase}/api/v1/auth/dev-session`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  credentials: "include",
+                  body: JSON.stringify({ role: "admin" }),
+                });
+                onRetry();
+              } catch (e) {
+                alert("세션 발급 실패: " + String(e));
+              }
+            }}
+            className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700 transition cursor-pointer"
+          >
+            🛠️ 관리자 권한 세션 발급받고 다시 시도
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function AdminEmptyState({ title = "표시할 항목이 없습니다." }: { title?: string }) {
