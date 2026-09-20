@@ -102,16 +102,16 @@ function mapArticleCard(
 ): HomeArticleCardViewModel {
   return {
     id: article.id,
-    category: topicLabels[article.topicIds[0] ?? ""] ?? "뉴스",
+    category: topicLabels[article.topicIds?.[0] ?? ""] ?? "뉴스",
     title: article.title,
     bodyText: pickBodyText(article),
-    sourceName: article.source.name,
-    publishedLabel: formatDate(article.source.publishedAt),
-    originalUrl: article.source.originalUrl,
+    sourceName: article.source?.name ?? "뉴스",
+    publishedLabel: formatDate(article.source?.publishedAt),
+    originalUrl: article.source?.originalUrl ?? "",
     summaryText: pickSummaryText(article),
     showsAiSummary:
-      article.summary.status === "available" &&
-      article.summary.aiGenerated &&
+      article.summary?.status === "available" &&
+      Boolean(article.summary?.aiGenerated) &&
       pickSummaryText(article) !== null,
     image:
       article.image?.status === "available" && article.image.url
@@ -121,9 +121,9 @@ function mapArticleCard(
             label: article.image.origin === "ai" ? "AI 생성 이미지" : article.image.attribution,
           }
         : null,
-    originalIsAvailable: article.availability.original === "available",
+    originalIsAvailable: article.availability?.original === "available",
     isFromPreviousFeedDate,
-    isRestricted: article.summary.status !== "available" && article.body.status !== "available",
+    isRestricted: article.summary?.status !== "available" && article.body?.status !== "available",
   };
 }
 
@@ -132,14 +132,14 @@ function mapArticleCard(
  * 이때 요약 박스는 `pickSummaryText`가 비워 같은 글을 두 번 보여주지 않는다.
  */
 function pickBodyText(article: ArticleApiModel): string | null {
-  if (article.body.status === "available" && article.body.text) return article.body.text;
-  if (article.summary.status === "available") return article.summary.text;
+  if (article.body?.status === "available" && article.body?.text) return article.body.text;
+  if (article.summary?.status === "available" && article.summary?.text) return article.summary.text;
   return null;
 }
 
 function pickSummaryText(article: ArticleApiModel): string | null {
-  if (article.summary.status !== "available" || !article.summary.text) return null;
-  const body = article.body.status === "available" ? article.body.text : null;
+  if (article.summary?.status !== "available" || !article.summary?.text) return null;
+  const body = article.body?.status === "available" ? article.body?.text : null;
   // 단문이 없어 요약이 본문 자리로 갔거나, 단문과 요약이 사실상 같은 글이면 박스를 숨긴다.
   if (!body || isSameText(body, article.summary.text)) return null;
   return article.summary.text;
