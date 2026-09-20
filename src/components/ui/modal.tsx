@@ -109,7 +109,7 @@ export function Modal({
           type="button"
           aria-label="닫기"
           onClick={onClose}
-          className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-nl-button bg-nl-bg"
+          className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-nl-button bg-nl-bg transition-colors hover:bg-nl-subtle"
         >
           <X width={24} height={24} className="text-nl-muted" aria-hidden />
         </button>

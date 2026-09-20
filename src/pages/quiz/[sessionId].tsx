@@ -12,6 +12,7 @@ import { z } from "zod";
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
 import { ReportDialog } from "@/components/reports/report-dialog";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
+import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
 import { ExplanationBlock } from "@/components/ui/explanation-block";
 import { ProgressBar, ProgressLabel } from "@/components/ui/progress";
@@ -349,6 +350,7 @@ function QuizPlayContent({ sessionId }: { sessionId: string }) {
                 timedOut={judgementTimedOut}
                 onRetry={() => submitMutation.mutate(answer)}
                 onGiveUp={() => giveUpMutation.mutate()}
+                isJudging={isJudging}
               />
             ) : (
               <ActionButtons
@@ -437,6 +439,7 @@ function ChoiceAnswer({
           timedOut={judgementTimedOut}
           onRetry={onRetry}
           onGiveUp={onGiveUp}
+          isJudging={isJudging}
         />
       ) : (
         <div className="flex flex-col gap-3 sm:flex-row">
@@ -480,11 +483,13 @@ function JudgementIncomplete({
   timedOut,
   onRetry,
   onGiveUp,
+  isJudging,
 }: {
   timeoutSeconds: 3 | 10;
   timedOut: boolean;
   onRetry: () => void;
   onGiveUp: () => void;
+  isJudging: boolean;
 }) {
   return (
     <StateNotice
@@ -494,8 +499,8 @@ function JudgementIncomplete({
       className="max-w-none"
       actions={
         <>
-          <Button size="s" onClick={onRetry}>재시도</Button>
-          <Button size="s" variant="secondary" onClick={onGiveUp}>포기</Button>
+          <Button size="s" disabled={isJudging} onClick={onRetry}>재시도</Button>
+          <Button size="s" variant="secondary" disabled={isJudging} onClick={onGiveUp}>포기</Button>
         </>
       }
     />
@@ -533,9 +538,11 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
       >
         {positive ? "✓ 정답이에요" : resolution.outcomeLabel}
       </p>
-      <p className="text-nl-caption text-nl-text">
-        내 답 {resolution.userAnswer ?? "포기"} · 정답 {resolution.answer ?? "-"}
-      </p>
+      <AnswerComparison
+        userAnswer={resolution.userAnswer}
+        correctAnswer={resolution.answer}
+        isCorrect={positive}
+      />
       {resolution.explanation ? (
         <ExplanationBlock
           header={positive ? "정답 해설" : "정답과 해설"}

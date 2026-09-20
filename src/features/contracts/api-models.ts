@@ -88,7 +88,7 @@ export type ArticleApiModel = {
    * 홈 카드 본문(bodyText): AI가 기사를 함축해 새로 쓴 단문 4~5문장(BE key_sentence).
    * summary(AI 한 줄 요약)와 다른 글이다 — 둘을 같은 값으로 채우지 않는다.
    */
-  body: {
+  body?: {
     status: "available" | "unavailable";
     text: string | null;
   };
@@ -231,10 +231,24 @@ export type ArchiveEntryApiModel = {
    * 제공사 요청 등). 생략하면 화면에서 일반 안내 문구로 대체한다.
    */
   discontinuedReason?: string | null;
+  /** 제목을 붙여 아카이빙된 항목만 채워진다. 날짜별 "전체 보관"으로 넘어간 항목엔 없다. */
+  archiveGroupTitle?: string | null;
 };
 
 export type ArchiveApiModel = {
-  groups: Array<{ date: string; entries: ArchiveEntryApiModel[] }>;
+  groups: Array<{
+    /** 제목 붙인 아카이빙은 archive_group 단위, 그 외(전체 보관)는 날짜 단위로 묶인 그룹 식별자. */
+    id: string;
+    date: string;
+    entries: ArchiveEntryApiModel[];
+    title?: string | null;
+  }>;
+};
+
+export type ArchiveTodayListResultApiModel = {
+  archiveGroupId: string;
+  title: string;
+  archivedCount: number;
 };
 
 /** "records"는 기록 삭제 요청, "account"는 탈퇴 요청. 서버는 둘을 별도 경로로 받는다. */

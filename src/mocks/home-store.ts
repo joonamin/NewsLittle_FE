@@ -172,13 +172,46 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
     return clone(member.todayList);
   }
 
+  function archiveTodayList(title: string): { archiveGroupId: string; title: string; archivedCount: number } {
+    const member = activeMember();
+    if (!member) throw new Error("AUTHENTICATION_REQUIRED");
+
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) throw new Error("DUPLICATE_ARCHIVE_TITLE");
+    if (member.archive.groups.some((group) => group.title === trimmedTitle)) {
+      throw new Error("DUPLICATE_ARCHIVE_TITLE");
+    }
+
+    const date = member.todayList.selectedForDate;
+    const archiveGroupId = `archive-group-${date}-${trimmedTitle}`;
+    const entries = member.todayList.items.map((item) => ({
+      id: `archive-${date}-${item.article.id}`,
+      selectedAt: item.selectedAt,
+      article: item.article,
+      displayStatus:
+        item.quizStatus === "suspended"
+          ? ("discontinued" as const)
+          : ("available" as const),
+      archiveGroupTitle: trimmedTitle,
+    }));
+
+    // 실제 BE는 archived_at 최신순으로 정렬해 내려준다 — 목도 방금 아카이빙한
+    // 그룹이 맨 앞(기본 펼침 대상)에 오도록 맞춘다.
+    member.archive.groups.unshift({ id: archiveGroupId, date, title: trimmedTitle, entries });
+    const archivedCount = member.todayList.items.length;
+    member.todayList = { selectedForDate: date, items: [] };
+
+    return { archiveGroupId, title: trimmedTitle, archivedCount };
+  }
+
   function archivePreviousLists(): HomeApiModel {
     const member = activeMember();
     if (!member) throw new Error("AUTHENTICATION_REQUIRED");
 
     for (const list of member.pendingPreviousLists) {
-      const existingGroup = member.archive.groups.find((group) => group.date === list.date);
-      const group = existingGroup ?? { date: list.date, entries: [] };
+      const dateGroupId = `date:${list.date}`;
+      const existingGroup = member.archive.groups.find((group) => group.id === dateGroupId);
+      const group = existingGroup ?? { id: dateGroupId, date: list.date, entries: [] };
       if (!existingGroup) member.archive.groups.push(group);
 
       for (const item of list.items) {
@@ -300,6 +333,7 @@ export function createMockHomeStore(options: MockHomeStoreOptions = {}) {
   return {
     addToTodayList,
     archive: () => clone(activeMember()?.archive ?? { groups: [] }),
+    archiveTodayList,
     authMe,
     archivePreviousLists,
     deleteArchiveEntry,

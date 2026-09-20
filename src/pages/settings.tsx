@@ -22,6 +22,7 @@ import {
   type SettingsDeletionViewModel,
 } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useDebouncedAction } from "@/hooks/use-debounced-action";
 import { getGuestTopics, setGuestTopics } from "@/lib/guest-topics";
 
 /** 탈퇴 완료 안내를 보여 준 뒤 홈으로 옮겨 가기까지의 시간. */
@@ -58,6 +59,7 @@ function SettingsContent() {
   const queryClient = useQueryClient();
   const { interestsSource, requestLogin, logout } = useHomeFlow();
   const { data: settings } = useSuspenseQuery(settingsQueryOptions);
+  const { run: runLogout, pending: isLoggingOut } = useDebouncedAction();
 
   const [guestTopicIds, setGuestTopicIdsState] = useState<TopicCode[]>(() =>
     settings.viewer.isMember ? [] : getGuestTopics(),
@@ -186,7 +188,7 @@ function SettingsContent() {
           <h2 className="text-[20px] leading-[1.5] font-bold text-nl-text">계정</h2>
           <p className="text-nl-body text-nl-text">Google 계정 · {settings.email}</p>
           <div>
-            <Button variant="secondary" onClick={() => void logout()}>
+            <Button variant="secondary" loading={isLoggingOut} onClick={() => void runLogout(logout)}>
               로그아웃
             </Button>
           </div>
