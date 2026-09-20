@@ -37,6 +37,17 @@ export function ReviewActionBar({ isSubmitting, canReview, blockedReason, onDeci
   const [decisionMode, setDecisionMode] = useState<"REJECT" | "REGENERATE">("REJECT");
   const checklistComplete = Object.values(checklist).every(Boolean);
 
+  const handleToggleAllChecklist = () => {
+    const nextState = !checklistComplete;
+    setChecklist({
+      factChecked: nextState,
+      opinionDistinguished: nextState,
+      baselineTimeConfirmed: nextState,
+      noPriorReadingNeeded: nextState,
+      imageRightsConfirmed: nextState,
+    });
+  };
+
   const toggleCheck = (key: keyof typeof checklist) => {
     setChecklist((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -75,9 +86,18 @@ export function ReviewActionBar({ isSubmitting, canReview, blockedReason, onDeci
     <div className="rounded-xl border border-nl-border bg-nl-surface p-5 shadow-xs space-y-4">
       {/* 1. 체크리스트 섹션 */}
       <div className="border-b border-nl-border pb-3">
-        <span className="text-xs font-bold uppercase tracking-wider text-nl-muted block mb-2">
-          검수 체크리스트 (5항목)
-        </span>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-nl-muted">
+            검수 체크리스트 (5항목)
+          </span>
+          <button
+            type="button"
+            onClick={handleToggleAllChecklist}
+            className="text-xs font-bold text-nl-accent hover:underline cursor-pointer"
+          >
+            {checklistComplete ? "전체 해제" : "✓ 전체 확인 (일괄 체크)"}
+          </button>
+        </div>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-nl-text">
           <label className="flex items-center gap-1.5 cursor-pointer select-none">
             <input
