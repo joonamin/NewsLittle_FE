@@ -202,25 +202,25 @@ export function toHomeViewModel(api: HomeApiModel): HomeViewModel {
       ? {
           count: api.todayList.items.length,
           dateLabel: formatDate(api.todayList.selectedForDate),
-          items: api.todayList.items.map((item) => ({
+          items: (api.todayList.items ?? []).map((item) => ({
             articleId: item.article.id,
             title: item.article.title,
-            originalUrl: item.article.source.originalUrl,
-            publishedLabel: formatDate(item.article.source.publishedAt),
+            originalUrl: item.article.source?.originalUrl ?? "",
+            publishedLabel: formatDate(item.article.source?.publishedAt),
             quizStatusLabel: quizStatusLabel[item.quizStatus],
             isFromPreviousFeedDate: item.isFromPreviousFeedDate,
           })),
         }
       : null,
-    pendingPreviousLists: api.pendingPreviousLists.map((list) => ({
+    pendingPreviousLists: (api.pendingPreviousLists ?? []).map((list) => ({
       dateLabel: formatDate(list.date),
-      items: list.items.map((item) => ({
+      items: (list.items ?? []).map((item) => ({
         articleId: item.article.id,
         title: item.article.title,
-        originalUrl: item.article.source.originalUrl,
+        originalUrl: item.article.source?.originalUrl ?? "",
       })),
     })),
-    needsPreviousListDecision: api.pendingPreviousLists.length > 0,
+    needsPreviousListDecision: (api.pendingPreviousLists ?? []).length > 0,
   };
 }
 
@@ -244,21 +244,21 @@ export function toQuizStartViewModel(api: QuizPreviewApiModel): QuizStartViewMod
 
   return {
     domainLabel: api.domain === "shortform" ? "숏폼 퀴즈" : "랜덤 퀴즈",
-    defaultFormatId: api.defaultFormat,
-    defaultFormat: formatLabel[api.defaultFormat],
+    defaultFormatId: api.defaultFormat ?? "choice",
+    defaultFormat: formatLabel[api.defaultFormat] ?? "선택형",
     formats: (["choice", "written"] as const).map((format) => ({
       id: format,
       label: formatLabel[format],
-      enabled: api.formatAvailability[format].enabled,
-      reason: api.formatAvailability[format].reason,
+      enabled: Boolean(api.formatAvailability?.[format]?.enabled),
+      reason: api.formatAvailability?.[format]?.reason ?? null,
     })),
-    plannedQuestionCount: api.plannedQuestionCount,
-    remainingCandidateCount: api.remainingCandidateCount,
-    candidates: api.candidates.map((candidate) => ({
+    plannedQuestionCount: api.plannedQuestionCount ?? 0,
+    remainingCandidateCount: api.remainingCandidateCount ?? 0,
+    candidates: (api.candidates ?? []).map((candidate) => ({
       title: candidate.title,
       included: candidate.status === "included",
       exclusionReason: candidate.exclusionReason
-        ? exclusionLabel[candidate.exclusionReason]
+        ? (exclusionLabel[candidate.exclusionReason] ?? null)
         : null,
     })),
   };
@@ -388,8 +388,8 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
     status: api.status,
     isServiceEnded: api.status === "ended-by-service",
     summary: api.summary,
-    canStartNextRound: api.remainingCandidateCount > 0,
-    recapItems: api.explanations.map((resolution, idx) => ({
+    canStartNextRound: (api.remainingCandidateCount ?? 0) > 0,
+    recapItems: (api.explanations ?? []).map((resolution, idx) => ({
       index: idx + 1,
       articleId: resolution.evidence?.id ?? null,
       quizId: resolution.quizId ?? null,
@@ -402,7 +402,7 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
       explanation: resolution.explanation,
       evidence: resolution.evidence ? mapArticleCard(resolution.evidence) : null,
     })),
-    explanations: api.explanations.map((resolution) => ({
+    explanations: (api.explanations ?? []).map((resolution) => ({
       outcome: resolution.outcome,
       answer: resolution.correctAnswer,
       evidenceTitle: resolution.evidence?.title ?? "",
@@ -428,16 +428,16 @@ export type ArchiveViewModel = {
 
 export function toArchiveViewModel(api: ArchiveApiModel): ArchiveViewModel {
   return {
-    groups: api.groups.map((group) => ({
+    groups: (api.groups ?? []).map((group) => ({
       date: group.date,
       dateLabel: formatDate(group.date),
-      items: group.entries.map((entry) => ({
+      items: (group.entries ?? []).map((entry) => ({
         id: entry.id,
         title: entry.article?.title ?? null,
-        originalUrl: entry.article?.source.originalUrl ?? null,
+        originalUrl: entry.article?.source?.originalUrl ?? null,
         discontinuedReason: entry.discontinuedReason ?? null,
-        sourceName: entry.article?.source.name ?? null,
-        publishedLabel: entry.article ? formatDate(entry.article.source.publishedAt) : null,
+        sourceName: entry.article?.source?.name ?? null,
+        publishedLabel: entry.article?.source ? formatDate(entry.article.source.publishedAt) : null,
         status: entry.displayStatus,
       })),
     })),
