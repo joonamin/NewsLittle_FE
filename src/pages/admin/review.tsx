@@ -33,10 +33,10 @@ export default function AdminReviewPage() {
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
 
   // 3. 현재 선택된 기사의 상세 대조 데이터 조회
-  // 첫 기사 자동 선택: 별도 effect 없이 렌더링 중 파생시켜 캐스케이드 렌더를 피한다.
+  // 첫 기사 자동 선택: 만료되지 않은(검수 가능한) 기사를 우선 선택한다.
   const activeId = queue?.items.some((item) => item.articleId === selectedArticleId)
     ? selectedArticleId!
-    : (queue?.items[0]?.articleId ?? 3);
+    : (queue?.items.find((item) => item.bodyDeletionHoursRemaining > 0)?.articleId ?? queue?.items[0]?.articleId ?? 3);
   const { data: reviewItem, isLoading: isItemLoading, isError: isItemError, refetch: refetchItem } = useQuery({
     ...adminArticleReviewQueryOptions(activeId),
     enabled: (queue?.items.length ?? 0) > 0,

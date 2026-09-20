@@ -272,6 +272,8 @@ export type QuizPlayViewModel = {
   progress: { current: number; total: number };
   progressLabel: string;
   question: {
+    quizId: string | null;
+    articleId: string | null;
     title: string;
     prompt: string;
     context: string | null;
@@ -282,6 +284,9 @@ export type QuizPlayViewModel = {
     showsSemanticFeedback: boolean;
   } | null;
   resolution: {
+    quizId: string | null;
+    answerRef: string | null;
+    articleId: string | null;
     outcomeLabel: string;
     outcome: "correct" | "incorrect" | "given-up" | "pending" | "service-excluded";
     userAnswer: string | null;
@@ -309,6 +314,8 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
     progressLabel: `${api.progress.current}/${api.progress.total}`,
     question: api.question
       ? {
+          quizId: api.question.id ?? null,
+          articleId: api.question.articleId ?? null,
           title: api.question.articleTitle,
           prompt: api.question.prompt,
           context: api.question.context,
@@ -329,6 +336,9 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
       : null,
     resolution: api.resolution
       ? {
+          quizId: api.resolution.quizId ?? api.question?.id ?? null,
+          answerRef: api.resolution.answerRef ?? null,
+          articleId: api.resolution.evidence?.id ?? api.question?.articleId ?? null,
           outcomeLabel: outcomeLabel[api.resolution.outcome],
           outcome: api.resolution.outcome,
           userAnswer: api.resolution.userAnswer,
