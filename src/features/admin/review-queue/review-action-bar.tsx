@@ -15,7 +15,7 @@ type ReviewActionBarProps = {
 
 export function ReviewActionBar({ isSubmitting, canReview, blockedReason, onDecision }: ReviewActionBarProps) {
   const { data: nav } = useQuery(navigationQueryOptions);
-  const reviewerDisplay = nav?.viewer?.email || nav?.viewer?.displayName || "관리자";
+  const reviewerDisplay = nav?.account.status === "member" ? nav.account.displayName : "관리자";
 
   // 체크리스트 5종 상태
   const [checklist, setChecklist] = useState({
