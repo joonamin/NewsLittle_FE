@@ -14,6 +14,7 @@ import { ReviewHeader } from "@/features/admin/review-queue/review-header";
 import { SideBySideViewer } from "@/features/admin/review-queue/side-by-side-viewer";
 import { ReviewActionBar } from "@/features/admin/review-queue/review-action-bar";
 import { Spinner } from "@/components/ui/spinner";
+import { AdminError } from "@/components/admin/admin-ui";
 
 export default function AdminReviewPage() {
   const queryClient = useQueryClient();
@@ -32,10 +33,10 @@ export default function AdminReviewPage() {
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
 
   // 3. 현재 선택된 기사의 상세 대조 데이터 조회
-  // 첫 기사 자동 선택: 별도 effect 없이 렌더링 중 파생시켜 캐스케이드 렌더를 피한다.
+  // 첫 기사 자동 선택: 만료되지 않은(검수 가능한) 기사를 우선 선택한다.
   const activeId = queue?.items.some((item) => item.articleId === selectedArticleId)
     ? selectedArticleId!
-    : (queue?.items[0]?.articleId ?? 3);
+    : (queue?.items.find((item) => item.bodyDeletionHoursRemaining > 0)?.articleId ?? queue?.items[0]?.articleId ?? 3);
   const { data: reviewItem, isLoading: isItemLoading, isError: isItemError, refetch: refetchItem } = useQuery({
     ...adminArticleReviewQueryOptions(activeId),
     enabled: (queue?.items.length ?? 0) > 0,
@@ -99,16 +100,7 @@ export default function AdminReviewPage() {
             <p className="text-sm text-nl-muted">검수 대기열을 불러오는 중입니다...</p>
           </div>
         ) : isQueueError || !queue ? (
-          <div className="flex min-h-[400px] flex-col items-center justify-center gap-3 text-center">
-            <p className="text-sm font-semibold text-red-600">검수 대기열을 불러오지 못했습니다.</p>
-            <button
-              type="button"
-              onClick={() => void refetchQueue()}
-              className="rounded-full bg-nl-surface border border-nl-border px-4 py-1.5 text-xs text-nl-text hover:bg-nl-subtle cursor-pointer"
-            >
-              다시 시도
-            </button>
-          </div>
+          <AdminError onRetry={() => void refetchQueue()} />
         ) : (
           <div className="space-y-6">
             {/* 상단 피드백 토스트 알림 */}

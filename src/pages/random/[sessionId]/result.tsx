@@ -4,9 +4,9 @@ import { type ReactNode, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
-import { ReportDialog } from "@/components/reports/report-dialog";
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
+import { ReportDialog } from "@/components/reports/report-dialog";
+import { StateNotice } from "@/components/ui/state-notice";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
@@ -291,42 +291,35 @@ function RecapRow({
             <p className="text-nl-caption text-nl-muted leading-[1.5]">{item.explanation}</p>
           ) : null}
 
-          {item.evidence && item.evidence.isRestricted ? (
-            <EvidenceAttribution
-              articleTitle={item.evidence.title}
-              sourceName={item.evidence.sourceName}
-              publishedLabel={item.evidence.publishedLabel}
-              originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
-              summaryUnavailable
-            />
-          ) : null}
-          {item.evidence && !item.evidence.isRestricted ? (
-            <article className="space-y-3 rounded-nl-card border border-nl-border bg-nl-accent-wash p-5">
-              <p className="text-nl-micro font-bold text-nl-accent">이 문제의 뉴스</p>
-              <h3 className="text-[18px] font-bold text-nl-text">{item.evidence.title}</h3>
-
-              {item.evidence.summaryText ? (
-                <p className="text-nl-caption text-nl-muted">{item.evidence.summaryText}</p>
+          {item.evidence ? (
+            <div className="space-y-3 pt-1">
+              {!item.evidence.originalIsAvailable ? (
+                <StateNotice
+                  title="원문을 열 수 없어요"
+                  description="현재 제공처에서 원문 접근을 지원하지 않아요. 풀이 결과는 그대로 유지됩니다."
+                  className="max-w-none"
+                />
               ) : null}
-
-              <ArticleSourceMeta
+              <EvidenceAttribution
+                articleTitle={item.evidence.title}
                 sourceName={item.evidence.sourceName}
                 publishedLabel={item.evidence.publishedLabel}
                 originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
-                showsAiSummary={item.evidence.showsAiSummary}
+                summaryUnavailable={item.evidence.isRestricted}
               />
-
-              <div className="flex flex-wrap items-center gap-4 pt-1">
-                <Button
-                  variant={isSaved ? "default" : "secondary"}
-                  size="s"
-                  disabled={isSaved || isSaving}
-                  onClick={onSaveArticle}
-                >
-                  {isSaved ? "오늘 목록에 담김" : isSaving ? "담는 중…" : "오늘 목록에 담기"}
-                </Button>
-              </div>
-            </article>
+              {!item.evidence.isRestricted ? (
+                <div className="flex flex-wrap items-center gap-4">
+                  <Button
+                    variant={isSaved ? "default" : "secondary"}
+                    size="s"
+                    disabled={isSaved || isSaving}
+                    onClick={onSaveArticle}
+                  >
+                    {isSaved ? "오늘 목록에 담김" : isSaving ? "담는 중…" : "오늘 목록에 담기"}
+                  </Button>
+                </div>
+              ) : null}
+            </div>
           ) : null}
 
           <button

@@ -43,7 +43,17 @@ export function AdminLoading() {
 }
 
 export function AdminError({ onRetry }: { onRetry: () => void }) {
-  return <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface"><AlertCircle className="h-8 w-8 text-nl-negative" /><p className="text-sm font-semibold text-nl-text">운영 데이터를 불러오지 못했습니다.</p><Button size="xs" variant="secondary" onClick={onRetry}>다시 시도</Button></div>;
+  return (
+    <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface p-6 text-center">
+      <AlertCircle className="h-8 w-8 text-nl-negative" />
+      <p className="text-sm font-semibold text-nl-text">운영 데이터를 불러오지 못했습니다.</p>
+      <div className="mt-2">
+        <Button size="xs" variant="secondary" onClick={onRetry}>
+          다시 시도
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export function AdminEmptyState({ title = "표시할 항목이 없습니다." }: { title?: string }) {
