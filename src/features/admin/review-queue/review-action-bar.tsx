@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Check, X, RotateCcw, AlertTriangle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import type { ReviewDecisionRequest } from "@/features/contracts/admin-models";
+import { navigationQueryOptions } from "@/features/contracts/query-keys";
 import { Button } from "@/components/ui/button";
 
 type ReviewActionBarProps = {
@@ -12,6 +14,9 @@ type ReviewActionBarProps = {
 };
 
 export function ReviewActionBar({ isSubmitting, canReview, blockedReason, onDecision }: ReviewActionBarProps) {
+  const { data: nav } = useQuery(navigationQueryOptions);
+  const reviewerDisplay = nav?.viewer?.email || nav?.viewer?.displayName || "관리자";
+
   // 체크리스트 5종 상태
   const [checklist, setChecklist] = useState({
     factChecked: false,
@@ -198,7 +203,7 @@ export function ReviewActionBar({ isSubmitting, canReview, blockedReason, onDeci
       {/* 3. 하단 운영 제약 캡션 (디자인 명시) */}
       <div className="pt-2 text-[11px] text-nl-muted flex items-center justify-between border-t border-nl-border/60">
         <span>개별 통과만 허용 · 일괄 자동 통과 버튼 없음 · 원문 복사·내보내기 금지</span>
-        <span>검토자: dev-admin@newslittle.local (실행 계정 불변 기록)</span>
+        <span>검토자: {reviewerDisplay} (실행 계정 불변 기록)</span>
       </div>
 
       {/* 반려 / 재생성 사유 입력 모달 */}
