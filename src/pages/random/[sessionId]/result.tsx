@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
+import { ReportDialog } from "@/components/reports/report-dialog";
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { AnswerComparison } from "@/components/ui/answer-comparison";
@@ -72,6 +73,7 @@ function RandomQuizResultContent({ sessionId }: { sessionId: string }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [savingArticleId, setSavingArticleId] = useState<string | null>(null);
   const [savedArticleIds, setSavedArticleIds] = useState<Record<string, true>>({});
+  const [reportItem, setReportItem] = useState<QuizRecapItemViewModel | null>(null);
 
   const toggleExpand = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -192,6 +194,7 @@ function RandomQuizResultContent({ sessionId }: { sessionId: string }) {
               onSaveArticle={() => {
                 if (item.evidence) void handleSaveArticle(item.evidence.id);
               }}
+              onReport={() => setReportItem(item)}
             />
           ))}
         </div>
@@ -214,6 +217,20 @@ function RandomQuizResultContent({ sessionId }: { sessionId: string }) {
           여기서 이용을 마쳐도 괜찮아요. 정답 수는 학습 효과를 뜻하지 않아요.
         </p>
       </div>
+      {reportItem ? (
+        <ReportDialog
+          open
+          initialType="JUDGMENT_ERROR"
+          target={{
+            surface: "QUIZ",
+            articleId: reportItem.articleId ?? "",
+            articleTitle: reportItem.evidence?.title ?? "퀴즈 문항",
+            quizId: reportItem.quizId,
+            answerRef: reportItem.answerRef,
+          }}
+          onClose={() => setReportItem(null)}
+        />
+      ) : null}
     </Page>
   );
 }
@@ -225,6 +242,7 @@ function RecapRow({
   isSaving,
   onToggle,
   onSaveArticle,
+  onReport,
 }: {
   item: QuizRecapItemViewModel;
   isExpanded: boolean;
@@ -232,6 +250,7 @@ function RecapRow({
   isSaving: boolean;
   onToggle: () => void;
   onSaveArticle: () => void;
+  onReport: () => void;
 }) {
   const outcomeColor =
     item.outcome === "correct"
@@ -310,7 +329,13 @@ function RecapRow({
             </article>
           ) : null}
 
-          <button type="button" className="text-nl-micro text-nl-negative hover:underline">
+          <button
+            type="button"
+            disabled={!item.quizId || !item.answerRef || !item.articleId}
+            title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
+            onClick={onReport}
+            className="text-nl-micro text-nl-negative hover:underline disabled:text-nl-muted disabled:no-underline"
+          >
             판정 오류 신고
           </button>
         </div>

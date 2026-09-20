@@ -104,7 +104,7 @@ describe("admin API", () => {
     const result = await adminApi.reviewQueue();
 
     expect(fetchMock).toHaveBeenCalledWith(
-      "/api/v1/operations/reviews/queue",
+      "/api/v1/operations/reviews/queue?page=1&pageSize=100",
       expect.objectContaining({ credentials: "include" }),
     );
     expect(result.totalCount).toBe(1);

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { ArticleGesture } from "@/components/ui/article-gesture";
+import { ReportDialog } from "@/components/reports/report-dialog";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
@@ -62,6 +63,7 @@ function HomeContent() {
     previousListError,
   } = useHomeFlow();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [reportArticleId, setReportArticleId] = useState<string | null>(null);
 
   const allCards = useMemo(
     () => feedData?.pages.flatMap((page) => page.cards) ?? home.feed.cards,
@@ -122,7 +124,7 @@ function HomeContent() {
                 }
                 await requestArticleSelection(card.id);
               }}
-              onReport={() => window.alert("신고 기능은 준비 중입니다.")}
+              onReport={() => setReportArticleId(card.id)}
             />
           ) : <LoadingState title="표시할 뉴스가 없어요" />}
           <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-nl-muted md:hidden">
@@ -147,6 +149,17 @@ function HomeContent() {
           onStartQuiz={() => void router.push("/quiz")}
         />
       </div>
+      {reportArticleId ? (
+        <ReportDialog
+          open
+          target={{
+            surface: "HOME_CARD",
+            articleId: reportArticleId,
+            articleTitle: allCards.find((item) => item.id === reportArticleId)?.title ?? "뉴스 기사",
+          }}
+          onClose={() => setReportArticleId(null)}
+        />
+      ) : null}
       <Modal
         open={home.needsPreviousListDecision}
         onClose={() => undefined}

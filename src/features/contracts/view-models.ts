@@ -339,6 +339,9 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
 
 export type QuizRecapItemViewModel = {
   index: number;
+  articleId: string | null;
+  quizId: string | null;
+  answerRef: string | null;
   prompt: string;
   outcome: QuizResolutionApiModel["outcome"];
   outcomeLabel: string;
@@ -375,6 +378,9 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
     canStartNextRound: api.remainingCandidateCount > 0,
     recapItems: api.explanations.map((resolution, idx) => ({
       index: idx + 1,
+      articleId: resolution.evidence?.id ?? null,
+      quizId: resolution.quizId ?? null,
+      answerRef: resolution.answerRef ?? null,
       prompt: resolution.prompt ?? resolution.evidence?.title ?? `문항 ${idx + 1}`,
       outcome: resolution.outcome,
       outcomeLabel: outcomeLabel[resolution.outcome] ?? resolution.outcome,

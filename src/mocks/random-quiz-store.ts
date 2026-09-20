@@ -95,6 +95,8 @@ export function getRandomQuizResult(sessionId: string): QuizResultApiModel {
 
     return {
       prompt,
+      quizId: `random-question-${state.format}-${i + 1}`,
+      answerRef: outcome === "service-excluded" ? null : `random:${i + 1}`,
       outcome,
       userAnswer,
       correctAnswer: outcome === "service-excluded" ? null : answer,

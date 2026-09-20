@@ -1,22 +1,29 @@
 import { useState } from "react";
 import { Check, X, RotateCcw, AlertTriangle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import type { ReviewDecisionRequest } from "@/features/contracts/admin-models";
+import { navigationQueryOptions } from "@/features/contracts/query-keys";
 import { Button } from "@/components/ui/button";
 
 type ReviewActionBarProps = {
   isSubmitting: boolean;
+  canReview: boolean;
+  blockedReason?: string;
   onDecision: (decision: ReviewDecisionRequest) => void;
 };
 
-export function ReviewActionBar({ isSubmitting, onDecision }: ReviewActionBarProps) {
+export function ReviewActionBar({ isSubmitting, canReview, blockedReason, onDecision }: ReviewActionBarProps) {
+  const { data: nav } = useQuery(navigationQueryOptions);
+  const reviewerDisplay = nav?.account.status === "member" ? nav.account.displayName : "관리자";
+
   // 체크리스트 5종 상태
   const [checklist, setChecklist] = useState({
-    factChecked: true,
-    opinionDistinguished: true,
-    baselineTimeConfirmed: true,
-    noPriorReadingNeeded: true,
-    imageRightsConfirmed: true,
+    factChecked: false,
+    opinionDistinguished: false,
+    baselineTimeConfirmed: false,
+    noPriorReadingNeeded: false,
+    imageRightsConfirmed: false,
   });
 
   // 통과 범위 체크박스 2종
@@ -24,13 +31,11 @@ export function ReviewActionBar({ isSubmitting, onDecision }: ReviewActionBarPro
   const [quizApproved, setQuizApproved] = useState(true);
 
   // 형식 및 유형 선택
-  const [selectedFormat, setSelectedFormat] = useState<"ALL" | "OX" | "MULTIPLE_CHOICE" | "SUBJECTIVE">("ALL");
-  const [selectedKind, setSelectedKind] = useState<"ALL" | "FACT" | "SEMANTIC">("ALL");
-
   // 반려 및 재생성 사유
   const [reason, setReason] = useState("");
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [decisionMode, setDecisionMode] = useState<"REJECT" | "REGENERATE">("REJECT");
+  const checklistComplete = Object.values(checklist).every(Boolean);
 
   const toggleCheck = (key: keyof typeof checklist) => {
     setChecklist((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -154,7 +159,7 @@ export function ReviewActionBar({ isSubmitting, onDecision }: ReviewActionBarPro
             variant="secondary"
             size="xs"
             onClick={() => handleOpenReject("REGENERATE")}
-            disabled={isSubmitting}
+            disabled={isSubmitting || !canReview}
             className="flex items-center gap-1.5 text-xs text-nl-muted"
           >
             <RotateCcw className="h-3.5 w-3.5" />
@@ -178,7 +183,7 @@ export function ReviewActionBar({ isSubmitting, onDecision }: ReviewActionBarPro
             variant="primary"
             size="xs"
             onClick={handleApprove}
-            disabled={isSubmitting || (!homeApproved && !quizApproved)}
+            disabled={isSubmitting || !canReview || !checklistComplete || (!homeApproved && !quizApproved)}
             className="flex items-center gap-1.5 text-xs font-bold"
           >
             <Check className="h-3.5 w-3.5" />
@@ -187,10 +192,18 @@ export function ReviewActionBar({ isSubmitting, onDecision }: ReviewActionBarPro
         </div>
       </div>
 
+      {!canReview && blockedReason ? (
+        <p role="alert" className="rounded-lg bg-nl-negative-subtle px-3 py-2 text-xs font-semibold text-nl-negative">
+          {blockedReason}
+        </p>
+      ) : !checklistComplete ? (
+        <p className="text-xs text-nl-muted">체크리스트 5개를 모두 직접 확인해야 통과할 수 있습니다.</p>
+      ) : null}
+
       {/* 3. 하단 운영 제약 캡션 (디자인 명시) */}
       <div className="pt-2 text-[11px] text-nl-muted flex items-center justify-between border-t border-nl-border/60">
         <span>개별 통과만 허용 · 일괄 자동 통과 버튼 없음 · 원문 복사·내보내기 금지</span>
-        <span>검토자: dev-admin@newslittle.local (실행 계정 불변 기록)</span>
+        <span>검토자: {reviewerDisplay} (실행 계정 불변 기록)</span>
       </div>
 
       {/* 반려 / 재생성 사유 입력 모달 */}

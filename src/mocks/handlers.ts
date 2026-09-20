@@ -31,9 +31,11 @@ import { mockAdminReviewStore } from "./admin-review-store";
 import { mockAdminDashboardStore } from "./admin-dashboard-store";
 import { mockAdminOperationsStore } from "./admin-operations-store";
 import type { ReportClassification, ReviewDecisionRequest, UsageBasisStatusV2 } from "@/features/contracts/admin-models";
+import type { CreateReportRequest } from "@/features/reports/report-models";
 
 const api = "/api/v1";
 const timedOutShortformSessions = new Set<string>();
+let nextReportId = 100;
 
 function successResponse<T>(data: T, init?: ResponseInit) {
   return HttpResponse.json({ data, meta: { requestId: "mock-request-id" } }, init);
@@ -237,6 +239,32 @@ export const handlers = [
     } catch (error) {
       return failureResponse(error);
     }
+  }),
+
+  http.post(`${api}/reports`, async ({ request }) => {
+    const payload = (await request.json()) as CreateReportRequest;
+    if (!payload.details?.trim()) return failureResponse(new Error("VALIDATION_ERROR"));
+    if (payload.reportType === "RIGHTS" && !payload.contact?.trim()) {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    if (payload.surface === "QUIZ" && !payload.quizId) {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    if (payload.reportType === "JUDGMENT_ERROR" && !payload.answerRef) {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    nextReportId += 1;
+    return successResponse({
+      id: String(nextReportId),
+      reportType: payload.reportType,
+      surface: payload.surface,
+      status: "RECEIVED" as const,
+      contactProvided: Boolean(payload.contact?.trim()),
+      judgmentAttachment: payload.answerRef
+        ? { answerRef: payload.answerRef, submittedAnswer: "모의 답변", quizVersion: 1, judgeVersion: "mock-v1" }
+        : null,
+      createdAt: new Date().toISOString(),
+    });
   }),
 
   // ADM-01 운영 대시보드

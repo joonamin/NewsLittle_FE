@@ -254,6 +254,8 @@ function resolutionFor(
 ): QuizResolutionApiModel {
   const content = contentAt(state.index);
   return {
+    quizId: String(state.index + 1),
+    answerRef: `shortform:${state.index + 1}`,
     outcome,
     userAnswer,
     correctAnswer:
@@ -464,6 +466,8 @@ export function getShortformQuizResult(sessionId: string): QuizResultApiModel {
 
     const resolution: QuizResolutionApiModel = {
       prompt: state.snapshot.format === "choice" ? content.choicePrompt : content.writtenPrompt,
+      quizId: String(idx + 1),
+      answerRef: `shortform:${idx + 1}`,
       outcome,
       userAnswer:
         outcome === "correct"
