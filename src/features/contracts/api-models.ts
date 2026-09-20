@@ -166,6 +166,10 @@ export type QuizQuestionApiModel = {
 
 export type QuizResolutionApiModel = {
   prompt?: string;
+  /** 신고 API에 그대로 돌려보내는 서버 발급 참조다. 클라이언트가 조립하지 않는다. */
+  answerRef?: string | null;
+  /** 결과 화면 신고용 문항 식별자. 구버전 서버에서는 없을 수 있다. */
+  quizId?: string | null;
   outcome: "correct" | "incorrect" | "given-up" | "pending" | "service-excluded";
   userAnswer: string | null;
   correctAnswer: string | null;

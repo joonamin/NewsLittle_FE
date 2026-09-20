@@ -36,10 +36,20 @@ export default function AdminReviewPage() {
   const activeId = queue?.items.some((item) => item.articleId === selectedArticleId)
     ? selectedArticleId!
     : (queue?.items[0]?.articleId ?? 3);
-  const { data: reviewItem, isLoading: isItemLoading } = useQuery({
+  const { data: reviewItem, isLoading: isItemLoading, isError: isItemError, refetch: refetchItem } = useQuery({
     ...adminArticleReviewQueryOptions(activeId),
     enabled: (queue?.items.length ?? 0) > 0,
   });
+  const canReview = Boolean(
+    reviewItem?.bodyRetained
+      && reviewItem.bodyText.trim()
+      && reviewItem.bodyDeletionHoursRemaining > 0,
+  );
+  const reviewBlockedReason = !reviewItem?.bodyRetained || !reviewItem?.bodyText.trim()
+    ? "원문이 없거나 이미 삭제되어 통과·재생성할 수 없습니다."
+    : reviewItem.bodyDeletionHoursRemaining <= 0
+      ? "원문 보관 기한이 지나 통과·재생성할 수 없습니다."
+      : undefined;
 
   // 4. 판정 처리 Mutation
   const decisionMutation = useMutation({
@@ -127,10 +137,15 @@ export default function AdminReviewPage() {
             />
 
             {/* B. 좌우 2열 병렬 대조 뷰 */}
-            {isItemLoading || !reviewItem ? (
+            {isItemLoading ? (
               <div className="flex min-h-[450px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface">
                 <Spinner className="h-6 w-6 text-nl-accent" />
                 <p className="text-xs text-nl-muted">기사 원문과 AI 생성물을 대조 중입니다...</p>
+              </div>
+            ) : isItemError || !reviewItem ? (
+              <div className="flex min-h-[450px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface text-center">
+                <p className="text-sm font-semibold text-red-600">기사 원문과 생성물을 불러오지 못했습니다.</p>
+                <button type="button" onClick={() => void refetchItem()} className="rounded-full border border-nl-border px-4 py-1.5 text-xs text-nl-text hover:bg-nl-subtle">다시 시도</button>
               </div>
             ) : (
               <SideBySideViewer
@@ -141,7 +156,10 @@ export default function AdminReviewPage() {
 
             {/* C. 하단 체크리스트 및 승인/반려 판정 액션 바 */}
             <ReviewActionBar
+              key={activeId}
               isSubmitting={decisionMutation.isPending}
+              canReview={canReview}
+              blockedReason={reviewBlockedReason}
               onDecision={(decision) => decisionMutation.mutate(decision)}
             />
           </div>

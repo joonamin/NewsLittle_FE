@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
+import { ReportDialog } from "@/components/reports/report-dialog";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Button } from "@/components/ui/button";
 import { StateNotice } from "@/components/ui/state-notice";
@@ -13,6 +14,7 @@ import { quizResultQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
 import { dehydrateScreenQueries, type DehydratedProps } from "@/features/contracts/server-prefetch";
 import type { QuizRecapItemViewModel } from "@/features/contracts/view-models";
+import type { UserReportType } from "@/features/reports/report-models";
 import { useHomeFlow } from "@/features/home/home-flow";
 
 type QuizResultPageProps = DehydratedProps & {
@@ -69,6 +71,10 @@ function QuizResultContent({ sessionId }: { sessionId: string }) {
   const { data: result } = useSuspenseQuery(quizResultQueryOptions("shortform", sessionId));
   const { home } = useHomeFlow();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
+  const [reportSelection, setReportSelection] = useState<{
+    item: QuizRecapItemViewModel;
+    type: UserReportType;
+  } | null>(null);
 
   const toggleExpand = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -163,6 +169,7 @@ function QuizResultContent({ sessionId }: { sessionId: string }) {
               item={item}
               isExpanded={expandedIndex === idx}
               onToggle={() => toggleExpand(idx)}
+              onReport={(type) => setReportSelection({ item, type })}
             />
           ))}
         </div>
@@ -193,6 +200,20 @@ function QuizResultContent({ sessionId }: { sessionId: string }) {
           여기서 이용을 마쳐도 괜찮아요. 정답 수는 학습 효과를 뜻하지 않아요.
         </p>
       </div>
+      {reportSelection ? (
+        <ReportDialog
+          open
+          initialType={reportSelection.type}
+          target={{
+            surface: "QUIZ",
+            articleId: reportSelection.item.articleId ?? "",
+            articleTitle: reportSelection.item.evidence?.title ?? "퀴즈 문항",
+            quizId: reportSelection.item.quizId,
+            answerRef: reportSelection.item.answerRef,
+          }}
+          onClose={() => setReportSelection(null)}
+        />
+      ) : null}
     </Page>
   );
 }
@@ -201,10 +222,12 @@ function RecapRow({
   item,
   isExpanded,
   onToggle,
+  onReport,
 }: {
   item: QuizRecapItemViewModel;
   isExpanded: boolean;
   onToggle: () => void;
+  onReport: (type: UserReportType) => void;
 }) {
   const outcomeColor =
     item.outcome === "correct"
@@ -274,15 +297,19 @@ function RecapRow({
           <div className="flex items-center gap-4 pt-1">
             <button
               type="button"
-              onClick={() => alert("판정 오류 신고가 접수되었습니다.")}
-              className="text-nl-micro text-nl-negative hover:underline"
+              disabled={!item.quizId || !item.answerRef || !item.articleId}
+              title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
+              onClick={() => onReport("JUDGMENT_ERROR")}
+              className="text-nl-micro text-nl-negative hover:underline disabled:text-nl-muted disabled:no-underline"
             >
               판정 오류 신고
             </button>
             <button
               type="button"
-              onClick={() => alert("내용 오류 신고가 접수되었습니다.")}
-              className="text-nl-micro text-nl-muted hover:underline"
+              disabled={!item.quizId || !item.articleId}
+              title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
+              onClick={() => onReport("CONTENT_ERROR")}
+              className="text-nl-micro text-nl-muted hover:underline disabled:no-underline"
             >
               내용 오류 신고
             </button>
