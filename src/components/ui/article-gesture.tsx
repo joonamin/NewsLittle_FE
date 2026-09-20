@@ -3,22 +3,27 @@ import { Check, ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import type { HomeArticleCardViewModel } from "@/features/contracts/view-models";
+import { useDebouncedAction } from "@/hooks/use-debounced-action";
 import { cn } from "@/lib/cn";
 import { splitSentences } from "@/lib/sentences";
-import { Spinner } from "@/components/ui/spinner";
 
 export type SaveToTodayButtonProps = {
   saved: boolean;
   onClick: () => void;
+  loading?: boolean;
 };
 
-export function SaveToTodayButton({ saved, onClick }: SaveToTodayButtonProps) {
+export function SaveToTodayButton({ saved, onClick, loading = false }: SaveToTodayButtonProps) {
   const Icon = saved ? Check : Plus;
 
   return (
-    <button
-      type="button"
+    <Button
+      variant={saved ? "default" : "primary"}
+      size="l"
+      loading={loading}
       aria-pressed={saved}
       data-save-today-button="true"
       onClick={(event) => {
@@ -26,14 +31,21 @@ export function SaveToTodayButton({ saved, onClick }: SaveToTodayButtonProps) {
         onClick();
       }}
       className={cn(
-        "box-border flex h-[52px] w-full shrink-0 items-center justify-center gap-2 rounded-nl-button border-2 px-5 text-nl-body font-bold",
-        "shadow-nl-save-button",
-        saved ? "border-nl-accent bg-nl-accent-subtle text-nl-accent" : "border-nl-accent bg-nl-accent text-nl-on-accent",
+        "relative box-border h-[52px] w-full shrink-0 text-nl-body font-bold transition-colors shadow-nl-save-button",
+        !saved && "border-2 border-nl-accent",
       )}
     >
-      <Icon width={20} height={20} aria-hidden />
-      {saved ? "오늘 목록에 담김" : "오늘 목록에 담기"}
-    </button>
+      <span
+        className={cn(
+          "pointer-events-none absolute left-6 top-1/2 -translate-y-1/2 flex items-center justify-center",
+          loading && "opacity-0",
+        )}
+        aria-hidden="true"
+      >
+        <Icon width={20} height={20} />
+      </span>
+      <span>{saved ? "오늘 목록에 담김" : "오늘 목록에 담기"}</span>
+    </Button>
   );
 }
 
@@ -91,7 +103,7 @@ function ExpandableBody({ articleId, text }: { articleId: string; text: string }
             setExpanded((current) => !current);
           }}
           onKeyDown={(event) => event.stopPropagation()}
-          className="text-nl-caption font-bold text-nl-accent"
+          className="text-nl-caption font-bold text-nl-accent hover:underline"
         >
           {expanded ? "접기" : "더보기"}
         </button>
@@ -107,9 +119,10 @@ export type ArticleGestureProps = {
   canGoNext: boolean;
   onPrevious: () => void;
   onNext: () => void;
-  onToggleSave: () => void;
+  onToggleSave: () => void | Promise<unknown>;
   onReport?: () => void;
   isLoadingNext?: boolean;
+  debounceMs?: number;
 };
 
 export function ArticleGesture({
@@ -122,6 +135,7 @@ export function ArticleGesture({
   onToggleSave,
   onReport,
   isLoadingNext = false,
+  debounceMs = 600,
 }: ArticleGestureProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -129,6 +143,14 @@ export function ArticleGesture({
   const lastWheelAt = useRef(0);
   const [failedImageArticleId, setFailedImageArticleId] = useState<string | null>(null);
   const usesPhoto = card.image !== null && failedImageArticleId !== card.id;
+
+  const { run: handleToggleSave, pending: isDebouncing, reset: resetToggleSave } =
+    useDebouncedAction(debounceMs);
+
+  // 카드가 바뀌면 이전 카드의 쿨다운은 더 이상 의미가 없으니 즉시 푼다.
+  useEffect(() => {
+    resetToggleSave();
+  }, [card.id, resetToggleSave]);
 
   const onPointerDown = (event: PointerEvent<HTMLElement>) => {
     pointerStartY.current = event.clientY;
@@ -189,7 +211,7 @@ export function ArticleGesture({
           }
         }
         event.preventDefault();
-        onToggleSave();
+        void handleToggleSave(onToggleSave);
         return;
       }
 
@@ -208,7 +230,7 @@ export function ArticleGesture({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [canGoNext, canGoPrevious, isLoadingNext, onNext, onPrevious, onToggleSave]);
+  }, [canGoNext, canGoPrevious, handleToggleSave, isLoadingNext, onNext, onPrevious, onToggleSave]);
 
   // 본문이 넘칠 때는 네이티브 단계에서 전파를 끊어야 위 리스너(기사 전환)까지 올라가지 않는다.
   useEffect(() => {
@@ -242,7 +264,7 @@ export function ArticleGesture({
       ) : null}
       <div className="relative flex h-full min-h-0 w-full flex-1 items-center">
         <article
-          onDoubleClick={onToggleSave}
+          onDoubleClick={() => void handleToggleSave(onToggleSave)}
           className={cn(
             "relative z-10 flex h-full min-h-[480px] min-w-0 flex-1 self-stretch overflow-hidden rounded-[24px] border px-10 py-6",
             usesPhoto
@@ -286,13 +308,13 @@ export function ArticleGesture({
                   </div>
                 </div>
               ) : null}
-              <p className="text-nl-micro text-nl-muted">{card.sourceName} · 원문 게시 {card.publishedLabel}</p>
-              <div className="flex items-center gap-4 text-nl-micro">
+              <p className="text-nl-caption text-nl-muted">{card.sourceName} · 원문 게시 {card.publishedLabel}</p>
+              <div className="flex items-center gap-3 text-nl-body font-bold">
                 {card.originalIsAvailable ? (
-                  <a className="flex-1 text-nl-accent" href={card.originalUrl} target="_blank" rel="noreferrer">
+                  <a className="text-nl-accent hover:underline" href={card.originalUrl} target="_blank" rel="noreferrer">
                     원문 읽기 ↗
                   </a>
-                ) : <span className="flex-1 text-nl-muted">원문을 제공하지 않아요</span>}
+                ) : <span className="text-nl-muted">원문을 제공하지 않아요</span>}
                 {onReport ? (
                   <button
                     type="button"
@@ -300,7 +322,7 @@ export function ArticleGesture({
                       event.stopPropagation();
                       onReport();
                     }}
-                    className="text-nl-negative"
+                    className="text-nl-negative hover:underline"
                   >
                     신고
                   </button>
@@ -311,7 +333,7 @@ export function ArticleGesture({
             </div>
             <div className="relative z-10 mt-auto flex shrink-0 flex-col gap-4 pt-4">
               <div className="h-px w-full bg-nl-border/55" aria-hidden />
-              <SaveToTodayButton saved={saved} onClick={onToggleSave} />
+              <SaveToTodayButton saved={saved} loading={isDebouncing} onClick={() => void handleToggleSave(onToggleSave)} />
             </div>
           </div>
         </article>
@@ -324,7 +346,7 @@ export function ArticleGesture({
               event.currentTarget.blur();
               onPrevious();
             }}
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text disabled:opacity-40"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text transition-colors hover:bg-nl-subtle disabled:opacity-40 disabled:hover:bg-nl-bg"
           >
             <ChevronUp width={24} height={24} />
           </button>
@@ -336,7 +358,7 @@ export function ArticleGesture({
               event.currentTarget.blur();
               onNext();
             }}
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text disabled:opacity-40"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-nl-border bg-nl-bg text-nl-text transition-colors hover:bg-nl-subtle disabled:opacity-40 disabled:hover:bg-nl-bg"
           >
             {isLoadingNext ? <Spinner className="h-5 w-5 text-nl-accent" /> : <ChevronDown width={24} height={24} />}
           </button>

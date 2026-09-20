@@ -8,7 +8,6 @@ import { ArticleGesture } from "@/components/ui/article-gesture";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
-import { Spinner } from "@/components/ui/spinner";
 import { StateNotice } from "@/components/ui/state-notice";
 import { ErrorState, LoadingState } from "@/components/ui/state-view";
 import { TodayListSidebar } from "@/components/ui/today-list-sidebar";
@@ -58,6 +57,7 @@ function HomeContent() {
     requestLogin,
     requestArticleSelection,
     removeArticle,
+    archiveTodayList,
     resolvePreviousLists,
     previousListDecision,
     previousListError,
@@ -117,12 +117,12 @@ function HomeContent() {
               isLoadingNext={isFetchingNextPage && cardIndex === allCards.length - 1}
               onPrevious={handlePrevious}
               onNext={handleNext}
-              onToggleSave={() => {
+              onToggleSave={async () => {
                 if (isSaved) {
-                  void removeArticle(card.id);
+                  await removeArticle(card.id);
                   return;
                 }
-                void requestArticleSelection(card.id);
+                await requestArticleSelection(card.id);
               }}
               onReport={() =>
                 openReport({
@@ -154,6 +154,7 @@ function HomeContent() {
           onLogin={requestLogin}
           onOpenArticle={(url) => window.open(url, "_blank", "noopener,noreferrer")}
           onRemoveArticle={(articleId) => void removeArticle(articleId)}
+          onArchive={archiveTodayList}
           onStartQuiz={() => void router.push("/quiz")}
         />
       </div>
@@ -164,8 +165,11 @@ function HomeContent() {
         footer={
           <div className="flex w-full justify-end gap-3">
             <Button variant="secondary" disabled={previousListDecision !== null} onClick={() => void resolvePreviousLists("discard")}>전체 버리기</Button>
-            <Button disabled={previousListDecision !== null} onClick={() => void resolvePreviousLists("archive")}>
-              {previousListDecision === "archive" ? <Spinner className="text-nl-on-accent" /> : null}
+            <Button
+              disabled={previousListDecision !== null}
+              loading={previousListDecision === "archive"}
+              onClick={() => void resolvePreviousLists("archive")}
+            >
               전체 보관하기
             </Button>
           </div>

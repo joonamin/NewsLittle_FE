@@ -23,6 +23,14 @@ export const queryKeys = {
     dashboard: ["admin", "dashboard"] as const,
     queue: ["admin", "review", "queue"] as const,
     articleReview: (articleId: number) => ["admin", "review", "article", articleId] as const,
+    usageBases: ["admin", "usage-bases"] as const,
+    usageBasis: (id: string) => ["admin", "usage-bases", id] as const,
+    assets: ["admin", "assets"] as const,
+    asset: (id: number) => ["admin", "assets", id] as const,
+    deletions: ["admin", "deletions"] as const,
+    deletion: (id: string) => ["admin", "deletions", id] as const,
+    reports: ["admin", "reports"] as const,
+    report: (id: string) => ["admin", "reports", id] as const,
   },
 };
 

@@ -12,6 +12,7 @@ import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
 import type { ArchiveViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
 import { useReportFlow } from "@/features/report/report-flow";
+import { useDebouncedAction } from "@/hooks/use-debounced-action";
 
 export default function ArchivePage() {
   const router = useRouter();
@@ -89,10 +90,11 @@ function ArchiveContent() {
   const queryClient = useQueryClient();
   const { openReport } = useReportFlow();
   const { data: archive } = useSuspenseQuery(archiveQueryOptions);
-  const [expandedDates, setExpandedDates] = useState<Set<string>>(
-    () => new Set(archive.groups.slice(0, 1).map((group) => group.date)),
+  const [expandedGroupIds, setExpandedGroupIds] = useState<Set<string>>(
+    () => new Set(archive.groups.slice(0, 1).map((group) => group.id)),
   );
 
+  const { run: runDelete } = useDebouncedAction();
   const deleteEntry = useMutation({
     mutationFn: (entryId: string) => screenApi.deleteArchiveEntry(entryId),
     onSuccess: (_result, entryId) => {
@@ -106,13 +108,13 @@ function ArchiveContent() {
     },
   });
 
-  const toggleGroup = (date: string) => {
-    setExpandedDates((previous) => {
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroupIds((previous) => {
       const next = new Set(previous);
-      if (next.has(date)) {
-        next.delete(date);
+      if (next.has(groupId)) {
+        next.delete(groupId);
       } else {
-        next.add(date);
+        next.add(groupId);
       }
       return next;
     });
@@ -141,15 +143,16 @@ function ArchiveContent() {
       ) : (
         archive.groups.map((group) => (
           <div
-            key={group.date}
+            key={group.id}
             className="flex flex-col gap-4 rounded-nl-card border border-nl-border bg-nl-bg p-6"
           >
             <ArchiveGroup
-              dateLabel={`${group.dateLabel} 선택 · ${group.items.length}개`}
+              title={group.title}
+              dateText={`${group.dateLabel} 선택`}
               items={group.items}
-              expanded={expandedDates.has(group.date)}
-              onToggleExpanded={() => toggleGroup(group.date)}
-              onDeleteItem={(id) => deleteEntry.mutate(id)}
+              expanded={expandedGroupIds.has(group.id)}
+              onToggleExpanded={() => toggleGroup(group.id)}
+              onDeleteItem={(id) => void runDelete(() => deleteEntry.mutateAsync(id).catch(() => undefined))}
               onReportItem={(item) => {
                 if (!item.articleId) return;
                 openReport({

@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
+import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
 import { ExplanationBlock } from "@/components/ui/explanation-block";
 import { ProgressBar, ProgressLabel } from "@/components/ui/progress";
@@ -295,7 +296,11 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
       <section className="space-y-5 rounded-nl-card border border-nl-border bg-nl-bg p-6 md:p-8">
         <p className={`text-[20px] font-bold ${positive ? "text-nl-positive" : "text-nl-text"}`}>{positive ? "✓ 정답이에요" : resolution.outcomeLabel}</p>
         <h2 className="text-nl-title font-bold">{session.question?.prompt}</h2>
-        <p className="text-nl-caption">내 답 {resolution.userAnswer ?? "포기"} · 정답 {resolution.answer}</p>
+        <AnswerComparison
+          userAnswer={resolution.userAnswer}
+          correctAnswer={resolution.answer}
+          isCorrect={positive}
+        />
         {resolution.explanation ? <p className="text-nl-body text-nl-muted">{resolution.explanation}</p> : null}
         {evidence ? (
           <article className="space-y-3 rounded-nl-card border border-nl-border bg-nl-accent-wash p-6">

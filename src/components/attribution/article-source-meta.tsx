@@ -33,7 +33,7 @@ export function ArticleSourceMeta({
         {attributionCopy.sourceLine(sourceName, publishedLabel)}
       </p>
       {originalUrl ? (
-        <a href={originalUrl} target="_blank" rel="noreferrer" className="text-nl-micro text-nl-accent">
+        <a href={originalUrl} target="_blank" rel="noreferrer" className="text-nl-micro text-nl-accent hover:underline">
           {attributionCopy.originalLinkLabel}
         </a>
       ) : (

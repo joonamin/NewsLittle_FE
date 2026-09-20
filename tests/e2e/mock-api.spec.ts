@@ -29,6 +29,75 @@ test("member home uses the PEN feed card and today-list sidebar interaction", as
   await expect(page.getByRole("button", { name: "오늘 목록에 담기" })).toBeVisible();
 });
 
+test("archiving the today list with a title flushes it and shows up in the archive page", async ({ page }) => {
+  await page.goto("/");
+
+  const sidebar = page.getByRole("complementary", { name: "오늘 목록" });
+  await expect(sidebar).toContainText(firstArticle.title);
+
+  const titleInput = page.getByRole("textbox", { name: "오늘 목록 제목" });
+  const archiveButton = page.getByRole("button", { name: "아카이빙" });
+  await expect(titleInput).toHaveValue(/^\d{8}_\d+$/);
+  await expect(archiveButton).toBeEnabled();
+
+  await titleInput.fill("이번 주 읽을거리");
+  await expect(archiveButton).toBeEnabled();
+  await archiveButton.click();
+
+  await expect(page.getByText("아직 담은 기사가 없어요")).toBeVisible();
+  await expect(titleInput).toHaveValue(/^\d{8}_\d+$/);
+
+  // 목 서버 상태가 브라우저 페이지 컨텍스트에 살아 있으므로, 상태를 초기화시키는
+  // 풀 네비게이션(page.goto) 대신 클라이언트 라우팅으로 이동해야 방금 만든 아카이브가 보인다.
+  await page.getByRole("link", { name: "아카이브" }).click();
+  await expect(page.getByText("이번 주 읽을거리", { exact: false })).toBeVisible();
+  await expect(page.getByRole("link", { name: firstArticle.title })).toBeVisible();
+});
+
+test("archiving with a duplicate title shows an inline error and keeps the list", async ({ page }) => {
+  await page.goto("/");
+
+  const titleInput = page.getByRole("textbox", { name: "오늘 목록 제목" });
+  await titleInput.fill("이번 주 읽을거리");
+  await page.getByRole("button", { name: "아카이빙" }).click();
+  await expect(page.getByText("아직 담은 기사가 없어요")).toBeVisible();
+
+  await page.getByRole("button", { name: "오늘 목록에 담기" }).click();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(firstArticle.title);
+
+  await titleInput.fill("이번 주 읽을거리");
+  await page.getByRole("button", { name: "아카이빙" }).click();
+
+  await expect(page.getByText("이미 사용 중인 이름입니다.")).toBeVisible();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(firstArticle.title);
+});
+
+test("archiving twice on the same day with different titles shows up as two separate archive cards", async ({ page }) => {
+  await page.goto("/");
+
+  const titleInput = page.getByRole("textbox", { name: "오늘 목록 제목" });
+  await titleInput.fill("첫 번째 묶음");
+  await page.getByRole("button", { name: "아카이빙" }).click();
+  await expect(page.getByText("아직 담은 기사가 없어요")).toBeVisible();
+
+  await page.getByRole("button", { name: "다음 기사" }).click();
+  await page.getByRole("button", { name: "오늘 목록에 담기" }).click();
+  await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(secondArticle.title);
+
+  await titleInput.fill("두 번째 묶음");
+  await page.getByRole("button", { name: "아카이빙" }).click();
+  await expect(page.getByText("아직 담은 기사가 없어요")).toBeVisible();
+
+  await page.getByRole("link", { name: "아카이브" }).click();
+  await expect(page.getByText("첫 번째 묶음", { exact: false })).toBeVisible();
+  await expect(page.getByText("두 번째 묶음", { exact: false })).toBeVisible();
+
+  // 최신 아카이빙(두 번째 묶음)만 기본으로 펼쳐지므로, 첫 번째 묶음은 펼쳐야 안의 링크가 보인다.
+  await page.getByRole("button", { name: /첫 번째 묶음/ }).click();
+  await expect(page.getByRole("link", { name: firstArticle.title })).toBeVisible();
+  await expect(page.getByRole("link", { name: secondArticle.title })).toBeVisible();
+});
+
 test("fetches next cursor items and appends them to feed when reaching the end", async ({ page }) => {
   await page.goto("/");
 
@@ -223,8 +292,9 @@ test("archive shows grouped entries with status badges and supports collapse and
     page.getByText("제목과 원문 링크만 보관해요. 기사 본문·요약은 저장하지 않으며, 다시 푸는 퀴즈는 제공하지 않아요."),
   ).toBeVisible();
 
-  const latestGroupHeader = page.getByRole("button", { name: /2026\. 9\. 12\. 선택 · 5개/ });
+  const latestGroupHeader = page.getByRole("button", { name: /2026\. 9\. 12\. 선택/ });
   await expect(latestGroupHeader).toHaveAttribute("aria-expanded", "true");
+  await expect(latestGroupHeader.getByText("5개")).toBeVisible();
   await expect(latestGroupHeader.getByText("펼침")).toBeVisible();
   await expect(page.getByRole("listitem")).toHaveCount(5);
   await expect(page.getByText("원문 접근 실패 · 보관 기록 유지")).toBeVisible();
@@ -237,8 +307,9 @@ test("archive shows grouped entries with status badges and supports collapse and
     page.getByText("제공처 요청으로 이용이 중단되어 제목과 원문 링크를 표시할 수 없습니다."),
   ).toBeVisible();
 
-  const previousGroupHeader = page.getByRole("button", { name: /2026\. 8\. 10\. 선택 · 1개/ });
+  const previousGroupHeader = page.getByRole("button", { name: /2026\. 8\. 10\. 선택/ });
   await expect(previousGroupHeader).toHaveAttribute("aria-expanded", "false");
+  await expect(previousGroupHeader.getByText("1개")).toBeVisible();
   await expect(previousGroupHeader.getByText("접힘")).toBeVisible();
   await previousGroupHeader.click();
   await expect(previousGroupHeader).toHaveAttribute("aria-expanded", "true");
@@ -370,6 +441,8 @@ test("archive shows archival guidance once every entry is deleted", async ({ pag
   for (let remaining = 5; remaining > 0; remaining -= 1) {
     await page.getByRole("button", { name: "삭제" }).first().click();
     await expect(page.getByRole("listitem")).toHaveCount(remaining - 1);
+    // 삭제 버튼은 연타 방지 쿨다운이 있어, 다음 클릭 전에 풀릴 때까지 기다린다.
+    await page.waitForTimeout(650);
   }
 
   await page.getByRole("button", { name: /2026\. 8\. 10\. 선택/ }).click();
@@ -408,6 +481,9 @@ test("pressing Enter on home screen toggles article in today list", async ({ pag
   await page.keyboard.press("Enter");
   await expect(page.getByRole("button", { name: "오늘 목록에 담김" })).toBeVisible();
   await expect(page.getByRole("complementary", { name: "오늘 목록" })).toContainText(secondArticle.title);
+
+  // 담기/빼기는 연타 방지 쿨다운이 있어, 다시 Enter를 누르기 전에 풀릴 때까지 기다린다.
+  await page.waitForTimeout(650);
 
   // 다시 Enter 키 입력 시 빼기 동작 수행
   await page.keyboard.press("Enter");

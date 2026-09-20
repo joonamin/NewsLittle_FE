@@ -10,6 +10,7 @@ import type {
   AddToTodayListRequest,
   AuthenticationApiModel,
   ArchiveApiModel,
+  ArchiveTodayListResultApiModel,
   AuthMeApiModel,
   CreateQuizSessionRequest,
   DeletionConfirmationRequest,
@@ -91,6 +92,11 @@ export const screenApi = {
     apiRequest<TodayListApiModel>(`/api/v1/today-list/${encodeURIComponent(articleId)}`, {
       method: "DELETE",
     }),
+  archiveTodayList: (title: string) =>
+    apiRequest<ArchiveTodayListResultApiModel>(
+      "/api/v1/today-list/archive",
+      jsonRequest("POST", { title }),
+    ),
   archivePreviousLists: () =>
     apiRequest<HomeApiModel>("/api/v1/previous-lists/archive", { method: "POST" }).then(
       toHomeViewModel,

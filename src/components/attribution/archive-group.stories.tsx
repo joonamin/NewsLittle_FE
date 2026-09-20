@@ -155,3 +155,21 @@ export const WithoutDeleteCallback: Story = {
     await expect(canvas.getAllByRole("button", { name: "신고" })).toHaveLength(3);
   },
 };
+
+export const WithPriorityHierarchy: Story = {
+  args: {
+    title: "20260920_1",
+    dateText: "2026. 9. 20. 선택",
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const title = canvas.getByText("20260920_1");
+    const date = canvas.getByText("2026. 9. 20. 선택");
+    const count = canvas.getByText("4개");
+    await expect(title).toBeVisible();
+    await expect(date).toBeVisible();
+    await expect(count).toBeVisible();
+    await expect(canvas.getByText("펼침")).toBeVisible();
+  },
+};
+

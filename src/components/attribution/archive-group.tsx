@@ -1,4 +1,5 @@
-import { Badge, DateGroupHeader } from "@/components/ui";
+import type { ReactNode } from "react";
+import { AccordionHeader, Badge } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
@@ -6,7 +7,7 @@ import { attributionCopy } from "./copy";
 
 /**
  * GLB-02 아카이브 규칙: 선택일별 제목·링크와 상태(원문 접근 실패·파생물 만료·이용 중단)를
- * 그룹 헤더(DateGroupHeader)와 항목 배지(Badge)로 표시한다. 이용 중단·만료 자산은
+ * 그룹 헤더(AccordionHeader)와 항목 배지(Badge)로 표시한다. 이용 중단·만료 자산은
  * 원문 링크 대신 허용된 상태 정보만 노출한다.
  *
  * "보관 범위"(제목·원문 링크만 보관한다는 안내)는 날짜별 그룹이 아니라 아카이브
@@ -34,7 +35,20 @@ export type ArchiveGroupItem = {
 };
 
 export type ArchiveGroupProps = {
-  dateLabel: string;
+  /** 기존 단일 라벨 호환용 (title, dateText, p1, p2, p3 미제공 시 fallback) */
+  dateLabel?: string;
+  /** 1순위 정보: 목록 제목 */
+  title?: string | null;
+  /** 2순위 정보: 날짜 라벨 (예: '2026. 9. 20. 선택') */
+  dateText?: string;
+  /** 3순위 정보: 수량/개수 라벨 (생략 시 `${items.length}개`) */
+  countText?: string;
+  /** 커스텀 우선순위 노드 직접 전달 시 사용 */
+  p1?: ReactNode;
+  /** 커스텀 우선순위 노드 직접 전달 시 사용 */
+  p2?: ReactNode;
+  /** 커스텀 우선순위 노드 직접 전달 시 사용 */
+  p3?: ReactNode;
   items: readonly ArchiveGroupItem[];
   expanded?: boolean;
   onToggleExpanded?: () => void;
@@ -63,7 +77,7 @@ function ArchiveItemRow({
     <li className="flex items-center gap-4 border-b border-nl-border py-4 last:border-b-0">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         {showsLink && item.originalUrl ? (
-          <a href={item.originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption font-bold text-nl-text">
+          <a href={item.originalUrl} target="_blank" rel="noreferrer" className="text-nl-caption font-bold text-nl-text hover:underline">
             {title}
           </a>
         ) : (
@@ -99,7 +113,7 @@ function ArchiveItemRow({
         <button
           type="button"
           onClick={onReport}
-          className="shrink-0 text-nl-micro text-nl-negative"
+          className="shrink-0 text-nl-micro text-nl-negative hover:underline"
         >
           신고
         </button>
@@ -115,6 +129,12 @@ function ArchiveItemRow({
 
 export function ArchiveGroup({
   dateLabel,
+  title,
+  dateText,
+  countText,
+  p1: explicitP1,
+  p2: explicitP2,
+  p3: explicitP3,
   items,
   expanded = true,
   onToggleExpanded,
@@ -122,9 +142,33 @@ export function ArchiveGroup({
   onReportItem,
   className,
 }: ArchiveGroupProps) {
+  const count = countText ?? `${items.length}개`;
+
+  let p1: ReactNode = explicitP1;
+  let p2: ReactNode = explicitP2;
+  let p3: ReactNode = explicitP3;
+
+  if (!p1 && !p2 && !p3) {
+    if (title || dateText) {
+      p1 = title || (dateText ?? dateLabel);
+      p2 = title ? (dateText ?? dateLabel) : undefined;
+      p3 = count;
+    }
+  }
+
+  const isLegacyLabel = !p1 && !p2 && !p3 && Boolean(dateLabel);
+
   return (
     <section className={cn("flex flex-col gap-4", className)}>
-      <DateGroupHeader label={dateLabel} expanded={expanded} showsStateText onClick={onToggleExpanded} />
+      <AccordionHeader
+        label={isLegacyLabel ? dateLabel : undefined}
+        p1={p1}
+        p2={p2}
+        p3={p3}
+        expanded={expanded}
+        showsStateText
+        onClick={onToggleExpanded}
+      />
       {expanded ? (
         <>
           <span className="h-px w-full bg-nl-border" aria-hidden="true" />

@@ -29,15 +29,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleToggleDeletionFailure = async () => {
-    try {
-      const updated = await adminApi.toggleDeletionFailure();
-      queryClient.setQueryData(queryKeys.admin.dashboard, updated);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   return (
     <>
       <Head>
@@ -61,19 +52,6 @@ export default function AdminDashboardPage() {
               <span className="text-xs text-nl-muted font-mono">
                 마지막 집계 {summary?.lastAggregatedAt ?? "--:--"} · 조회 전용
               </span>
-
-              {/* 삭제 실패 상태 시뮬레이션 토글 버튼 (테스트용) */}
-              <Button
-                size="xs"
-                variant="secondary"
-                onClick={handleToggleDeletionFailure}
-                className="text-xs text-nl-muted hover:text-nl-text border border-dashed border-nl-border"
-                title="삭제 실패 경고 노출 여부를 토글합니다."
-              >
-                {summary?.deletionFailureAlert.hasFailure
-                  ? "🚨 삭제 실패 모의 (ON)"
-                  : "✅ 삭제 실패 모의 (OFF)"}
-              </Button>
 
               <Button
                 size="xs"

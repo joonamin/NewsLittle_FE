@@ -32,11 +32,13 @@ export default function AdminReviewPage() {
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
 
   // 3. 현재 선택된 기사의 상세 대조 데이터 조회
-  // 첫 기사 자동 선택: 별도 effect 없이 렌더링 중 파생시켜 커스케이드 렌더를 피한다.
-  const activeId = selectedArticleId ?? (queue?.items[0]?.articleId ?? 3);
+  // 첫 기사 자동 선택: 별도 effect 없이 렌더링 중 파생시켜 캐스케이드 렌더를 피한다.
+  const activeId = queue?.items.some((item) => item.articleId === selectedArticleId)
+    ? selectedArticleId!
+    : (queue?.items[0]?.articleId ?? 3);
   const { data: reviewItem, isLoading: isItemLoading } = useQuery({
     ...adminArticleReviewQueryOptions(activeId),
-    enabled: selectedArticleId !== null || (queue?.items.length ?? 0) > 0,
+    enabled: (queue?.items.length ?? 0) > 0,
   });
 
   // 4. 판정 처리 Mutation

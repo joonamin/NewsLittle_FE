@@ -8,6 +8,7 @@ import { GoogleSignIn } from "@/components/ui/google-sign-in";
 import { Modal } from "@/components/ui/modal";
 import { useHomeFlow } from "@/features/home/home-flow";
 import { ReportModal } from "@/features/report/report-modal";
+import { useDebouncedAction } from "@/hooks/use-debounced-action";
 
 import { MobileNotice } from "./mobile-notice";
 
@@ -41,6 +42,7 @@ export function AppShell({ children }: AppShellProps) {
     requestLogin,
   } = useHomeFlow();
   const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation>(null);
+  const { run: runLogout } = useDebouncedAction();
 
   const completeNavigation = (item: NavigationTarget) => {
     if (navigation.account.status === "guest" && item.id === "archive") {
@@ -74,7 +76,7 @@ export function AppShell({ children }: AppShellProps) {
           onNavigate={requestNavigation}
           onLogin={requestLogin}
           onAccountNavigate={(item) => requestNavigation({ id: item.id, label: item.label, href: item.href })}
-          onAccountAction={() => void logout()}
+          onAccountAction={() => void runLogout(logout)}
         />
         <main>{children}</main>
 

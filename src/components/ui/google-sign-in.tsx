@@ -55,7 +55,7 @@ export function GoogleSignIn({ pending, onCredential }: Props) {
       {!ready && !error ? <p role="status">Google 로그인 버튼을 불러오는 중입니다.</p> : null}
       {error ? <div>
         <p role="alert">{error}</p>
-        <button type="button" className="underline" onClick={() => {
+        <button type="button" className="underline hover:no-underline" onClick={() => {
           setError(null);
           setReady(false);
           setAttempt((value) => value + 1);
