@@ -291,15 +291,19 @@ function RecapRow({
           <div className="flex items-center gap-4 pt-1">
             <button
               type="button"
+              disabled={!item.quizId || !item.answerRef || !item.articleId}
+              title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
               onClick={() => openQuestionReport("JUDGMENT_ERROR")}
-              className="text-nl-micro text-nl-negative hover:underline"
+              className="text-nl-micro text-nl-negative hover:underline disabled:text-nl-muted disabled:no-underline"
             >
               판정 오류 신고
             </button>
             <button
               type="button"
+              disabled={!item.quizId || !item.articleId}
+              title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
               onClick={() => openQuestionReport("CONTENT_ERROR")}
-              className="text-nl-micro text-nl-muted hover:underline"
+              className="text-nl-micro text-nl-muted hover:underline disabled:no-underline"
             >
               내용 오류 신고
             </button>

@@ -6,6 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
+import { StateNotice } from "@/components/ui/state-notice";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
@@ -275,13 +276,22 @@ function RecapRow({
           ) : null}
 
           {item.evidence && item.evidence.isRestricted ? (
-            <EvidenceAttribution
-              articleTitle={item.evidence.title}
-              sourceName={item.evidence.sourceName}
-              publishedLabel={item.evidence.publishedLabel}
-              originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
-              summaryUnavailable
-            />
+            <>
+              {!item.evidence.originalIsAvailable ? (
+                <StateNotice
+                  title="원문을 열 수 없어요"
+                  description="현재 제공처에서 원문 접근을 지원하지 않아요. 풀이 결과는 그대로 유지됩니다."
+                  className="max-w-none"
+                />
+              ) : null}
+              <EvidenceAttribution
+                articleTitle={item.evidence.title}
+                sourceName={item.evidence.sourceName}
+                publishedLabel={item.evidence.publishedLabel}
+                originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
+                summaryUnavailable
+              />
+            </>
           ) : null}
           {item.evidence && !item.evidence.isRestricted ? (
             <article className="space-y-3 rounded-nl-card border border-nl-border bg-nl-accent-wash p-5">
@@ -292,11 +302,19 @@ function RecapRow({
                 <p className="text-nl-caption text-nl-muted">{item.evidence.summaryText}</p>
               ) : null}
 
+              {!item.evidence.originalIsAvailable ? (
+                <StateNotice
+                  title="원문을 열 수 없어요"
+                  description="현재 제공처에서 원문 접근을 지원하지 않아요. 풀이 결과는 그대로 유지됩니다."
+                  className="max-w-none"
+                />
+              ) : null}
+
               <ArticleSourceMeta
                 sourceName={item.evidence.sourceName}
                 publishedLabel={item.evidence.publishedLabel}
                 originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
-                showsAiSummary={item.evidence.showsAiSummary}
+                showsAiSummary={item.evidence.showsAiSummary && Boolean(item.evidence.summaryText?.trim())}
                 onReport={() => {
                   const evidence = item.evidence;
                   if (!evidence) return;
@@ -324,6 +342,8 @@ function RecapRow({
 
           <button
             type="button"
+            disabled={!item.quizId || !item.answerRef || !item.articleId}
+            title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
             onClick={() => {
               const evidence = item.evidence;
               if (!evidence || !item.quizId) return;
@@ -337,7 +357,7 @@ function RecapRow({
                 defaultReason: "JUDGMENT_ERROR",
               });
             }}
-            className="text-nl-micro text-nl-negative hover:underline"
+            className="text-nl-micro text-nl-negative hover:underline disabled:text-nl-muted disabled:no-underline"
           >
             판정 오류 신고
           </button>

@@ -9,6 +9,8 @@ import type {
 } from "@/features/contracts/api-models";
 import { screenApi } from "@/features/contracts/screen-api";
 
+import { reportErrorMessage } from "./report-validation";
+
 /**
  * GLB-03 신고 모달을 어느 화면에서든 같은 방식으로 열기 위한 대상 정보.
  * BE `POST /api/v1/reports`(newslittle.modules.reports.schemas.CreateReportRequest)와
@@ -73,6 +75,8 @@ type ReportFlowContextValue = {
   lastResult: ReportFlowState["lastResult"];
   isPending: boolean;
   isError: boolean;
+  /** 실패 사유를 상태 코드별로 구분한 안내 문구. 실패 상태가 아니면 null. */
+  errorMessage: string | null;
   openReport: (target: ReportTarget) => void;
   closeReport: () => void;
   submitReport: (values: ReportSubmitValues) => Promise<void>;
@@ -127,6 +131,7 @@ export function ReportFlowProvider({ children }: { children: ReactNode }) {
       lastResult: state.lastResult,
       isPending: submitMutation.isPending,
       isError: submitMutation.isError,
+      errorMessage: submitMutation.isError ? reportErrorMessage(submitMutation.error) : null,
       openReport,
       closeReport,
       submitReport,
@@ -137,6 +142,7 @@ export function ReportFlowProvider({ children }: { children: ReactNode }) {
       state.lastResult,
       state.submitted,
       state.target,
+      submitMutation.error,
       submitMutation.isError,
       submitMutation.isPending,
       submitReport,

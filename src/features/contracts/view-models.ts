@@ -199,25 +199,25 @@ export function toHomeViewModel(api: HomeApiModel): HomeViewModel {
       ? {
           count: api.todayList.items.length,
           dateLabel: formatDate(api.todayList.selectedForDate),
-          items: api.todayList.items.map((item) => ({
+          items: (api.todayList.items ?? []).map((item) => ({
             articleId: item.article.id,
             title: item.article.title,
-            originalUrl: item.article.source.originalUrl,
-            publishedLabel: formatDate(item.article.source.publishedAt),
+            originalUrl: item.article.source?.originalUrl ?? "",
+            publishedLabel: formatDate(item.article.source?.publishedAt),
             quizStatusLabel: quizStatusLabel[item.quizStatus],
             isFromPreviousFeedDate: item.isFromPreviousFeedDate,
           })),
         }
       : null,
-    pendingPreviousLists: api.pendingPreviousLists.map((list) => ({
+    pendingPreviousLists: (api.pendingPreviousLists ?? []).map((list) => ({
       dateLabel: formatDate(list.date),
-      items: list.items.map((item) => ({
+      items: (list.items ?? []).map((item) => ({
         articleId: item.article.id,
         title: item.article.title,
-        originalUrl: item.article.source.originalUrl,
+        originalUrl: item.article.source?.originalUrl ?? "",
       })),
     })),
-    needsPreviousListDecision: api.pendingPreviousLists.length > 0,
+    needsPreviousListDecision: (api.pendingPreviousLists ?? []).length > 0,
   };
 }
 
@@ -241,21 +241,21 @@ export function toQuizStartViewModel(api: QuizPreviewApiModel): QuizStartViewMod
 
   return {
     domainLabel: api.domain === "shortform" ? "숏폼 퀴즈" : "랜덤 퀴즈",
-    defaultFormatId: api.defaultFormat,
-    defaultFormat: formatLabel[api.defaultFormat],
+    defaultFormatId: api.defaultFormat ?? "choice",
+    defaultFormat: formatLabel[api.defaultFormat] ?? "선택형",
     formats: (["choice", "written"] as const).map((format) => ({
       id: format,
       label: formatLabel[format],
-      enabled: api.formatAvailability[format].enabled,
-      reason: api.formatAvailability[format].reason,
+      enabled: Boolean(api.formatAvailability?.[format]?.enabled),
+      reason: api.formatAvailability?.[format]?.reason ?? null,
     })),
-    plannedQuestionCount: api.plannedQuestionCount,
-    remainingCandidateCount: api.remainingCandidateCount,
-    candidates: api.candidates.map((candidate) => ({
+    plannedQuestionCount: api.plannedQuestionCount ?? 0,
+    remainingCandidateCount: api.remainingCandidateCount ?? 0,
+    candidates: (api.candidates ?? []).map((candidate) => ({
       title: candidate.title,
       included: candidate.status === "included",
       exclusionReason: candidate.exclusionReason
-        ? exclusionLabel[candidate.exclusionReason]
+        ? (exclusionLabel[candidate.exclusionReason] ?? null)
         : null,
     })),
   };
@@ -281,6 +281,7 @@ export type QuizPlayViewModel = {
     showsSemanticFeedback: boolean;
   } | null;
   resolution: {
+    articleId: string | null;
     outcomeLabel: string;
     outcome: "correct" | "incorrect" | "given-up" | "pending" | "service-excluded";
     userAnswer: string | null;
@@ -332,14 +333,15 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
       : null,
     resolution: api.resolution
       ? {
+          articleId: api.resolution.evidence?.id ?? null,
           outcomeLabel: outcomeLabel[api.resolution.outcome],
           outcome: api.resolution.outcome,
           userAnswer: api.resolution.userAnswer,
           answer: api.resolution.correctAnswer,
           explanation: api.resolution.explanation,
           evidence: mapArticleCard(api.resolution.evidence),
-          answerRef: api.resolution.answerRef,
-          quizId: api.resolution.quizId,
+          answerRef: api.resolution.answerRef ?? null,
+          quizId: api.resolution.quizId ?? api.question?.id ?? null,
         }
       : null,
   };
@@ -347,6 +349,7 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
 
 export type QuizRecapItemViewModel = {
   index: number;
+  articleId: string | null;
   prompt: string;
   outcome: QuizResolutionApiModel["outcome"];
   outcomeLabel: string;
@@ -383,9 +386,10 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
     status: api.status,
     isServiceEnded: api.status === "ended-by-service",
     summary: api.summary,
-    canStartNextRound: api.remainingCandidateCount > 0,
-    recapItems: api.explanations.map((resolution, idx) => ({
+    canStartNextRound: (api.remainingCandidateCount ?? 0) > 0,
+    recapItems: (api.explanations ?? []).map((resolution, idx) => ({
       index: idx + 1,
+      articleId: resolution.evidence?.id ?? null,
       prompt: resolution.prompt ?? resolution.evidence?.title ?? `문항 ${idx + 1}`,
       outcome: resolution.outcome,
       outcomeLabel: outcomeLabel[resolution.outcome] ?? resolution.outcome,
@@ -393,10 +397,10 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
       correctAnswer: resolution.correctAnswer,
       explanation: resolution.explanation,
       evidence: resolution.evidence ? mapArticleCard(resolution.evidence) : null,
-      answerRef: resolution.answerRef,
-      quizId: resolution.quizId,
+      answerRef: resolution.answerRef ?? null,
+      quizId: resolution.quizId ?? null,
     })),
-    explanations: api.explanations.map((resolution) => ({
+    explanations: (api.explanations ?? []).map((resolution) => ({
       outcome: resolution.outcome,
       answer: resolution.correctAnswer,
       evidenceTitle: resolution.evidence?.title ?? "",

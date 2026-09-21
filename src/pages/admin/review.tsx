@@ -14,6 +14,7 @@ import { ReviewHeader } from "@/features/admin/review-queue/review-header";
 import { SideBySideViewer } from "@/features/admin/review-queue/side-by-side-viewer";
 import { ReviewActionBar } from "@/features/admin/review-queue/review-action-bar";
 import { Spinner } from "@/components/ui/spinner";
+import { AdminError } from "@/components/admin/admin-ui";
 
 export default function AdminReviewPage() {
   const queryClient = useQueryClient();
@@ -32,14 +33,24 @@ export default function AdminReviewPage() {
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null);
 
   // 3. 현재 선택된 기사의 상세 대조 데이터 조회
-  // 첫 기사 자동 선택: 별도 effect 없이 렌더링 중 파생시켜 캐스케이드 렌더를 피한다.
+  // 첫 기사 자동 선택: 만료되지 않은(검수 가능한) 기사를 우선 선택한다.
   const activeId = queue?.items.some((item) => item.articleId === selectedArticleId)
     ? selectedArticleId!
-    : (queue?.items[0]?.articleId ?? 3);
-  const { data: reviewItem, isLoading: isItemLoading } = useQuery({
+    : (queue?.items.find((item) => item.bodyDeletionHoursRemaining > 0)?.articleId ?? queue?.items[0]?.articleId ?? 3);
+  const { data: reviewItem, isLoading: isItemLoading, isError: isItemError, refetch: refetchItem } = useQuery({
     ...adminArticleReviewQueryOptions(activeId),
     enabled: (queue?.items.length ?? 0) > 0,
   });
+  const canReview = Boolean(
+    reviewItem?.bodyRetained
+      && reviewItem.bodyText.trim()
+      && reviewItem.bodyDeletionHoursRemaining > 0,
+  );
+  const reviewBlockedReason = !reviewItem?.bodyRetained || !reviewItem?.bodyText.trim()
+    ? "원문이 없거나 이미 삭제되어 통과·재생성할 수 없습니다."
+    : reviewItem.bodyDeletionHoursRemaining <= 0
+      ? "원문 보관 기한이 지나 통과·재생성할 수 없습니다."
+      : undefined;
 
   // 4. 판정 처리 Mutation
   const decisionMutation = useMutation({
@@ -89,16 +100,7 @@ export default function AdminReviewPage() {
             <p className="text-sm text-nl-muted">검수 대기열을 불러오는 중입니다...</p>
           </div>
         ) : isQueueError || !queue ? (
-          <div className="flex min-h-[400px] flex-col items-center justify-center gap-3 text-center">
-            <p className="text-sm font-semibold text-red-600">검수 대기열을 불러오지 못했습니다.</p>
-            <button
-              type="button"
-              onClick={() => void refetchQueue()}
-              className="rounded-full bg-nl-surface border border-nl-border px-4 py-1.5 text-xs text-nl-text hover:bg-nl-subtle cursor-pointer"
-            >
-              다시 시도
-            </button>
-          </div>
+          <AdminError onRetry={() => void refetchQueue()} />
         ) : (
           <div className="space-y-6">
             {/* 상단 피드백 토스트 알림 */}
@@ -127,10 +129,15 @@ export default function AdminReviewPage() {
             />
 
             {/* B. 좌우 2열 병렬 대조 뷰 */}
-            {isItemLoading || !reviewItem ? (
+            {isItemLoading ? (
               <div className="flex min-h-[450px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface">
                 <Spinner className="h-6 w-6 text-nl-accent" />
                 <p className="text-xs text-nl-muted">기사 원문과 AI 생성물을 대조 중입니다...</p>
+              </div>
+            ) : isItemError || !reviewItem ? (
+              <div className="flex min-h-[450px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface text-center">
+                <p className="text-sm font-semibold text-red-600">기사 원문과 생성물을 불러오지 못했습니다.</p>
+                <button type="button" onClick={() => void refetchItem()} className="rounded-full border border-nl-border px-4 py-1.5 text-xs text-nl-text hover:bg-nl-subtle">다시 시도</button>
               </div>
             ) : (
               <SideBySideViewer
@@ -141,7 +148,10 @@ export default function AdminReviewPage() {
 
             {/* C. 하단 체크리스트 및 승인/반려 판정 액션 바 */}
             <ReviewActionBar
+              key={activeId}
               isSubmitting={decisionMutation.isPending}
+              canReview={canReview}
+              blockedReason={reviewBlockedReason}
               onDecision={(decision) => decisionMutation.mutate(decision)}
             />
           </div>

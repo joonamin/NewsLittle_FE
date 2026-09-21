@@ -43,7 +43,17 @@ export function AdminLoading() {
 }
 
 export function AdminError({ onRetry }: { onRetry: () => void }) {
-  return <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface"><AlertCircle className="h-8 w-8 text-nl-negative" /><p className="text-sm font-semibold text-nl-text">운영 데이터를 불러오지 못했습니다.</p><Button size="xs" variant="secondary" onClick={onRetry}>다시 시도</Button></div>;
+  return (
+    <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 rounded-xl border border-nl-border bg-nl-surface p-6 text-center">
+      <AlertCircle className="h-8 w-8 text-nl-negative" />
+      <p className="text-sm font-semibold text-nl-text">운영 데이터를 불러오지 못했습니다.</p>
+      <div className="mt-2">
+        <Button size="xs" variant="secondary" onClick={onRetry}>
+          다시 시도
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 export function AdminEmptyState({ title = "표시할 항목이 없습니다." }: { title?: string }) {
@@ -62,10 +72,10 @@ export function AuditLog({ logs }: { logs: AdminAuditLog[] }) {
   );
 }
 
-export function ConfirmActionModal({ open, title, description, confirmLabel, pending, reasonRequired = true, onClose, onConfirm }: { open: boolean; title: string; description: string; confirmLabel: string; pending?: boolean; reasonRequired?: boolean; onClose: () => void; onConfirm: (reason: string) => void }) {
+export function ConfirmActionModal({ open, title, description, confirmLabel, pending, errorMessage, confirmDisabled = false, reasonRequired = true, onClose, onConfirm }: { open: boolean; title: string; description: string; confirmLabel: string; pending?: boolean; errorMessage?: string | null; confirmDisabled?: boolean; reasonRequired?: boolean; onClose: () => void; onConfirm: (reason: string) => void }) {
   const [reason, setReason] = useState("");
   const close = () => { setReason(""); onClose(); };
-  return <Modal open={open} onClose={close} title={title} size="compact" footer={<div className="flex justify-end gap-3"><Button variant="secondary" size="s" onClick={close}>취소</Button><Button size="s" disabled={pending || (reasonRequired && !reason.trim())} onClick={() => onConfirm(reason.trim())}>{pending ? "처리 중..." : confirmLabel}</Button></div>}><p className="text-sm leading-6 text-nl-muted">{description}</p>{reasonRequired ? <label className="text-xs font-semibold text-nl-text">처리 사유 · 필수<textarea aria-label="처리 사유" value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 min-h-24 w-full rounded-lg border border-nl-border bg-nl-bg p-3 text-sm font-normal outline-none focus:border-nl-accent" placeholder="판단 근거와 처리 사유를 입력하세요." /></label> : null}<p className="text-[11px] text-nl-muted">실행 계정과 시각이 감사 로그에 자동 기록됩니다.</p></Modal>;
+  return <Modal open={open} onClose={close} title={title} size="compact" footer={<div className="flex justify-end gap-3"><Button variant="secondary" size="s" disabled={pending} onClick={close}>취소</Button><Button size="s" disabled={pending || confirmDisabled || (reasonRequired && !reason.trim())} onClick={() => onConfirm(reason.trim())}>{pending ? "처리 중..." : confirmLabel}</Button></div>}><p className="text-sm leading-6 text-nl-muted">{description}</p>{reasonRequired ? <label className="text-xs font-semibold text-nl-text">처리 사유 · 필수<textarea aria-label="처리 사유" value={reason} disabled={pending} onChange={(event) => setReason(event.target.value)} className="mt-2 min-h-24 w-full rounded-lg border border-nl-border bg-nl-bg p-3 text-sm font-normal outline-none focus:border-nl-accent disabled:opacity-60" placeholder="판단 근거와 처리 사유를 입력하세요." /></label> : null}{errorMessage ? <p role="alert" className="rounded-lg bg-nl-negative-subtle px-3 py-2 text-xs font-semibold text-nl-negative">{errorMessage}</p> : null}<p className="text-[11px] text-nl-muted">실행 계정과 시각이 감사 로그에 자동 기록됩니다.</p></Modal>;
 }
 
 export const adminInputClass = "h-10 rounded-lg border border-nl-border bg-nl-bg px-3 text-xs text-nl-text outline-none focus:border-nl-accent";

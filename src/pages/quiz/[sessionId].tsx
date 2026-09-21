@@ -512,6 +512,7 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
   const evidence = resolution.evidence;
   const positive = resolution.outcome === "correct";
   const { openReport } = useReportFlow();
+  const canReport = Boolean(session.question && resolution.answerRef);
 
   if (resolution.outcome === "service-excluded") {
     return (
@@ -564,6 +565,8 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
       {evidence && session.question ? (
         <button
           type="button"
+          disabled={!canReport}
+          title={!canReport ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
           onClick={() =>
             openReport({
               surface: "QUIZ",
@@ -575,7 +578,7 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
               defaultReason: "JUDGMENT_ERROR",
             })
           }
-          className="text-nl-micro text-nl-negative underline-offset-4 hover:underline"
+          className="text-nl-micro text-nl-negative underline-offset-4 hover:underline disabled:text-nl-muted disabled:no-underline"
         >
           판정 오류 신고
         </button>

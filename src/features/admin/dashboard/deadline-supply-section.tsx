@@ -72,7 +72,7 @@ export function DeadlineSupplySection({
         </div>
 
         <div className="mt-4 border-t border-nl-border pt-3 text-[11px] text-nl-muted">
-          본문 48시간 만료 및 파생물 30일 만료 시 시스템에 의해 자동 회수·삭제됩니다.
+          본문 7일 만료 및 파생물 30일 만료 시 시스템에 의해 자동 회수·삭제됩니다.
         </div>
       </div>
 

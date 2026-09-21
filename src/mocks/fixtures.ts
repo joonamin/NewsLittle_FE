@@ -307,28 +307,28 @@ export const randomWrittenSecondHintSessionFixture: QuizSessionApiModel = {
 };
 
 const resolution = {
+  quizId: "shortform-question-choice-1",
+  answerRef: "shortform:1",
   outcome: "correct" as const,
   userAnswer: "주말",
   correctAnswer: "주말",
   explanation: "모의 기사에서 주말 프로그램 확대를 안내했습니다.",
   semanticFeedback: null,
   evidence: firstArticle,
-  answerRef: "shortform:1",
-  quizId: "shortform-question-choice-1",
 };
 
 export const randomResolvedSessionFixture: QuizSessionApiModel = {
   ...randomSessionFixture,
   progress: { current: 1, total: 5, processed: 1 },
   resolution: {
+    quizId: "random-question-choice-1",
+    answerRef: "random:1",
     outcome: "correct",
     userAnswer: "청소년",
     correctAnswer: "청소년",
     explanation: "기사에서는 청소년을 대상으로 과학 교실 참가 신청을 받는다고 설명합니다.",
     semanticFeedback: null,
     evidence: secondArticle,
-    answerRef: "random:1",
-    quizId: "random-question-choice-1",
   },
 };
 

@@ -6,6 +6,7 @@ import type { ReportType } from "@/features/contracts/api-models";
 import { cn } from "@/lib/cn";
 
 import { useReportFlow, type ReportTarget } from "./report-flow";
+import { validateReportInput } from "./report-validation";
 
 const reasonOrder: readonly ReportType[] = [
   "CONTENT_ERROR",
@@ -48,7 +49,7 @@ export function ReportModal() {
 }
 
 function ReportModalForm({ target }: { target: ReportTarget }) {
-  const { submitted, lastResult, isPending, isError, closeReport, submitReport } = useReportFlow();
+  const { submitted, lastResult, isPending, errorMessage, closeReport, submitReport } = useReportFlow();
   const [reason, setReason] = useState<ReportType | null>(
     target.defaultReason ?? target.availableReasons[0] ?? null,
   );
@@ -65,9 +66,11 @@ function ReportModalForm({ target }: { target: ReportTarget }) {
   const canSubmit = Boolean(reason) && details.trim().length > 0 && !isPending && !judgementBlocked;
 
   const handleSubmit = async () => {
-    if (!reason || judgementBlocked) return;
-    if (requiresContact && !contact.trim()) {
-      setShowsContactError(true);
+    if (!reason) return;
+    // BE model_validator와 동일한 조건을 제출 직전에 한 번 더 확인한다(테스트로 커버됨).
+    const validationError = validateReportInput({ reportType: reason, details, contact, target });
+    if (validationError) {
+      if (requiresContact && !contact.trim()) setShowsContactError(true);
       return;
     }
     await submitReport({ reportType: reason, details: details.trim(), contact });
@@ -186,9 +189,9 @@ function ReportModalForm({ target }: { target: ReportTarget }) {
             않으면 회신 없이 처리돼요.
           </p>
 
-          {isError ? (
+          {errorMessage ? (
             <p role="alert" className="text-nl-caption text-nl-negative">
-              신고 접수에 실패했어요. 잠시 후 다시 시도해 주세요.
+              {errorMessage}
             </p>
           ) : null}
         </div>
