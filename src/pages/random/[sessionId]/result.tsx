@@ -4,8 +4,8 @@ import { type ReactNode, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
+import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
-import { ReportDialog } from "@/components/reports/report-dialog";
 import { StateNotice } from "@/components/ui/state-notice";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { AnswerComparison } from "@/components/ui/answer-comparison";
@@ -16,6 +16,7 @@ import { screenApi } from "@/features/contracts/screen-api";
 import { dehydrateScreenQueries, type DehydratedProps } from "@/features/contracts/server-prefetch";
 import type { QuizRecapItemViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useReportFlow } from "@/features/report/report-flow";
 
 type RandomQuizResultPageProps = DehydratedProps & {
   sessionId: string;
@@ -73,7 +74,6 @@ function RandomQuizResultContent({ sessionId }: { sessionId: string }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
   const [savingArticleId, setSavingArticleId] = useState<string | null>(null);
   const [savedArticleIds, setSavedArticleIds] = useState<Record<string, true>>({});
-  const [reportItem, setReportItem] = useState<QuizRecapItemViewModel | null>(null);
 
   const toggleExpand = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -194,7 +194,6 @@ function RandomQuizResultContent({ sessionId }: { sessionId: string }) {
               onSaveArticle={() => {
                 if (item.evidence) void handleSaveArticle(item.evidence.id);
               }}
-              onReport={() => setReportItem(item)}
             />
           ))}
         </div>
@@ -217,20 +216,6 @@ function RandomQuizResultContent({ sessionId }: { sessionId: string }) {
           여기서 이용을 마쳐도 괜찮아요. 정답 수는 학습 효과를 뜻하지 않아요.
         </p>
       </div>
-      {reportItem ? (
-        <ReportDialog
-          open
-          initialType="JUDGMENT_ERROR"
-          target={{
-            surface: "QUIZ",
-            articleId: reportItem.articleId ?? "",
-            articleTitle: reportItem.evidence?.title ?? "퀴즈 문항",
-            quizId: reportItem.quizId,
-            answerRef: reportItem.answerRef,
-          }}
-          onClose={() => setReportItem(null)}
-        />
-      ) : null}
     </Page>
   );
 }
@@ -242,7 +227,6 @@ function RecapRow({
   isSaving,
   onToggle,
   onSaveArticle,
-  onReport,
 }: {
   item: QuizRecapItemViewModel;
   isExpanded: boolean;
@@ -250,8 +234,8 @@ function RecapRow({
   isSaving: boolean;
   onToggle: () => void;
   onSaveArticle: () => void;
-  onReport: () => void;
 }) {
+  const { openReport } = useReportFlow();
   const outcomeColor =
     item.outcome === "correct"
       ? "text-nl-positive"
@@ -291,8 +275,8 @@ function RecapRow({
             <p className="text-nl-caption text-nl-muted leading-[1.5]">{item.explanation}</p>
           ) : null}
 
-          {item.evidence ? (
-            <div className="space-y-3 pt-1">
+          {item.evidence && item.evidence.isRestricted ? (
+            <>
               {!item.evidence.originalIsAvailable ? (
                 <StateNotice
                   title="원문을 열 수 없어요"
@@ -305,28 +289,74 @@ function RecapRow({
                 sourceName={item.evidence.sourceName}
                 publishedLabel={item.evidence.publishedLabel}
                 originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
-                summaryUnavailable={item.evidence.isRestricted}
+                summaryUnavailable
               />
-              {!item.evidence.isRestricted ? (
-                <div className="flex flex-wrap items-center gap-4">
-                  <Button
-                    variant={isSaved ? "default" : "secondary"}
-                    size="s"
-                    disabled={isSaved || isSaving}
-                    onClick={onSaveArticle}
-                  >
-                    {isSaved ? "오늘 목록에 담김" : isSaving ? "담는 중…" : "오늘 목록에 담기"}
-                  </Button>
-                </div>
+            </>
+          ) : null}
+          {item.evidence && !item.evidence.isRestricted ? (
+            <article className="space-y-3 rounded-nl-card border border-nl-border bg-nl-accent-wash p-5">
+              <p className="text-nl-micro font-bold text-nl-accent">이 문제의 뉴스</p>
+              <h3 className="text-[18px] font-bold text-nl-text">{item.evidence.title}</h3>
+
+              {item.evidence.summaryText ? (
+                <p className="text-nl-caption text-nl-muted">{item.evidence.summaryText}</p>
               ) : null}
-            </div>
+
+              {!item.evidence.originalIsAvailable ? (
+                <StateNotice
+                  title="원문을 열 수 없어요"
+                  description="현재 제공처에서 원문 접근을 지원하지 않아요. 풀이 결과는 그대로 유지됩니다."
+                  className="max-w-none"
+                />
+              ) : null}
+
+              <ArticleSourceMeta
+                sourceName={item.evidence.sourceName}
+                publishedLabel={item.evidence.publishedLabel}
+                originalUrl={item.evidence.originalIsAvailable ? item.evidence.originalUrl : null}
+                showsAiSummary={item.evidence.showsAiSummary && Boolean(item.evidence.summaryText?.trim())}
+                onReport={() => {
+                  const evidence = item.evidence;
+                  if (!evidence) return;
+                  openReport({
+                    surface: "HOME_CARD",
+                    articleId: evidence.id,
+                    targetLabel: evidence.title,
+                    availableReasons: ["CONTENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
+                  });
+                }}
+              />
+
+              <div className="flex flex-wrap items-center gap-4 pt-1">
+                <Button
+                  variant={isSaved ? "default" : "secondary"}
+                  size="s"
+                  disabled={isSaved || isSaving}
+                  onClick={onSaveArticle}
+                >
+                  {isSaved ? "오늘 목록에 담김" : isSaving ? "담는 중…" : "오늘 목록에 담기"}
+                </Button>
+              </div>
+            </article>
           ) : null}
 
           <button
             type="button"
             disabled={!item.quizId || !item.answerRef || !item.articleId}
             title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
-            onClick={onReport}
+            onClick={() => {
+              const evidence = item.evidence;
+              if (!evidence || !item.quizId) return;
+              openReport({
+                surface: "QUIZ",
+                articleId: evidence.id,
+                quizId: item.quizId,
+                answerRef: item.answerRef,
+                targetLabel: item.prompt,
+                availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
+                defaultReason: "JUDGMENT_ERROR",
+              });
+            }}
             className="text-nl-micro text-nl-negative hover:underline disabled:text-nl-muted disabled:no-underline"
           >
             판정 오류 신고

@@ -13,6 +13,7 @@ export const attributionCopy = {
   aiImageBadge: "AI 생성 이미지",
   originalLinkLabel: "원문 읽기 ↗",
   originalUnavailableLabel: "원문 접근 불가",
+  reportLabel: "신고",
   previousDateBadgeLabel: (publishedLabel: string) => `게시일 ${publishedLabel}`,
   evidenceHeading: "근거 기사",
   asOfLabel: (label: string) => `기준 시점 ${label}`,

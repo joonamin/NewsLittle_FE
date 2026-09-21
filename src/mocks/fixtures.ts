@@ -307,7 +307,7 @@ export const randomWrittenSecondHintSessionFixture: QuizSessionApiModel = {
 };
 
 const resolution = {
-  quizId: "1",
+  quizId: "shortform-question-choice-1",
   answerRef: "shortform:1",
   outcome: "correct" as const,
   userAnswer: "주말",
@@ -321,7 +321,7 @@ export const randomResolvedSessionFixture: QuizSessionApiModel = {
   ...randomSessionFixture,
   progress: { current: 1, total: 5, processed: 1 },
   resolution: {
-    quizId: "2",
+    quizId: "random-question-choice-1",
     answerRef: "random:1",
     outcome: "correct",
     userAnswer: "청소년",

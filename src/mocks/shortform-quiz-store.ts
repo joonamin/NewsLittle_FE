@@ -173,7 +173,7 @@ function sessionFromState(sessionId: string, state: SessionState): QuizSessionAp
     },
     question: article
       ? {
-          id: `shortform-question-${state.snapshot.format}-${state.index + 1}`,
+          id: questionIdFor(state.snapshot.format, state.index),
           articleId: article.id,
           articleTitle: article.title,
           kind: semanticQuestion ? "semantic" : "fact",
@@ -247,6 +247,10 @@ function stateFor(sessionId: string) {
   return created;
 }
 
+function questionIdFor(format: QuizFormat, index: number) {
+  return `shortform-question-${format}-${index + 1}`;
+}
+
 function resolutionFor(
   state: SessionState,
   outcome: QuizResolutionApiModel["outcome"],
@@ -254,8 +258,6 @@ function resolutionFor(
 ): QuizResolutionApiModel {
   const content = contentAt(state.index);
   return {
-    quizId: String(state.index + 1),
-    answerRef: `shortform:${state.index + 1}`,
     outcome,
     userAnswer,
     correctAnswer:
@@ -263,6 +265,9 @@ function resolutionFor(
     explanation: content.explanation,
     semanticFeedback: null,
     evidence: articleFor(state),
+    // 실제 판정이 있어야만(포기·서비스 제외 제외) 신고할 답변이 있다.
+    answerRef: userAnswer !== null ? `shortform:${state.index + 1}` : null,
+    quizId: questionIdFor(state.snapshot.format, state.index),
   };
 }
 
@@ -393,6 +398,8 @@ export function excludeShortformQuizQuestion(sessionId: string) {
     explanation: "이용 조건이 변경되어 문항을 제외했어요. 오답과 채점 분모에 포함하지 않아요.",
     semanticFeedback: null,
     evidence: articleFor(state),
+    answerRef: null,
+    quizId: questionIdFor(state.snapshot.format, state.index),
   };
   return structuredClone(sessionFromState(sessionId, state));
 }
@@ -466,8 +473,6 @@ export function getShortformQuizResult(sessionId: string): QuizResultApiModel {
 
     const resolution: QuizResolutionApiModel = {
       prompt: state.snapshot.format === "choice" ? content.choicePrompt : content.writtenPrompt,
-      quizId: String(idx + 1),
-      answerRef: `shortform:${idx + 1}`,
       outcome,
       userAnswer:
         outcome === "correct"
@@ -482,6 +487,8 @@ export function getShortformQuizResult(sessionId: string): QuizResultApiModel {
       explanation: content.explanation,
       semanticFeedback: null,
       evidence: articleFor({ snapshot: state.snapshot, index: idx } as SessionState),
+      answerRef: outcome === "correct" || outcome === "incorrect" ? `shortform:${idx + 1}` : null,
+      quizId: questionIdFor(state.snapshot.format, idx),
     };
     if (sessionId.includes("original-unavailable")) {
       resolution.evidence.availability.original = "unavailable";

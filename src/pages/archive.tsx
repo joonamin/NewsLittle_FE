@@ -11,6 +11,7 @@ import { screenApi } from "@/features/contracts/screen-api";
 import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
 import type { ArchiveViewModel } from "@/features/contracts/view-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useReportFlow } from "@/features/report/report-flow";
 import { useDebouncedAction } from "@/hooks/use-debounced-action";
 
 export default function ArchivePage() {
@@ -87,6 +88,7 @@ export default function ArchivePage() {
 
 function ArchiveContent() {
   const queryClient = useQueryClient();
+  const { openReport } = useReportFlow();
   const { data: archive } = useSuspenseQuery(archiveQueryOptions);
   const [expandedGroupIds, setExpandedGroupIds] = useState<Set<string>>(
     () => new Set(archive.groups.slice(0, 1).map((group) => group.id)),
@@ -151,6 +153,15 @@ function ArchiveContent() {
               expanded={expandedGroupIds.has(group.id)}
               onToggleExpanded={() => toggleGroup(group.id)}
               onDeleteItem={(id) => void runDelete(() => deleteEntry.mutateAsync(id).catch(() => undefined))}
+              onReportItem={(item) => {
+                if (!item.articleId) return;
+                openReport({
+                  surface: "ARCHIVE",
+                  articleId: item.articleId,
+                  targetLabel: item.title ?? "보관한 기사",
+                  availableReasons: ["RIGHTS", "SOURCE_UNREACHABLE"],
+                });
+              }}
             />
           </div>
         ))

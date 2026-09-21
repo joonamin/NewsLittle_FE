@@ -25,6 +25,8 @@ import type {
   QuizResultApiModel,
   QuizSessionApiModel,
   SignInWithGoogleRequest,
+  SubmitReportApiModel,
+  SubmitReportRequest,
   TodayListApiModel,
   SubmitQuizAnswerRequest,
   UpdateInterestTopicsRequest,
@@ -148,4 +150,7 @@ export const screenApi = {
         : "/api/v1/settings/records-deletion-request",
       jsonRequest("POST", { confirm: true } satisfies DeletionConfirmationRequest),
     ),
+  /** GLB-03 신고 모달(FR-14). 비회원도 호출할 수 있다. */
+  submitReport: (payload: SubmitReportRequest) =>
+    apiRequest<SubmitReportApiModel>("/api/v1/reports", jsonRequest("POST", payload)),
 };

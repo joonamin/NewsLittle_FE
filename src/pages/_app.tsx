@@ -9,6 +9,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { AppErrorFallback, ServerPrefetchedProvider } from "@/components/ui/async-boundary";
 import type { DehydratedProps } from "@/features/contracts/server-prefetch";
 import { HomeFlowProvider } from "@/features/home/home-flow";
+import { ReportFlowProvider } from "@/features/report/report-flow";
 import { createQueryClient } from "@/lib/query-client";
 import { MockingProvider } from "@/mocks/mocking-provider";
 
@@ -48,9 +49,11 @@ export default function App({ Component, pageProps }: AppProps) {
             <HydrationBoundary state={pageProps.dehydratedState}>
               <ErrorBoundary FallbackComponent={AppErrorFallback}>
                 <HomeFlowProvider>
-                  <AppShell>
-                    <Component {...pageProps} />
-                  </AppShell>
+                  <ReportFlowProvider>
+                    <AppShell>
+                      <Component {...pageProps} />
+                    </AppShell>
+                  </ReportFlowProvider>
                 </HomeFlowProvider>
               </ErrorBoundary>
             </HydrationBoundary>

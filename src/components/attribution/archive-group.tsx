@@ -15,13 +15,16 @@ import { attributionCopy } from "./copy";
  * "상태 안내" 참고). 이 컴포넌트가 아니라 페이지에서 직접 조합한다.
  *
  * 삭제는 SCR-07(FR-10·FR-15)의 계정 관리 기능이라 이 컴포넌트는 콜백만 받는다.
- * 신고는 GLB-03(아직 미구현)의 접점만 고정해 두는 자리로, 다른 화면의 "판정 오류
- * 신고"와 같은 자리표시 버튼이다.
+ * 신고는 GLB-03 전역 모달의 접점이며, 권리·원문 접근 실패만 다룬다(제목·링크만
+ * 보관하는 항목 특성상 내용 오류·판정 오류는 대상이 아니다).
  */
 export type ArchiveItemStatus = "available" | "access-failed" | "derivative-expired" | "discontinued";
 
 export type ArchiveGroupItem = {
   id: string;
+  /** 신고 대상 articleId. "discontinued"라 실제 기사를 특정할 수 없으면 null이고,
+   * 이 경우 신고 접점을 렌더링하지 않는다(BE가 articleId 없이는 신고를 받을 수 없다). */
+  articleId: string | null;
   title: string | null;
   originalUrl: string | null;
   sourceName?: string | null;
@@ -50,10 +53,19 @@ export type ArchiveGroupProps = {
   expanded?: boolean;
   onToggleExpanded?: () => void;
   onDeleteItem?: (id: string) => void;
+  onReportItem?: (item: ArchiveGroupItem) => void;
   className?: string;
 };
 
-function ArchiveItemRow({ item, onDelete }: { item: ArchiveGroupItem; onDelete?: () => void }) {
+function ArchiveItemRow({
+  item,
+  onDelete,
+  onReport,
+}: {
+  item: ArchiveGroupItem;
+  onDelete?: () => void;
+  onReport?: () => void;
+}) {
   const showsLink = item.status === "available" || item.status === "derivative-expired";
   const showsSourceLine = item.status === "available" && item.sourceName && item.publishedLabel;
   const title =
@@ -97,9 +109,15 @@ function ArchiveItemRow({ item, onDelete }: { item: ArchiveGroupItem; onDelete?:
           </Badge>
         ) : null}
       </div>
-      <button type="button" className="shrink-0 text-nl-micro text-nl-negative hover:underline">
-        신고
-      </button>
+      {item.articleId ? (
+        <button
+          type="button"
+          onClick={onReport}
+          className="shrink-0 text-nl-micro text-nl-negative hover:underline"
+        >
+          신고
+        </button>
+      ) : null}
       {onDelete ? (
         <Button variant="secondary" size="l" className="shrink-0" onClick={onDelete}>
           삭제
@@ -121,6 +139,7 @@ export function ArchiveGroup({
   expanded = true,
   onToggleExpanded,
   onDeleteItem,
+  onReportItem,
   className,
 }: ArchiveGroupProps) {
   const count = countText ?? `${items.length}개`;
@@ -159,6 +178,7 @@ export function ArchiveGroup({
                 key={item.id}
                 item={item}
                 onDelete={onDeleteItem ? () => onDeleteItem(item.id) : undefined}
+                onReport={onReportItem ? () => onReportItem(item) : undefined}
               />
             ))}
           </ul>

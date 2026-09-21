@@ -10,7 +10,6 @@ import {
 import { z } from "zod";
 
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
-import { ReportDialog } from "@/components/reports/report-dialog";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
@@ -33,6 +32,7 @@ import {
   WRITTEN_JUDGEMENT_TIMEOUT_MS,
 } from "@/features/quiz/judgement-timeout";
 import { useQuizAbandonGuard } from "@/features/quiz/use-quiz-abandon-guard";
+import { useReportFlow } from "@/features/report/report-flow";
 import { submitValidated, useValidatedForm } from "@/lib/form";
 import { ApiError } from "@/lib/api-client";
 
@@ -508,16 +508,11 @@ function JudgementIncomplete({
 }
 
 function Resolution({ session }: { session: QuizPlayViewModel }) {
-  const [reportOpen, setReportOpen] = useState(false);
   const resolution = session.resolution!;
   const evidence = resolution.evidence;
   const positive = resolution.outcome === "correct";
-
-  const articleId = session.question?.articleId ?? resolution.articleId ?? "";
-  const articleTitle = evidence?.title ?? session.question?.title ?? "퀴즈 문항";
-  const quizId = resolution.quizId ?? session.question?.quizId ?? null;
-  const answerRef = resolution.answerRef ?? null;
-  const canReport = Boolean(quizId && answerRef && articleId);
+  const { openReport } = useReportFlow();
+  const canReport = Boolean(session.question && resolution.answerRef);
 
   if (resolution.outcome === "service-excluded") {
     return (
@@ -567,29 +562,26 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
           />
         </>
       ) : null}
-      <button
-        type="button"
-        disabled={!canReport}
-        title={!canReport ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
-        onClick={() => setReportOpen(true)}
-        className="text-nl-micro text-nl-negative underline-offset-4 hover:underline disabled:text-nl-muted disabled:no-underline cursor-pointer"
-      >
-        판정 오류 신고
-      </button>
-
-      {reportOpen ? (
-        <ReportDialog
-          open
-          initialType="JUDGMENT_ERROR"
-          target={{
-            surface: "QUIZ",
-            articleId,
-            articleTitle,
-            quizId,
-            answerRef,
-          }}
-          onClose={() => setReportOpen(false)}
-        />
+      {evidence && session.question ? (
+        <button
+          type="button"
+          disabled={!canReport}
+          title={!canReport ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
+          onClick={() =>
+            openReport({
+              surface: "QUIZ",
+              articleId: evidence.id,
+              quizId: session.question!.id,
+              answerRef: resolution.answerRef,
+              targetLabel: session.question!.prompt,
+              availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
+              defaultReason: "JUDGMENT_ERROR",
+            })
+          }
+          className="text-nl-micro text-nl-negative underline-offset-4 hover:underline disabled:text-nl-muted disabled:no-underline"
+        >
+          판정 오류 신고
+        </button>
       ) : null}
     </div>
   );

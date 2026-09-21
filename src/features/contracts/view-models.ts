@@ -269,8 +269,8 @@ export type QuizPlayViewModel = {
   progress: { current: number; total: number };
   progressLabel: string;
   question: {
-    quizId: string | null;
-    articleId: string | null;
+    /** BE 신고 계약(surface=QUIZ)의 quizId. 문항 정의 자체의 id이며 세션 id와 다르다. */
+    id: string;
     title: string;
     prompt: string;
     context: string | null;
@@ -281,8 +281,6 @@ export type QuizPlayViewModel = {
     showsSemanticFeedback: boolean;
   } | null;
   resolution: {
-    quizId: string | null;
-    answerRef: string | null;
     articleId: string | null;
     outcomeLabel: string;
     outcome: "correct" | "incorrect" | "given-up" | "pending" | "service-excluded";
@@ -290,6 +288,9 @@ export type QuizPlayViewModel = {
     answer: string | null;
     explanation: string | null;
     evidence: ReturnType<typeof mapArticleCard> | null;
+    /** GLB-03 판정 오류 신고용. 판정된 답변이 없으면 null. */
+    answerRef: string | null;
+    quizId: string | null;
   } | null;
 };
 
@@ -311,8 +312,7 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
     progressLabel: `${api.progress.current}/${api.progress.total}`,
     question: api.question
       ? {
-          quizId: api.question.id ?? null,
-          articleId: api.question.articleId ?? null,
+          id: api.question.id,
           title: api.question.articleTitle,
           prompt: api.question.prompt,
           context: api.question.context,
@@ -333,15 +333,15 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
       : null,
     resolution: api.resolution
       ? {
-          quizId: api.resolution.quizId ?? api.question?.id ?? null,
-          answerRef: api.resolution.answerRef ?? null,
-          articleId: api.resolution.evidence?.id ?? api.question?.articleId ?? null,
+          articleId: api.resolution.evidence?.id ?? null,
           outcomeLabel: outcomeLabel[api.resolution.outcome],
           outcome: api.resolution.outcome,
           userAnswer: api.resolution.userAnswer,
           answer: api.resolution.correctAnswer,
           explanation: api.resolution.explanation,
           evidence: mapArticleCard(api.resolution.evidence),
+          answerRef: api.resolution.answerRef ?? null,
+          quizId: api.resolution.quizId ?? api.question?.id ?? null,
         }
       : null,
   };
@@ -350,8 +350,6 @@ export function toQuizPlayViewModel(api: QuizSessionApiModel): QuizPlayViewModel
 export type QuizRecapItemViewModel = {
   index: number;
   articleId: string | null;
-  quizId: string | null;
-  answerRef: string | null;
   prompt: string;
   outcome: QuizResolutionApiModel["outcome"];
   outcomeLabel: string;
@@ -359,6 +357,9 @@ export type QuizRecapItemViewModel = {
   correctAnswer: string | null;
   explanation: string | null;
   evidence: ReturnType<typeof mapArticleCard> | null;
+  /** GLB-03 판정 오류 신고용. 결과 화면은 question 객체가 없어 이 필드가 유일한 quizId 출처다. */
+  answerRef: string | null;
+  quizId: string | null;
 };
 
 export type QuizResultViewModel = {
@@ -389,8 +390,6 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
     recapItems: (api.explanations ?? []).map((resolution, idx) => ({
       index: idx + 1,
       articleId: resolution.evidence?.id ?? null,
-      quizId: resolution.quizId ?? null,
-      answerRef: resolution.answerRef ?? null,
       prompt: resolution.prompt ?? resolution.evidence?.title ?? `문항 ${idx + 1}`,
       outcome: resolution.outcome,
       outcomeLabel: outcomeLabel[resolution.outcome] ?? resolution.outcome,
@@ -398,6 +397,8 @@ export function toQuizResultViewModel(api: QuizResultApiModel): QuizResultViewMo
       correctAnswer: resolution.correctAnswer,
       explanation: resolution.explanation,
       evidence: resolution.evidence ? mapArticleCard(resolution.evidence) : null,
+      answerRef: resolution.answerRef ?? null,
+      quizId: resolution.quizId ?? null,
     })),
     explanations: (api.explanations ?? []).map((resolution) => ({
       outcome: resolution.outcome,
@@ -415,6 +416,12 @@ export type ArchiveViewModel = {
     title: string | null;
     items: Array<{
       id: string;
+      /**
+       * 보관 항목이 가리키는 실제 기사 id(BE 신고 계약의 articleId). 항목 자체의
+       * id(entry.id)와는 다르다. "이용 중단"(article이 null)이면 신고 대상 기사를
+       * 특정할 수 없어 null — 이 경우 신고 접점을 비활성화해야 한다.
+       */
+      articleId: string | null;
       title: string | null;
       originalUrl: string | null;
       sourceName: string | null;
@@ -434,6 +441,7 @@ export function toArchiveViewModel(api: ArchiveApiModel): ArchiveViewModel {
       title: group.title ?? null,
       items: group.entries.map((entry) => ({
         id: entry.id,
+        articleId: entry.article?.id ?? null,
         title: entry.article?.title ?? null,
         originalUrl: entry.article?.source.originalUrl ?? null,
         discontinuedReason: entry.discontinuedReason ?? null,

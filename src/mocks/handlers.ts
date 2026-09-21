@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from "msw";
 
-import type { TopicCode } from "@/features/contracts/api-models";
+import type { SubmitReportRequest, TopicCode } from "@/features/contracts/api-models";
 
 import { randomPreviewFixture } from "./fixtures";
 import { mockHomeStore } from "./home-store";
@@ -31,11 +31,9 @@ import { mockAdminReviewStore } from "./admin-review-store";
 import { mockAdminDashboardStore } from "./admin-dashboard-store";
 import { mockAdminOperationsStore } from "./admin-operations-store";
 import type { ReportClassification, ReviewDecisionRequest, UsageBasisStatusV2 } from "@/features/contracts/admin-models";
-import type { CreateReportRequest } from "@/features/reports/report-models";
 
 const api = "/api/v1";
 const timedOutShortformSessions = new Set<string>();
-let nextReportId = 100;
 
 function successResponse<T>(data: T, init?: ResponseInit) {
   return HttpResponse.json({ data, meta: { requestId: "mock-request-id" } }, init);
@@ -240,31 +238,48 @@ export const handlers = [
       return failureResponse(error);
     }
   }),
-
+  /**
+   * GLB-03 신고 접수(FR-14). BE `newslittle.modules.reports.schemas.CreateReportRequest`의
+   * model_validator(권리는 연락 경로 필수, quizId는 surface=QUIZ일 때만·반드시,
+   * answerRef는 JUDGMENT_ERROR일 때만·반드시, JUDGMENT_ERROR는 surface=QUIZ여야 함)를
+   * 그대로 흉내낸다 — 로컬에서도 같은 조건으로 422가 나야 계약 어긋남을 바로 잡을 수 있다.
+   */
   http.post(`${api}/reports`, async ({ request }) => {
-    const payload = (await request.json()) as CreateReportRequest;
-    if (!payload.details?.trim()) return failureResponse(new Error("VALIDATION_ERROR"));
+    const payload = (await request.json().catch(() => null)) as Partial<SubmitReportRequest> | null;
+    if (!payload?.reportType || !payload.surface || !payload.articleId || !payload.details?.trim()) {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
     if (payload.reportType === "RIGHTS" && !payload.contact?.trim()) {
       return failureResponse(new Error("VALIDATION_ERROR"));
     }
-    if (payload.surface === "QUIZ" && !payload.quizId) {
+    if ((payload.surface === "QUIZ") !== Boolean(payload.quizId)) {
       return failureResponse(new Error("VALIDATION_ERROR"));
     }
-    if (payload.reportType === "JUDGMENT_ERROR" && !payload.answerRef) {
+    if ((payload.reportType === "JUDGMENT_ERROR") !== Boolean(payload.answerRef)) {
       return failureResponse(new Error("VALIDATION_ERROR"));
     }
-    nextReportId += 1;
-    return successResponse({
-      id: String(nextReportId),
-      reportType: payload.reportType,
-      surface: payload.surface,
-      status: "RECEIVED" as const,
-      contactProvided: Boolean(payload.contact?.trim()),
-      judgmentAttachment: payload.answerRef
-        ? { answerRef: payload.answerRef, submittedAnswer: "모의 답변", quizVersion: 1, judgeVersion: "mock-v1" }
-        : null,
-      createdAt: new Date().toISOString(),
-    });
+    if (payload.reportType === "JUDGMENT_ERROR" && payload.surface !== "QUIZ") {
+      return failureResponse(new Error("VALIDATION_ERROR"));
+    }
+    return successResponse(
+      {
+        id: `mock-report-${Date.now()}`,
+        reportType: payload.reportType,
+        surface: payload.surface,
+        status: "RECEIVED",
+        contactProvided: Boolean(payload.contact?.trim()),
+        judgmentAttachment: payload.answerRef
+          ? {
+              answerRef: payload.answerRef,
+              submittedAnswer: "모의 답변",
+              quizVersion: 1,
+              judgeVersion: "mock-judge-v1",
+            }
+          : null,
+        createdAt: new Date().toISOString(),
+      },
+      { status: 201 },
+    );
   }),
 
   // ADM-01 운영 대시보드

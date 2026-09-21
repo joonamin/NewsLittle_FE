@@ -7,6 +7,7 @@ import { GlobalNav } from "@/components/ui/global-nav";
 import { GoogleSignIn } from "@/components/ui/google-sign-in";
 import { Modal } from "@/components/ui/modal";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { ReportModal } from "@/features/report/report-modal";
 import { useDebouncedAction } from "@/hooks/use-debounced-action";
 
 import { MobileNotice } from "./mobile-notice";
@@ -135,6 +136,8 @@ export function AppShell({ children }: AppShellProps) {
         >
           <p className="text-nl-body text-nl-muted">아카이브와 회원 기능을 이용하려면 로그인해 주세요.</p>
         </Modal>
+
+        <ReportModal />
       </div>
     </>
   );

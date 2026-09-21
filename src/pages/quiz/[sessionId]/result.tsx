@@ -5,7 +5,6 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { EvidenceAttribution } from "@/components/attribution/evidence-attribution";
-import { ReportDialog } from "@/components/reports/report-dialog";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
@@ -15,8 +14,8 @@ import { quizResultQueryOptions } from "@/features/contracts/query-keys";
 import { screenApi } from "@/features/contracts/screen-api";
 import { dehydrateScreenQueries, type DehydratedProps } from "@/features/contracts/server-prefetch";
 import type { QuizRecapItemViewModel } from "@/features/contracts/view-models";
-import type { UserReportType } from "@/features/reports/report-models";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useReportFlow } from "@/features/report/report-flow";
 
 type QuizResultPageProps = DehydratedProps & {
   sessionId: string;
@@ -72,10 +71,6 @@ function QuizResultContent({ sessionId }: { sessionId: string }) {
   const { data: result } = useSuspenseQuery(quizResultQueryOptions("shortform", sessionId));
   const { home } = useHomeFlow();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
-  const [reportSelection, setReportSelection] = useState<{
-    item: QuizRecapItemViewModel;
-    type: UserReportType;
-  } | null>(null);
 
   const toggleExpand = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -170,7 +165,6 @@ function QuizResultContent({ sessionId }: { sessionId: string }) {
               item={item}
               isExpanded={expandedIndex === idx}
               onToggle={() => toggleExpand(idx)}
-              onReport={(type) => setReportSelection({ item, type })}
             />
           ))}
         </div>
@@ -201,20 +195,6 @@ function QuizResultContent({ sessionId }: { sessionId: string }) {
           여기서 이용을 마쳐도 괜찮아요. 정답 수는 학습 효과를 뜻하지 않아요.
         </p>
       </div>
-      {reportSelection ? (
-        <ReportDialog
-          open
-          initialType={reportSelection.type}
-          target={{
-            surface: "QUIZ",
-            articleId: reportSelection.item.articleId ?? "",
-            articleTitle: reportSelection.item.evidence?.title ?? "퀴즈 문항",
-            quizId: reportSelection.item.quizId,
-            answerRef: reportSelection.item.answerRef,
-          }}
-          onClose={() => setReportSelection(null)}
-        />
-      ) : null}
     </Page>
   );
 }
@@ -223,13 +203,24 @@ function RecapRow({
   item,
   isExpanded,
   onToggle,
-  onReport,
 }: {
   item: QuizRecapItemViewModel;
   isExpanded: boolean;
   onToggle: () => void;
-  onReport: (type: UserReportType) => void;
 }) {
+  const { openReport } = useReportFlow();
+  const openQuestionReport = (defaultReason: "JUDGMENT_ERROR" | "CONTENT_ERROR") => {
+    if (!item.evidence || !item.quizId) return;
+    openReport({
+      surface: "QUIZ",
+      articleId: item.evidence.id,
+      quizId: item.quizId,
+      answerRef: item.answerRef,
+      targetLabel: item.prompt,
+      availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
+      defaultReason,
+    });
+  };
   const outcomeColor =
     item.outcome === "correct"
       ? "text-nl-positive"
@@ -302,7 +293,7 @@ function RecapRow({
               type="button"
               disabled={!item.quizId || !item.answerRef || !item.articleId}
               title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
-              onClick={() => onReport("JUDGMENT_ERROR")}
+              onClick={() => openQuestionReport("JUDGMENT_ERROR")}
               className="text-nl-micro text-nl-negative hover:underline disabled:text-nl-muted disabled:no-underline"
             >
               판정 오류 신고
@@ -311,7 +302,7 @@ function RecapRow({
               type="button"
               disabled={!item.quizId || !item.articleId}
               title={!item.quizId ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
-              onClick={() => onReport("CONTENT_ERROR")}
+              onClick={() => openQuestionReport("CONTENT_ERROR")}
               className="text-nl-micro text-nl-muted hover:underline disabled:no-underline"
             >
               내용 오류 신고

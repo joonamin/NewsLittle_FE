@@ -5,7 +5,6 @@ import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-q
 import { z } from "zod";
 
 import { ArticleSourceMeta } from "@/components/attribution/article-source-meta";
-import { ReportDialog } from "@/components/reports/report-dialog";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { AnswerComparison } from "@/components/ui/answer-comparison";
 import { Button } from "@/components/ui/button";
@@ -25,6 +24,7 @@ import {
   WRITTEN_JUDGEMENT_TIMEOUT_MS,
 } from "@/features/quiz/judgement-timeout";
 import { useQuizAbandonGuard } from "@/features/quiz/use-quiz-abandon-guard";
+import { useReportFlow } from "@/features/report/report-flow";
 import { submitValidated, useValidatedForm } from "@/lib/form";
 
 type RandomQuizPlayPageProps = DehydratedProps & { sessionId: string };
@@ -273,6 +273,7 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
   const evidence = resolution.evidence;
   const positive = resolution.outcome === "correct";
   const { home, requestArticleSelection } = useHomeFlow();
+  const { openReport } = useReportFlow();
   const [isSaving, setIsSaving] = useState(false);
   const [savedLocally, setSavedLocally] = useState(false);
   const isSaved =
@@ -290,12 +291,7 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
     }
   };
 
-  const [reportOpen, setReportOpen] = useState(false);
-  const articleId = session.question?.articleId ?? resolution.articleId ?? evidence?.id ?? "";
-  const articleTitle = evidence?.title ?? session.question?.title ?? "랜덤 퀴즈 문항";
-  const quizId = resolution.quizId ?? session.question?.quizId ?? null;
-  const answerRef = resolution.answerRef ?? null;
-  const canReport = Boolean(quizId && answerRef && articleId);
+  const canReport = Boolean(session.question && resolution.answerRef);
 
   return (
     <>
@@ -318,6 +314,14 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
               publishedLabel={evidence.publishedLabel}
               originalUrl={evidence.originalIsAvailable ? evidence.originalUrl : null}
               showsAiSummary={evidence.showsAiSummary && Boolean(evidence.summaryText?.trim())}
+              onReport={() =>
+                openReport({
+                  surface: "HOME_CARD",
+                  articleId: evidence.id,
+                  targetLabel: evidence.title,
+                  availableReasons: ["CONTENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
+                })
+              }
             />
             <div className="flex flex-wrap items-center gap-4">
               <Button variant={isSaved ? "default" : "secondary"} size="s" disabled={isSaved || isSaving} onClick={() => void saveArticle()}>
@@ -326,29 +330,26 @@ function Resolution({ session }: { session: QuizPlayViewModel }) {
             </div>
           </article>
         ) : null}
-        <button
-          type="button"
-          disabled={!canReport}
-          title={!canReport ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
-          onClick={() => setReportOpen(true)}
-          className="text-nl-micro text-nl-negative underline-offset-4 hover:underline disabled:text-nl-muted disabled:no-underline cursor-pointer"
-        >
-          판정 오류 신고
-        </button>
-
-        {reportOpen ? (
-          <ReportDialog
-            open
-            initialType="JUDGMENT_ERROR"
-            target={{
-              surface: "QUIZ",
-              articleId,
-              articleTitle,
-              quizId,
-              answerRef,
-            }}
-            onClose={() => setReportOpen(false)}
-          />
+        {evidence && session.question ? (
+          <button
+            type="button"
+            disabled={!canReport}
+            title={!canReport ? "서버에서 문항 식별자를 받지 못해 현재 신고할 수 없습니다." : undefined}
+            onClick={() =>
+              openReport({
+                surface: "QUIZ",
+                articleId: evidence.id,
+                quizId: session.question!.id,
+                answerRef: resolution.answerRef,
+                targetLabel: session.question!.prompt,
+                availableReasons: ["JUDGMENT_ERROR", "CONTENT_ERROR"],
+                defaultReason: "JUDGMENT_ERROR",
+              })
+            }
+            className="text-nl-micro text-nl-negative underline-offset-4 hover:underline disabled:text-nl-muted disabled:no-underline"
+          >
+            판정 오류 신고
+          </button>
         ) : null}
       </section>
     </>

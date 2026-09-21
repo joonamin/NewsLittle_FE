@@ -13,6 +13,7 @@ const meta = {
     items: [
       {
         id: "archive-library-program",
+        articleId: "article-library-program",
         title: "모의 기사: 지역 공공도서관이 주말 프로그램을 확대합니다",
         originalUrl: "https://example.com/articles/library-program",
         sourceName: "데모 뉴스",
@@ -21,18 +22,22 @@ const meta = {
       },
       {
         id: "archive-access-failed",
+        articleId: "article-science-class",
         title: "모의 기사: 청소년 과학 교실의 참가 신청이 시작됐습니다",
         originalUrl: null,
         status: "access-failed" as const,
       },
       {
         id: "archive-derivative-expired",
+        articleId: "article-urban-trees",
         title: "모의 기사: 도심의 열을 낮추는 나무, 그늘 이상의 역할",
         originalUrl: "https://example.com/articles/urban-trees",
         status: "derivative-expired" as const,
       },
       {
         id: "archive-discontinued",
+        // 이용 중단은 article이 null로 내려와 실제 기사를 특정할 수 없다 — 신고 버튼도 없다.
+        articleId: null,
         title: null,
         originalUrl: null,
         status: "discontinued" as const,
@@ -57,7 +62,8 @@ export const Default: Story = {
     await expect(canvas.getByText("요약·퀴즈 연결 없음")).toBeVisible();
     await expect(canvas.getByText("이용 중단")).toBeVisible();
     await expect(canvas.getByText("이용 중단으로 표시가 제한된 기사")).toBeVisible();
-    await expect(canvas.getAllByRole("button", { name: "신고" })).toHaveLength(4);
+    // 이용 중단 항목은 article이 없어 신고 대상을 특정할 수 없다 — 4개 중 3개만 신고 버튼을 보인다.
+    await expect(canvas.getAllByRole("button", { name: "신고" })).toHaveLength(3);
 
     const deleteButtons = canvas.getAllByRole("button", { name: "삭제" });
     await expect(deleteButtons).toHaveLength(4);
@@ -88,6 +94,7 @@ export const DiscontinuedIgnoresSuppliedTitle: Story = {
     items: [
       {
         id: "archive-discontinued-with-title",
+        articleId: null,
         title: "호출부가 실수로 넘긴 실제 제목",
         originalUrl: "https://example.com/should-not-render",
         sourceName: "데모 뉴스",
@@ -111,6 +118,7 @@ export const DiscontinuedWithCustomReason: Story = {
     items: [
       {
         id: "archive-metadata-terms-ended",
+        articleId: null,
         title: null,
         originalUrl: null,
         status: "discontinued" as const,
@@ -118,6 +126,7 @@ export const DiscontinuedWithCustomReason: Story = {
       },
       {
         id: "archive-provider-requested",
+        articleId: null,
         title: null,
         originalUrl: null,
         status: "discontinued" as const,
@@ -143,7 +152,7 @@ export const WithoutDeleteCallback: Story = {
     const canvas = within(canvasElement);
 
     await expect(canvas.queryByRole("button", { name: "삭제" })).not.toBeInTheDocument();
-    await expect(canvas.getAllByRole("button", { name: "신고" })).toHaveLength(4);
+    await expect(canvas.getAllByRole("button", { name: "신고" })).toHaveLength(3);
   },
 };
 

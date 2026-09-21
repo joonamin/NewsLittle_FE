@@ -95,8 +95,6 @@ export function getRandomQuizResult(sessionId: string): QuizResultApiModel {
 
     return {
       prompt,
-      quizId: `random-question-${state.format}-${i + 1}`,
-      answerRef: outcome === "service-excluded" ? null : `random:${i + 1}`,
       outcome,
       userAnswer,
       correctAnswer: outcome === "service-excluded" ? null : answer,
@@ -105,6 +103,8 @@ export function getRandomQuizResult(sessionId: string): QuizResultApiModel {
         : `${summary} 정답은 ‘${answer}’입니다.`,
       semanticFeedback: null,
       evidence: articles[i],
+      answerRef: outcome === "correct" || outcome === "incorrect" ? `random:${i + 1}` : null,
+      quizId: `random-question-${state.format}-${i + 1}`,
     };
   });
 

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 
 import { ArticleGesture } from "@/components/ui/article-gesture";
-import { ReportDialog } from "@/components/reports/report-dialog";
 import { AsyncBoundary } from "@/components/ui/async-boundary";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
@@ -16,6 +15,7 @@ import { feedInfiniteQueryOptions, homeQueryOptions } from "@/features/contracts
 import { screenApi } from "@/features/contracts/screen-api";
 import { dehydrateScreenQueries } from "@/features/contracts/server-prefetch";
 import { useHomeFlow } from "@/features/home/home-flow";
+import { useReportFlow } from "@/features/report/report-flow";
 
 export default function HomePage() {
   const router = useRouter();
@@ -62,8 +62,8 @@ function HomeContent() {
     previousListDecision,
     previousListError,
   } = useHomeFlow();
+  const { openReport } = useReportFlow();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [reportArticleId, setReportArticleId] = useState<string | null>(null);
 
   const allCards = useMemo(
     () => feedData?.pages.flatMap((page) => page.cards) ?? home.feed.cards,
@@ -124,7 +124,16 @@ function HomeContent() {
                 }
                 await requestArticleSelection(card.id);
               }}
-              onReport={() => setReportArticleId(card.id)}
+              onReport={() =>
+                openReport({
+                  surface: "HOME_CARD",
+                  articleId: card.id,
+                  targetLabel: card.title,
+                  // 홈 카드는 퀴즈 컨텍스트가 없어 판정 오류를 신고할 대상 자체가
+                  // 없다 — 항상 막히는 유형이라 아예 노출하지 않는다.
+                  availableReasons: ["CONTENT_ERROR", "RIGHTS", "SOURCE_UNREACHABLE"],
+                })
+              }
             />
           ) : <LoadingState title="표시할 뉴스가 없어요" />}
           <div className="mt-4 flex items-center justify-center gap-3 text-[11px] text-nl-muted md:hidden">
@@ -149,17 +158,6 @@ function HomeContent() {
           onStartQuiz={() => void router.push("/quiz")}
         />
       </div>
-      {reportArticleId ? (
-        <ReportDialog
-          open
-          target={{
-            surface: "HOME_CARD",
-            articleId: reportArticleId,
-            articleTitle: allCards.find((item) => item.id === reportArticleId)?.title ?? "뉴스 기사",
-          }}
-          onClose={() => setReportArticleId(null)}
-        />
-      ) : null}
       <Modal
         open={home.needsPreviousListDecision}
         onClose={() => undefined}

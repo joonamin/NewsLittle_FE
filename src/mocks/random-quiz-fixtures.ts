@@ -68,6 +68,9 @@ export function randomQuizSession(format: QuizFormat, index = 0, resolutionInput
       explanation: `${article.summary.text} 정답은 ‘${answer}’입니다.`,
       semanticFeedback: null,
       evidence: article,
+      // 실제 판정이 있어야만(포기·서비스 제외 제외) 신고할 답변이 있다.
+      answerRef: resolutionInput.userAnswer !== null ? `random:${index + 1}` : null,
+      quizId: `random-question-${format}-${index + 1}`,
     } : null,
   };
 }

@@ -14,6 +14,8 @@ export type ArticleSourceMetaProps = {
   publishedLabel: string;
   originalUrl: string | null;
   showsAiSummary: boolean;
+  /** GLB-03 신고 접점. 생략하면 이 메타 행에는 신고 링크를 표시하지 않는다. */
+  onReport?: () => void;
   className?: string;
 };
 
@@ -22,6 +24,7 @@ export function ArticleSourceMeta({
   publishedLabel,
   originalUrl,
   showsAiSummary,
+  onReport,
   className,
 }: ArticleSourceMetaProps) {
   return (
@@ -37,6 +40,11 @@ export function ArticleSourceMeta({
         <span className="text-nl-micro text-nl-muted">{attributionCopy.originalUnavailableLabel}</span>
       )}
       {showsAiSummary ? <Badge tone="accent">{attributionCopy.aiSummaryBadge}</Badge> : null}
+      {onReport ? (
+        <button type="button" onClick={onReport} className="text-nl-micro text-nl-negative">
+          {attributionCopy.reportLabel}
+        </button>
+      ) : null}
     </div>
   );
 }
